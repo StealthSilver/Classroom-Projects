@@ -58,7 +58,7 @@ def main():
 
     start = html.index(start_marker) + len(start_marker)
     end = html.index(end_marker)
-    if start >= end:
+    if start > end:
         raise RuntimeError("The model-weight markers are in the wrong order.")
     html = html[:start] + encoded_weights + html[end:]
     HTML_PATH.write_text(html, encoding="utf-8")
