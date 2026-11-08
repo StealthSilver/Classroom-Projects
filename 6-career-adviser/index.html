@@ -1,0 +1,1744 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pathfinder – AI Career Suggestion System</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      /* =====================================================================
+   1. DESIGN TOKENS  (change colours here and the whole app changes)
+   ===================================================================== */
+      :root {
+        --bg: #07070d;
+        --surface: rgba(255, 255, 255, 0.04);
+        --surface-hover: rgba(255, 255, 255, 0.08);
+        --border: rgba(255, 255, 255, 0.09);
+        --text: #f2f3f8;
+        --muted: #9a9db0;
+        --accent-1: #8b5cf6; /* violet */
+        --accent-2: #22d3ee; /* cyan   */
+        --gradient: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+        --radius: 18px;
+        --font:
+          "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: var(--font);
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+        overflow-x: hidden;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      /* Soft glowing blobs in the background */
+      body::before,
+      body::after {
+        content: "";
+        position: fixed;
+        width: 520px;
+        height: 520px;
+        border-radius: 50%;
+        filter: blur(120px);
+        opacity: 0.25;
+        z-index: -1;
+        animation: float 14s ease-in-out infinite alternate;
+      }
+      body::before {
+        background: var(--accent-1);
+        top: -160px;
+        left: -140px;
+      }
+      body::after {
+        background: var(--accent-2);
+        bottom: -180px;
+        right: -140px;
+        animation-delay: -6s;
+      }
+      @keyframes float {
+        to {
+          transform: translate(60px, 40px) scale(1.1);
+        }
+      }
+
+      /* =====================================================================
+   2. LAYOUT
+   ===================================================================== */
+      .app {
+        max-width: 760px;
+        margin: 0 auto;
+        padding: 24px 20px 80px;
+      }
+
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 48px;
+      }
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 800;
+        font-size: 1.15rem;
+        letter-spacing: -0.02em;
+      }
+      .logo-mark {
+        width: 32px;
+        height: 32px;
+        border-radius: 10px;
+        background: var(--gradient);
+        display: grid;
+        place-items: center;
+        font-size: 1rem;
+      }
+      .header-right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .pill {
+        font-size: 0.78rem;
+        color: var(--muted);
+        padding: 7px 12px;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        background: var(--surface);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        transition: 0.2s;
+      }
+      .pill:hover {
+        background: var(--surface-hover);
+        color: var(--text);
+      }
+      .dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #f59e0b;
+      }
+      .dot.on {
+        background: #34d399;
+        box-shadow: 0 0 8px #34d399;
+      }
+
+      .screen {
+        display: none;
+        animation: fadeUp 0.5s ease both;
+      }
+      .screen.active {
+        display: block;
+      }
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(16px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+
+      /* =====================================================================
+   3. BUTTONS
+   ===================================================================== */
+      .btn {
+        font-family: inherit;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        border-radius: 14px;
+        padding: 15px 28px;
+        transition: 0.2s;
+      }
+      .btn-primary {
+        background: var(--gradient);
+        color: #fff;
+        box-shadow: 0 10px 30px -10px var(--accent-1);
+      }
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 14px 34px -10px var(--accent-1);
+      }
+      .btn-ghost {
+        background: var(--surface);
+        color: var(--text);
+        border: 1px solid var(--border);
+      }
+      .btn-ghost:hover {
+        background: var(--surface-hover);
+      }
+
+      /* =====================================================================
+   4. HOME SCREEN
+   ===================================================================== */
+      .hero {
+        text-align: center;
+        padding-top: 30px;
+      }
+      .badge {
+        display: inline-block;
+        font-size: 0.78rem;
+        font-weight: 600;
+        padding: 7px 14px;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        background: var(--surface);
+        color: var(--accent-2);
+        margin-bottom: 26px;
+      }
+      .hero h1 {
+        font-size: clamp(2.4rem, 7vw, 4rem);
+        font-weight: 800;
+        line-height: 1.05;
+        letter-spacing: -0.04em;
+        margin-bottom: 20px;
+      }
+      .gradient-text {
+        background: var(--gradient);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+      .hero p {
+        color: var(--muted);
+        font-size: 1.1rem;
+        line-height: 1.6;
+        max-width: 500px;
+        margin: 0 auto 36px;
+      }
+
+      .features {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-top: 56px;
+      }
+      .feature {
+        padding: 20px;
+        border: 1px solid var(--border);
+        background: var(--surface);
+        border-radius: var(--radius);
+        text-align: left;
+      }
+      .feature .icon {
+        font-size: 1.4rem;
+        margin-bottom: 10px;
+      }
+      .feature b {
+        display: block;
+        margin-bottom: 4px;
+        font-size: 0.95rem;
+      }
+      .feature span {
+        color: var(--muted);
+        font-size: 0.85rem;
+        line-height: 1.5;
+      }
+
+      /* =====================================================================
+   5. QUIZ SCREEN
+   ===================================================================== */
+      .progress-wrap {
+        margin-bottom: 36px;
+      }
+      .progress-top {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.85rem;
+        color: var(--muted);
+        margin-bottom: 10px;
+      }
+      .progress-bar {
+        height: 5px;
+        background: var(--surface-hover);
+        border-radius: 99px;
+        overflow: hidden;
+      }
+      .progress-fill {
+        height: 100%;
+        width: 0;
+        background: var(--gradient);
+        border-radius: 99px;
+        transition: width 0.4s ease;
+      }
+
+      .question {
+        font-size: clamp(1.5rem, 4.5vw, 2.1rem);
+        font-weight: 700;
+        letter-spacing: -0.03em;
+        line-height: 1.2;
+        margin-bottom: 28px;
+      }
+
+      .options {
+        display: grid;
+        gap: 12px;
+      }
+      .option {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        text-align: left;
+        width: 100%;
+        font-family: inherit;
+        font-size: 1rem;
+        color: var(--text);
+        cursor: pointer;
+        padding: 18px 20px;
+        border-radius: var(--radius);
+        background: var(--surface);
+        border: 1px solid var(--border);
+        transition: 0.18s;
+      }
+      .option:hover {
+        background: var(--surface-hover);
+        transform: translateX(4px);
+        border-color: rgba(139, 92, 246, 0.5);
+      }
+      .option.selected {
+        border-color: var(--accent-2);
+        background: rgba(34, 211, 238, 0.08);
+      }
+      .option .o-icon {
+        font-size: 1.5rem;
+      }
+      .option .o-key {
+        margin-left: auto;
+        font-size: 0.75rem;
+        color: var(--muted);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 2px 8px;
+      }
+
+      .quiz-nav {
+        margin-top: 28px;
+      }
+
+      /* =====================================================================
+   6. LOADING SCREEN
+   ===================================================================== */
+      .loader {
+        text-align: center;
+        padding-top: 90px;
+      }
+      .orb {
+        width: 90px;
+        height: 90px;
+        margin: 0 auto 36px;
+        border-radius: 50%;
+        background: var(--gradient);
+        animation: pulse 1.6s ease-in-out infinite;
+        box-shadow: 0 0 60px var(--accent-1);
+      }
+      @keyframes pulse {
+        50% {
+          transform: scale(1.25);
+          box-shadow: 0 0 90px var(--accent-2);
+        }
+      }
+      .loader h2 {
+        font-size: 1.6rem;
+        letter-spacing: -0.03em;
+        margin-bottom: 10px;
+      }
+      .loader p {
+        color: var(--muted);
+        min-height: 1.5em;
+      }
+
+      /* =====================================================================
+   7. RESULTS SCREEN
+   ===================================================================== */
+      .results-head h2 {
+        font-size: clamp(1.8rem, 5vw, 2.6rem);
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        margin-bottom: 8px;
+      }
+      .source-tag {
+        font-size: 0.8rem;
+        color: var(--muted);
+        margin-bottom: 20px;
+      }
+      .summary-card {
+        padding: 22px;
+        border-radius: var(--radius);
+        border: 1px solid var(--border);
+        background: linear-gradient(
+          135deg,
+          rgba(139, 92, 246, 0.12),
+          rgba(34, 211, 238, 0.08)
+        );
+        line-height: 1.65;
+        margin-bottom: 18px;
+      }
+      .traits {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 30px;
+      }
+      .trait {
+        font-size: 0.82rem;
+        padding: 7px 13px;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        background: var(--surface);
+      }
+
+      .career {
+        border: 1px solid var(--border);
+        background: var(--surface);
+        border-radius: var(--radius);
+        margin-bottom: 12px;
+        overflow: hidden;
+        transition: 0.2s;
+      }
+      .career:hover {
+        border-color: rgba(139, 92, 246, 0.5);
+      }
+      .career summary {
+        list-style: none;
+        cursor: pointer;
+        padding: 18px 20px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+      .career summary::-webkit-details-marker {
+        display: none;
+      }
+      .rank {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: var(--muted);
+        width: 22px;
+      }
+      .c-emoji {
+        font-size: 1.7rem;
+      }
+      .c-main {
+        flex: 1;
+        min-width: 0;
+      }
+      .c-title {
+        font-weight: 700;
+        font-size: 1.05rem;
+        letter-spacing: -0.02em;
+        margin-bottom: 8px;
+      }
+      .match-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .match-bar {
+        flex: 1;
+        height: 5px;
+        border-radius: 99px;
+        background: var(--surface-hover);
+        overflow: hidden;
+      }
+      .match-fill {
+        height: 100%;
+        width: 0;
+        background: var(--gradient);
+        border-radius: 99px;
+        transition: width 1s cubic-bezier(0.2, 0.8, 0.2, 1);
+      }
+      .match-num {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--accent-2);
+        width: 44px;
+        text-align: right;
+      }
+      .chev {
+        color: var(--muted);
+        transition: transform 0.2s;
+      }
+      .career[open] .chev {
+        transform: rotate(180deg);
+      }
+
+      .c-body {
+        padding: 0 20px 22px 58px;
+        color: var(--muted);
+        line-height: 1.65;
+        font-size: 0.95rem;
+      }
+      .c-body h4 {
+        color: var(--text);
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin: 16px 0 8px;
+      }
+      .skills {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .skill {
+        font-size: 0.8rem;
+        padding: 5px 11px;
+        border-radius: 8px;
+        background: rgba(139, 92, 246, 0.14);
+        color: #c4b5fd;
+      }
+
+      .result-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: 30px;
+      }
+
+      /* =====================================================================
+   8. SETTINGS DIALOG + TOAST
+   ===================================================================== */
+      dialog {
+        margin: auto;
+        border: 1px solid var(--border);
+        border-radius: 22px;
+        padding: 28px;
+        background: #11111c;
+        color: var(--text);
+        width: min(440px, 92vw);
+        font-family: var(--font);
+      }
+      dialog::backdrop {
+        background: rgba(0, 0, 0, 0.65);
+        backdrop-filter: blur(4px);
+      }
+      dialog h3 {
+        font-size: 1.3rem;
+        margin-bottom: 6px;
+        letter-spacing: -0.02em;
+      }
+      dialog p.sub {
+        color: var(--muted);
+        font-size: 0.88rem;
+        line-height: 1.55;
+        margin-bottom: 20px;
+      }
+      label {
+        display: block;
+        font-size: 0.8rem;
+        color: var(--muted);
+        margin: 14px 0 6px;
+      }
+      select,
+      input {
+        width: 100%;
+        font-family: inherit;
+        font-size: 0.95rem;
+        color: var(--text);
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 13px 14px;
+        outline: none;
+      }
+      select option {
+        background: #11111c;
+      }
+      select:focus,
+      input:focus {
+        border-color: var(--accent-1);
+      }
+      .dialog-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 22px;
+      }
+      .dialog-actions .btn {
+        padding: 12px 20px;
+        font-size: 0.92rem;
+      }
+      .hint {
+        font-size: 0.78rem;
+        color: var(--muted);
+        margin-top: 14px;
+        line-height: 1.5;
+      }
+      .hint a {
+        color: var(--accent-2);
+      }
+
+      .toast {
+        position: fixed;
+        bottom: 28px;
+        left: 50%;
+        transform: translate(-50%, 30px);
+        opacity: 0;
+        background: #1b1b2b;
+        border: 1px solid var(--border);
+        padding: 12px 20px;
+        border-radius: 12px;
+        font-size: 0.88rem;
+        transition: 0.3s;
+        pointer-events: none;
+        z-index: 20;
+        max-width: 90vw;
+      }
+      .toast.show {
+        opacity: 1;
+        transform: translate(-50%, 0);
+      }
+
+      /* =====================================================================
+   9. RESPONSIVE + ACCESSIBILITY
+   ===================================================================== */
+      @media (max-width: 600px) {
+        .features {
+          grid-template-columns: 1fr;
+        }
+        .c-body {
+          padding-left: 20px;
+        }
+        .option .o-key {
+          display: none;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation: none !important;
+          transition: none !important;
+        }
+      }
+      @media print {
+        body::before,
+        body::after,
+        header,
+        .result-actions {
+          display: none;
+        }
+        body {
+          background: #fff;
+          color: #000;
+        }
+        .career {
+          break-inside: avoid;
+          border-color: #ccc;
+        }
+        .c-body,
+        .source-tag,
+        .match-num {
+          color: #333;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="app">
+      <!-- ================= HEADER ================= -->
+      <header>
+        <div class="logo">
+          <div class="logo-mark">🧭</div>
+          Pathfinder
+        </div>
+        <div class="header-right">
+          <div class="pill" id="aiPill" title="AI settings">
+            <span class="dot" id="aiDot"></span
+            ><span id="aiStatus">AI not connected</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- ================= HOME SCREEN ================= -->
+      <section class="screen active" id="home">
+        <div class="hero">
+          <div class="badge">✨ AI-powered career guidance</div>
+          <h1>
+            Find the career<br /><span class="gradient-text"
+              >made for you.</span
+            >
+          </h1>
+          <p>
+            Answer 10 quick questions about how you think and what you enjoy.
+            Our AI will map out 10 careers that fit you best.
+          </p>
+          <button class="btn btn-primary" id="startBtn">
+            Start the quiz →
+          </button>
+        </div>
+
+        <div class="features">
+          <div class="feature">
+            <div class="icon">⚡</div>
+            <b>2 minutes</b><span>10 simple questions, no sign-up needed.</span>
+          </div>
+          <div class="feature">
+            <div class="icon">🧠</div>
+            <b>AI analysis</b
+            ><span>Understands your personality, not just keywords.</span>
+          </div>
+          <div class="feature">
+            <div class="icon">🎯</div>
+            <b>10 matches</b
+            ><span>Each with skills to learn and a first step to take.</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ================= QUIZ SCREEN ================= -->
+      <section class="screen" id="quiz">
+        <div class="progress-wrap">
+          <div class="progress-top">
+            <span id="progressText">Question 1 of 10</span
+            ><span id="progressPct">0%</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+        </div>
+        <h2 class="question" id="questionText"></h2>
+        <div class="options" id="options"></div>
+        <div class="quiz-nav">
+          <button class="btn btn-ghost" id="backBtn">← Back</button>
+        </div>
+      </section>
+
+      <!-- ================= LOADING SCREEN ================= -->
+      <section class="screen" id="loading">
+        <div class="loader">
+          <div class="orb"></div>
+          <h2>Analysing your answers</h2>
+          <p id="loadingMsg">Reading your personality…</p>
+        </div>
+      </section>
+
+      <!-- ================= RESULTS SCREEN ================= -->
+      <section class="screen" id="results">
+        <div class="results-head">
+          <h2>Your <span class="gradient-text">top 10</span> careers</h2>
+          <div class="source-tag" id="sourceTag"></div>
+        </div>
+        <div class="summary-card" id="summary"></div>
+        <div class="traits" id="traits"></div>
+        <div id="careerList"></div>
+        <div class="result-actions">
+          <button class="btn btn-primary" id="retakeBtn">↺ Retake quiz</button>
+          <button class="btn btn-ghost" id="printBtn">⬇ Save as PDF</button>
+        </div>
+      </section>
+    </div>
+
+    <!-- ================= SETTINGS DIALOG ================= -->
+    <dialog id="settings">
+      <h3>Connect AI</h3>
+      <p class="sub">
+        Paste an API key to get personalised results from a real AI model.
+        Without a key, the app uses a built-in smart matching engine instead.
+      </p>
+
+      <label for="provider">AI provider</label>
+      <select id="provider">
+        <option value="gemini">Google Gemini (free tier available)</option>
+        <option value="claude">Anthropic Claude</option>
+      </select>
+
+      <label for="apiKey">API key</label>
+      <input
+        type="password"
+        id="apiKey"
+        placeholder="Paste your key here"
+        autocomplete="off"
+      />
+
+      <div class="hint">
+        Get a free Gemini key at
+        <a
+          href="https://aistudio.google.com/apikey"
+          target="_blank"
+          rel="noopener"
+          >aistudio.google.com/apikey</a
+        >. Claude keys come from
+        <a href="https://console.anthropic.com" target="_blank" rel="noopener"
+          >console.anthropic.com</a
+        >. Your key is saved only in this browser.
+      </div>
+
+      <div class="dialog-actions">
+        <button class="btn btn-primary" id="saveKey">Save</button>
+        <button class="btn btn-ghost" id="clearKey">Remove key</button>
+        <button class="btn btn-ghost" id="closeSettings">Close</button>
+      </div>
+    </dialog>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+      /* =====================================================================
+   PART 1 – SETTINGS (easy to edit)
+   ===================================================================== */
+      const CLAUDE_MODEL = "claude-sonnet-4-6"; // change if Anthropic releases a newer model
+      const GEMINI_MODEL = "gemini-2.5-flash"; // change if Google releases a newer model
+
+      /* =====================================================================
+   PART 2 – THE 10 QUESTIONS
+   Every answer gives the student "trait points" (tags). The tags are used
+   by the offline matcher and are also sent to the AI as extra context.
+   Traits: tech, creative, people, business, science, health,
+           practical, leadership, analytical
+   ===================================================================== */
+      const QUESTIONS = [
+        {
+          q: "It's a free weekend. What sounds the most fun?",
+          options: [
+            {
+              icon: "🛠️",
+              text: "Building or coding something cool",
+              tags: ["tech", "practical"],
+            },
+            {
+              icon: "🎨",
+              text: "Drawing, writing or editing videos",
+              tags: ["creative"],
+            },
+            {
+              icon: "🤝",
+              text: "Hanging out with friends or volunteering",
+              tags: ["people", "health"],
+            },
+            {
+              icon: "💡",
+              text: "Planning a side hustle or business idea",
+              tags: ["business", "leadership"],
+            },
+          ],
+        },
+
+        {
+          q: "Which school subject do you enjoy the most?",
+          options: [
+            {
+              icon: "💻",
+              text: "Maths or Computer Science",
+              tags: ["tech", "analytical"],
+            },
+            {
+              icon: "🧪",
+              text: "Biology, Chemistry or Physics",
+              tags: ["science", "health"],
+            },
+            {
+              icon: "🎭",
+              text: "Languages, Art or Social Studies",
+              tags: ["creative", "people"],
+            },
+            {
+              icon: "📊",
+              text: "Commerce or Economics",
+              tags: ["business", "analytical"],
+            },
+          ],
+        },
+
+        {
+          q: "Where would you love to work every day?",
+          options: [
+            {
+              icon: "🏠",
+              text: "On a laptop, from anywhere",
+              tags: ["tech", "analytical"],
+            },
+            {
+              icon: "🔬",
+              text: "In a lab or hospital",
+              tags: ["science", "health"],
+            },
+            {
+              icon: "🏗️",
+              text: "Outdoors, on-site or in a workshop",
+              tags: ["practical"],
+            },
+            {
+              icon: "🎬",
+              text: "In a studio or creative space",
+              tags: ["creative", "people"],
+            },
+          ],
+        },
+
+        {
+          q: "A big problem shows up. What do you do first?",
+          options: [
+            {
+              icon: "🔍",
+              text: "Break it down logically using data",
+              tags: ["analytical", "science"],
+            },
+            {
+              icon: "🌈",
+              text: "Come up with an unusual, creative idea",
+              tags: ["creative"],
+            },
+            {
+              icon: "💬",
+              text: "Talk to people and get everyone aligned",
+              tags: ["people", "leadership"],
+            },
+            {
+              icon: "🔧",
+              text: "Jump in and fix it hands-on",
+              tags: ["practical", "tech"],
+            },
+          ],
+        },
+
+        {
+          q: "What matters most to you in a future job?",
+          options: [
+            {
+              icon: "💰",
+              text: "High income and fast growth",
+              tags: ["business", "leadership"],
+            },
+            {
+              icon: "❤️",
+              text: "Helping people and making an impact",
+              tags: ["health", "people"],
+            },
+            {
+              icon: "🕊️",
+              text: "Creative freedom to be myself",
+              tags: ["creative"],
+            },
+            {
+              icon: "🏛️",
+              text: "Stability and respected expertise",
+              tags: ["science", "analytical"],
+            },
+          ],
+        },
+
+        {
+          q: "In a group project, you are usually the…",
+          options: [
+            {
+              icon: "🧭",
+              text: "Leader who organises everyone",
+              tags: ["leadership", "business"],
+            },
+            {
+              icon: "📚",
+              text: "Researcher who digs into the details",
+              tags: ["analytical", "science"],
+            },
+            {
+              icon: "🎤",
+              text: "Designer or presenter",
+              tags: ["creative", "people"],
+            },
+            {
+              icon: "⚙️",
+              text: "Builder who makes it actually work",
+              tags: ["tech", "practical"],
+            },
+          ],
+        },
+
+        {
+          q: "How do you feel about maths and numbers?",
+          options: [
+            {
+              icon: "😍",
+              text: "I love them, they feel like puzzles",
+              tags: ["analytical", "tech"],
+            },
+            {
+              icon: "👍",
+              text: "I'm fine when they're useful in real life",
+              tags: ["business", "science"],
+            },
+            {
+              icon: "📝",
+              text: "I prefer words, stories and ideas",
+              tags: ["creative", "people"],
+            },
+            {
+              icon: "📏",
+              text: "I like measuring and building real things",
+              tags: ["practical"],
+            },
+          ],
+        },
+
+        {
+          q: "Which one-hour task would you enjoy the most?",
+          options: [
+            {
+              icon: "🐞",
+              text: "Solving a tricky coding or logic puzzle",
+              tags: ["tech", "analytical"],
+            },
+            {
+              icon: "🖼️",
+              text: "Designing a poster or editing a video",
+              tags: ["creative"],
+            },
+            {
+              icon: "🗣️",
+              text: "Explaining a concept to a friend",
+              tags: ["people", "leadership"],
+            },
+            {
+              icon: "⚗️",
+              text: "Running a science experiment",
+              tags: ["science", "practical"],
+            },
+          ],
+        },
+
+        {
+          q: "Where do you see yourself in 10 years?",
+          options: [
+            {
+              icon: "🏢",
+              text: "Leading a team or running a company",
+              tags: ["leadership", "business"],
+            },
+            {
+              icon: "🧬",
+              text: "A top expert in a tech or research field",
+              tags: ["science", "tech"],
+            },
+            {
+              icon: "🌟",
+              text: "Known for my creative work",
+              tags: ["creative"],
+            },
+            {
+              icon: "🌍",
+              text: "Making a difference in my community",
+              tags: ["people", "health"],
+            },
+          ],
+        },
+
+        {
+          q: "Which work rhythm suits you best?",
+          options: [
+            {
+              icon: "🕰️",
+              text: "Steady, predictable and well structured",
+              tags: ["science", "health"],
+            },
+            {
+              icon: "🚀",
+              text: "Fast, risky, startup energy",
+              tags: ["business", "leadership"],
+            },
+            {
+              icon: "🔄",
+              text: "New project every few weeks",
+              tags: ["creative", "tech"],
+            },
+            {
+              icon: "🏃",
+              text: "Active, on my feet, hands-on",
+              tags: ["practical", "people"],
+            },
+          ],
+        },
+      ];
+
+      const TRAIT_LABELS = {
+        tech: "💻 Tech-minded",
+        creative: "🎨 Creative",
+        people: "🤝 People person",
+        business: "📈 Business-savvy",
+        science: "🔬 Scientific",
+        health: "❤️ Caring",
+        practical: "🛠️ Hands-on",
+        leadership: "🧭 Natural leader",
+        analytical: "🧮 Analytical",
+      };
+
+      /* =====================================================================
+   PART 3 – CAREER DATABASE (used by the offline "smart match" engine
+   and as a safety net if the AI request fails)
+   ===================================================================== */
+      const CAREERS = [
+        {
+          title: "Software Developer",
+          emoji: "💻",
+          tags: ["tech", "analytical"],
+          why: "You enjoy logic and building things, which is exactly what developers do all day.",
+          skills: ["Programming", "Problem solving", "Version control"],
+          firstStep:
+            "Build a small project (like a to-do app) in Python or JavaScript this month.",
+        },
+        {
+          title: "Data Scientist",
+          emoji: "📊",
+          tags: ["analytical", "tech", "science"],
+          why: "You like finding patterns and answers hidden inside numbers.",
+          skills: ["Python", "Statistics", "Data visualisation"],
+          firstStep:
+            "Analyse a free dataset on Kaggle and share your findings.",
+        },
+        {
+          title: "AI / Machine Learning Engineer",
+          emoji: "🤖",
+          tags: ["tech", "analytical", "science"],
+          why: "Your mix of curiosity and technical skill suits teaching computers to learn.",
+          skills: ["Python", "Maths for ML", "Model building"],
+          firstStep:
+            "Complete a beginner machine learning course and build one small model.",
+        },
+        {
+          title: "Cybersecurity Analyst",
+          emoji: "🛡️",
+          tags: ["tech", "analytical", "practical"],
+          why: "You like solving puzzles and thinking like an attacker to protect others.",
+          skills: ["Networking", "Linux", "Ethical hacking"],
+          firstStep: "Try beginner challenges on TryHackMe or Hack The Box.",
+        },
+        {
+          title: "UX / UI Designer",
+          emoji: "🎯",
+          tags: ["creative", "tech", "people"],
+          why: "You combine creativity with empathy to design products people love.",
+          skills: ["Figma", "User research", "Visual design"],
+          firstStep: "Redesign a screen of your favourite app in Figma.",
+        },
+        {
+          title: "Graphic / Motion Designer",
+          emoji: "🎨",
+          tags: ["creative"],
+          why: "Visual storytelling comes naturally to you.",
+          skills: ["Design tools", "Typography", "Animation"],
+          firstStep:
+            "Create 5 posters or short animations and put them in a portfolio.",
+        },
+        {
+          title: "Content Creator / Filmmaker",
+          emoji: "🎬",
+          tags: ["creative", "people"],
+          why: "You like expressing ideas and connecting with an audience.",
+          skills: ["Storytelling", "Video editing", "Audience building"],
+          firstStep: "Post one short video or article every week for 2 months.",
+        },
+        {
+          title: "Digital Marketer",
+          emoji: "📣",
+          tags: ["business", "creative"],
+          why: "You blend creativity with an eye for what makes people take action.",
+          skills: ["SEO", "Social media", "Analytics"],
+          firstStep: "Grow a small page or blog and track what works.",
+        },
+        {
+          title: "Entrepreneur / Startup Founder",
+          emoji: "🚀",
+          tags: ["business", "leadership"],
+          why: "You like ideas, risk and building something of your own.",
+          skills: ["Sales", "Leadership", "Product thinking"],
+          firstStep:
+            "Sell one small product or service to real customers this semester.",
+        },
+        {
+          title: "Product Manager",
+          emoji: "🧩",
+          tags: ["leadership", "tech", "business"],
+          why: "You can connect people, technology and business goals.",
+          skills: ["Communication", "Prioritisation", "Basic analytics"],
+          firstStep:
+            "Write a one-page plan for improving an app you use daily.",
+        },
+        {
+          title: "Financial Analyst / Chartered Accountant",
+          emoji: "💹",
+          tags: ["analytical", "business"],
+          why: "Numbers and money decisions seem to energise you.",
+          skills: ["Accounting", "Excel", "Financial modelling"],
+          firstStep:
+            "Learn Excel basics and track a mock investment portfolio.",
+        },
+        {
+          title: "Management Consultant",
+          emoji: "📈",
+          tags: ["analytical", "leadership", "business"],
+          why: "You solve big problems by mixing logic with people skills.",
+          skills: ["Structured thinking", "Presentation", "Research"],
+          firstStep: "Practise case studies with a friend every week.",
+        },
+        {
+          title: "Doctor",
+          emoji: "🩺",
+          tags: ["health", "science", "people"],
+          why: "You care about people and enjoy science.",
+          skills: ["Biology", "Empathy", "Decision making under pressure"],
+          firstStep:
+            "Research entrance exams for medicine and begin a study plan.",
+        },
+        {
+          title: "Physiotherapist / Allied Health",
+          emoji: "💪",
+          tags: ["health", "practical", "people"],
+          why: "You like helping people through hands-on, active work.",
+          skills: ["Anatomy", "Patient care", "Exercise science"],
+          firstStep:
+            "Shadow a physiotherapist for a day or volunteer in a clinic.",
+        },
+        {
+          title: "Biotech / Medical Researcher",
+          emoji: "🧬",
+          tags: ["science", "health", "analytical"],
+          why: "You are curious about how life works and love experiments.",
+          skills: ["Lab methods", "Data analysis", "Scientific writing"],
+          firstStep:
+            "Read about one recent discovery and try a school or college research project.",
+        },
+        {
+          title: "Psychologist / Counsellor",
+          emoji: "🧠",
+          tags: ["people", "health"],
+          why: "You are a good listener who wants to help people feel better.",
+          skills: ["Active listening", "Psychology basics", "Empathy"],
+          firstStep:
+            "Read an introductory psychology book and volunteer as a peer supporter.",
+        },
+        {
+          title: "Teacher / Educator",
+          emoji: "🍎",
+          tags: ["people", "leadership"],
+          why: "You enjoy explaining ideas and watching others grow.",
+          skills: ["Communication", "Patience", "Curriculum design"],
+          firstStep: "Tutor a younger student in your best subject.",
+        },
+        {
+          title: "HR / People Manager",
+          emoji: "🧑‍🤝‍🧑",
+          tags: ["people", "leadership", "business"],
+          why: "You are good with people and organising teams.",
+          skills: ["Communication", "Conflict resolution", "Recruiting"],
+          firstStep: "Organise an event or lead a student club.",
+        },
+        {
+          title: "Mechanical / Civil Engineer",
+          emoji: "🏗️",
+          tags: ["practical", "analytical", "science"],
+          why: "You like understanding how real things are built and why they work.",
+          skills: ["Physics", "CAD", "Project planning"],
+          firstStep: "Build a small model or prototype and learn a CAD tool.",
+        },
+        {
+          title: "Electronics / Robotics Engineer",
+          emoji: "🔌",
+          tags: ["practical", "tech", "science"],
+          why: "You like tinkering and bringing machines to life.",
+          skills: ["Circuits", "Embedded programming", "Mechanics"],
+          firstStep: "Buy an Arduino kit and make a simple robot.",
+        },
+        {
+          title: "Architect",
+          emoji: "🏛️",
+          tags: ["creative", "practical", "analytical"],
+          why: "You mix creativity with practical thinking to design spaces.",
+          skills: ["Design", "3D modelling", "Maths and structure"],
+          firstStep: "Sketch a floor plan and learn a 3D tool like SketchUp.",
+        },
+        {
+          title: "Environmental Scientist",
+          emoji: "🌱",
+          tags: ["science", "practical"],
+          why: "You like science that makes a real difference to the planet.",
+          skills: ["Field research", "Data analysis", "Sustainability"],
+          firstStep:
+            "Start a small local project, such as measuring waste or water quality.",
+        },
+        {
+          title: "Lawyer",
+          emoji: "⚖️",
+          tags: ["analytical", "leadership", "people"],
+          why: "You can argue logically and stand up for people.",
+          skills: ["Reasoning", "Public speaking", "Writing"],
+          firstStep:
+            "Join a debate or mock trial and read about law entrance exams.",
+        },
+        {
+          title: "Journalist / Writer",
+          emoji: "✍️",
+          tags: ["creative", "people"],
+          why: "You are curious about stories and good at sharing them.",
+          skills: ["Writing", "Interviewing", "Research"],
+          firstStep: "Start a blog or write for your college magazine.",
+        },
+        {
+          title: "Public Policy / Civil Services",
+          emoji: "🏛️",
+          tags: ["leadership", "people", "analytical"],
+          why: "You want to improve society at a large scale.",
+          skills: ["Current affairs", "Analysis", "Leadership"],
+          firstStep:
+            "Read a good newspaper daily and learn about the relevant exams.",
+        },
+        {
+          title: "Game Developer",
+          emoji: "🎮",
+          tags: ["tech", "creative"],
+          why: "You mix technical skill with imagination.",
+          skills: ["Unity or Unreal", "C# or C++", "Game design"],
+          firstStep: "Make a simple 2D game in Unity and share it online.",
+        },
+      ];
+
+      /* =====================================================================
+   PART 4 – APP STATE & SMALL HELPERS
+   ===================================================================== */
+      let current = 0; // index of the question being shown
+      let answers = new Array(QUESTIONS.length).fill(null); // chosen option index per question
+
+      const $ = (id) => document.getElementById(id); // shortcut for getElementById
+
+      // Prevents AI text from injecting HTML into the page
+      function esc(text) {
+        return String(text ?? "").replace(
+          /[&<>"']/g,
+          (c) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            })[c],
+        );
+      }
+
+      function showScreen(id) {
+        document
+          .querySelectorAll(".screen")
+          .forEach((s) => s.classList.remove("active"));
+        $(id).classList.add("active");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      let toastTimer;
+      function toast(message) {
+        $("toast").textContent = message;
+        $("toast").classList.add("show");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(
+          () => $("toast").classList.remove("show"),
+          3500,
+        );
+      }
+
+      // localStorage can be blocked in some browsers, so we wrap it safely
+      function store(key, value) {
+        try {
+          localStorage.setItem(key, value);
+        } catch (e) {}
+      }
+      function load(key) {
+        try {
+          return localStorage.getItem(key) || "";
+        } catch (e) {
+          return "";
+        }
+      }
+
+      /* =====================================================================
+   PART 5 – QUIZ LOGIC
+   ===================================================================== */
+      function renderQuestion() {
+        const q = QUESTIONS[current];
+        const pct = Math.round((current / QUESTIONS.length) * 100);
+
+        $("progressText").textContent =
+          `Question ${current + 1} of ${QUESTIONS.length}`;
+        $("progressPct").textContent = pct + "%";
+        $("progressFill").style.width = pct + "%";
+        $("questionText").textContent = q.q;
+        $("backBtn").style.visibility = current === 0 ? "hidden" : "visible";
+
+        $("options").innerHTML = q.options
+          .map(
+            (o, i) => `
+      <button class="option ${answers[current] === i ? "selected" : ""}" data-index="${i}">
+        <span class="o-icon">${o.icon}</span>
+        <span>${esc(o.text)}</span>
+        <span class="o-key">${i + 1}</span>
+      </button>`,
+          )
+          .join("");
+
+        // Replay the entrance animation for each question
+        const screen = $("quiz");
+        screen.style.animation = "none";
+        screen.offsetHeight;
+        screen.style.animation = "";
+      }
+
+      function chooseOption(index) {
+        answers[current] = index;
+        renderQuestion(); // shows the "selected" highlight
+        setTimeout(() => {
+          if (current < QUESTIONS.length - 1) {
+            current++;
+            renderQuestion();
+          } else {
+            finishQuiz();
+          }
+        }, 280);
+      }
+
+      function startQuiz() {
+        current = 0;
+        answers = new Array(QUESTIONS.length).fill(null);
+        showScreen("quiz");
+        renderQuestion();
+      }
+
+      $("options").addEventListener("click", (e) => {
+        const btn = e.target.closest(".option");
+        if (btn) chooseOption(Number(btn.dataset.index));
+      });
+
+      $("backBtn").addEventListener("click", () => {
+        if (current > 0) {
+          current--;
+          renderQuestion();
+        }
+      });
+
+      // Keyboard shortcuts: 1-4 to answer, left arrow to go back
+      document.addEventListener("keydown", (e) => {
+        if (!$("quiz").classList.contains("active") || $("settings").open)
+          return;
+        if (["1", "2", "3", "4"].includes(e.key))
+          chooseOption(Number(e.key) - 1);
+        if (e.key === "ArrowLeft" && current > 0) {
+          current--;
+          renderQuestion();
+        }
+      });
+
+      /* =====================================================================
+   PART 6 – TRAIT SCORING (works offline)
+   ===================================================================== */
+      function calculateTraits() {
+        const scores = {};
+        answers.forEach((choice, qIndex) => {
+          QUESTIONS[qIndex].options[choice].tags.forEach((tag) => {
+            scores[tag] = (scores[tag] || 0) + 1;
+          });
+        });
+        return scores; // example: { tech: 5, analytical: 4, creative: 1 }
+      }
+
+      // Offline matcher: scores every career by how well its tags match the student's traits
+      function offlineMatch(traits) {
+        const scored = CAREERS.map((c) => ({
+          ...c,
+          score: c.tags.reduce((sum, tag) => sum + (traits[tag] || 0), 0),
+        })).sort((a, b) => b.score - a.score);
+
+        const best = scored[0].score || 1;
+        return scored.slice(0, 10).map((c, i) => ({
+          title: c.title,
+          emoji: c.emoji,
+          why: c.why,
+          skills: c.skills,
+          firstStep: c.firstStep,
+          match: Math.max(55, Math.round(60 + 38 * (c.score / best)) - i), // 55-98%, falling with rank
+        }));
+      }
+
+      function offlineSummary(traits) {
+        const top = Object.entries(traits)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 3)
+          .map(([tag]) =>
+            TRAIT_LABELS[tag].replace(/^\S+\s/, "").toLowerCase(),
+          );
+        return `Your answers show you are ${top.join(", ")}. The careers below mix these strengths, ranked from the best fit to a good fit.`;
+      }
+
+      /* =====================================================================
+   PART 7 – AI CALLS
+   ===================================================================== */
+      // Turn the student's answers into a text profile the AI can read
+      function buildPrompt(traits) {
+        const qa = QUESTIONS.map(
+          (q, i) =>
+            `Q${i + 1}. ${q.q}\n   Answer: ${q.options[answers[i]].text}`,
+        ).join("\n");
+
+        const traitText = Object.entries(traits)
+          .sort((a, b) => b[1] - a[1])
+          .map(([tag, n]) => `${tag}: ${n}`)
+          .join(", ");
+
+        return `You are a friendly, honest career counsellor for school and college students.
+A student answered a 10-question quiz. Here are their answers:
+
+${qa}
+
+Trait scores from the quiz: ${traitText}
+
+Suggest EXACTLY 10 different careers that fit this student, ordered from best to weakest match.
+Mix well-known and emerging careers. Be specific and encouraging.
+
+Reply with ONLY valid JSON (no markdown, no extra text) in this exact shape:
+{
+  "summary": "2-3 sentences describing the student's personality and strengths, written to 'you'",
+  "careers": [
+    {
+      "title": "Career name",
+      "emoji": "one fitting emoji",
+      "match": 95,
+      "why": "1-2 sentences on why this fits THIS student, referring to their answers",
+      "skills": ["skill 1", "skill 2", "skill 3"],
+      "firstStep": "one concrete action the student can take this month"
+    }
+  ]
+}
+"match" must be a number from 50 to 99 and must decrease down the list.`;
+      }
+
+      async function askClaude(prompt, key) {
+        const res = await fetch("https://api.anthropic.com/v1/messages", {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            "x-api-key": key,
+            "anthropic-version": "2023-06-01",
+            "anthropic-dangerous-direct-browser-access": "true", // needed to call from a browser
+          },
+          body: JSON.stringify({
+            model: CLAUDE_MODEL,
+            max_tokens: 3500,
+            messages: [{ role: "user", content: prompt }],
+          }),
+        });
+        if (!res.ok) throw new Error("Claude error " + res.status);
+        const data = await res.json();
+        return data.content.map((part) => part.text || "").join("");
+      }
+
+      async function askGemini(prompt, key) {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${encodeURIComponent(key)}`;
+        const res = await fetch(url, {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: { responseMimeType: "application/json" },
+          }),
+        });
+        if (!res.ok) throw new Error("Gemini error " + res.status);
+        const data = await res.json();
+        return data.candidates[0].content.parts
+          .map((p) => p.text || "")
+          .join("");
+      }
+
+      // AI sometimes wraps JSON in extra text, so we cut out just the { ... } part
+      function parseAIJson(text) {
+        const start = text.indexOf("{");
+        const end = text.lastIndexOf("}");
+        if (start === -1 || end === -1) throw new Error("No JSON found");
+        const data = JSON.parse(text.slice(start, end + 1));
+        if (!Array.isArray(data.careers) || data.careers.length === 0)
+          throw new Error("Bad format");
+
+        data.careers = data.careers.slice(0, 10).map((c) => ({
+          title: c.title || "Career",
+          emoji: c.emoji || "⭐",
+          why: c.why || "",
+          skills: Array.isArray(c.skills) ? c.skills.slice(0, 5) : [],
+          firstStep: c.firstStep || "",
+          match: Math.min(99, Math.max(1, Number(c.match) || 70)),
+        }));
+        return data;
+      }
+
+      /* =====================================================================
+   PART 8 – FINISH QUIZ → GET RESULTS
+   ===================================================================== */
+      const LOADING_MESSAGES = [
+        "Reading your personality…",
+        "Spotting your strengths…",
+        "Scanning hundreds of careers…",
+        "Ranking your best matches…",
+      ];
+
+      async function finishQuiz() {
+        $("progressFill").style.width = "100%";
+        showScreen("loading");
+
+        // Rotate the loading messages
+        let m = 0;
+        $("loadingMsg").textContent = LOADING_MESSAGES[0];
+        const timer = setInterval(() => {
+          m = (m + 1) % LOADING_MESSAGES.length;
+          $("loadingMsg").textContent = LOADING_MESSAGES[m];
+        }, 1600);
+
+        const traits = calculateTraits();
+        const provider = load("pf_provider") || "gemini";
+        const key = load("pf_key");
+
+        let result, source;
+
+        if (key) {
+          try {
+            const prompt = buildPrompt(traits);
+            const text =
+              provider === "claude"
+                ? await askClaude(prompt, key)
+                : await askGemini(prompt, key);
+            result = parseAIJson(text);
+            source = `✨ Personalised by ${provider === "claude" ? "Claude" : "Gemini"} AI`;
+          } catch (err) {
+            console.error(err);
+            toast("AI request failed – showing smart-match results instead.");
+          }
+        }
+
+        // No key, or AI failed → use the offline matcher
+        if (!result) {
+          result = {
+            summary: offlineSummary(traits),
+            careers: offlineMatch(traits),
+          };
+          source = key
+            ? "Smart-match engine (AI was unavailable)"
+            : "Smart-match engine · connect an AI key for personalised results";
+        }
+
+        clearInterval(timer);
+        renderResults(result, traits, source);
+      }
+
+      /* =====================================================================
+   PART 9 – SHOW RESULTS
+   ===================================================================== */
+      function renderResults(result, traits, source) {
+        $("sourceTag").textContent = source;
+        $("summary").textContent = result.summary || "";
+
+        // Top 4 traits as chips
+        $("traits").innerHTML = Object.entries(traits)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 4)
+          .map(([tag]) => `<span class="trait">${TRAIT_LABELS[tag]}</span>`)
+          .join("");
+
+        // One expandable card per career
+        $("careerList").innerHTML = result.careers
+          .map(
+            (c, i) => `
+    <details class="career" ${i === 0 ? "open" : ""}>
+      <summary>
+        <span class="rank">${String(i + 1).padStart(2, "0")}</span>
+        <span class="c-emoji">${esc(c.emoji)}</span>
+        <div class="c-main">
+          <div class="c-title">${esc(c.title)}</div>
+          <div class="match-row">
+            <div class="match-bar"><div class="match-fill" data-width="${c.match}"></div></div>
+            <span class="match-num">${c.match}%</span>
+          </div>
+        </div>
+        <span class="chev">▾</span>
+      </summary>
+      <div class="c-body">
+        <h4>Why it fits you</h4>
+        <p>${esc(c.why)}</p>
+        <h4>Skills to build</h4>
+        <div class="skills">${c.skills.map((s) => `<span class="skill">${esc(s)}</span>`).join("")}</div>
+        <h4>Your first step</h4>
+        <p>${esc(c.firstStep)}</p>
+      </div>
+    </details>`,
+          )
+          .join("");
+
+        showScreen("results");
+
+        // Animate the match bars after the screen is visible
+        setTimeout(() => {
+          document.querySelectorAll(".match-fill").forEach((bar) => {
+            bar.style.width = bar.dataset.width + "%";
+          });
+        }, 150);
+      }
+
+      /* =====================================================================
+   PART 10 – SETTINGS DIALOG
+   ===================================================================== */
+      function updateAIStatus() {
+        const hasKey = !!load("pf_key");
+        const provider = load("pf_provider") === "claude" ? "Claude" : "Gemini";
+        $("aiDot").classList.toggle("on", hasKey);
+        $("aiStatus").textContent = hasKey
+          ? `${provider} connected`
+          : "Connect AI";
+      }
+
+      function openSettings() {
+        $("provider").value = load("pf_provider") || "gemini";
+        $("apiKey").value = load("pf_key");
+        $("settings").showModal();
+      }
+
+      $("aiPill").addEventListener("click", openSettings);
+      $("closeSettings").addEventListener("click", () => $("settings").close());
+      $("saveKey").addEventListener("click", () => {
+        store("pf_provider", $("provider").value);
+        store("pf_key", $("apiKey").value.trim());
+        updateAIStatus();
+        $("settings").close();
+        toast("Saved ✓");
+      });
+      $("clearKey").addEventListener("click", () => {
+        store("pf_key", "");
+        $("apiKey").value = "";
+        updateAIStatus();
+        toast("Key removed");
+      });
+
+      /* =====================================================================
+   PART 11 – BUTTONS & START-UP
+   ===================================================================== */
+      $("startBtn").addEventListener("click", startQuiz);
+      $("retakeBtn").addEventListener("click", () => {
+        showScreen("home");
+      });
+      $("printBtn").addEventListener("click", () => {
+        document.querySelectorAll(".career").forEach((d) => (d.open = true)); // expand all before printing
+        window.print();
+      });
+
+      updateAIStatus();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,852 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AI Smart School Helpdesk</title>
+    <style>
+      :root {
+        --navy: #1b2f6b;
+        --navy2: #2c4796;
+        --amber: #f4a62a;
+        --bg: #eef2fb;
+        --card: #fff;
+        --ink: #16213d;
+        --dim: #5d6a8c;
+        --line: #d5ddf0;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+      }
+      body {
+        background: var(--bg);
+        color: var(--ink);
+        font:
+          16px/1.55 system-ui,
+          -apple-system,
+          "Segoe UI",
+          Roboto,
+          sans-serif;
+      }
+      header {
+        background: var(--navy);
+        color: #fff;
+        padding: 16px;
+      }
+      header div {
+        max-width: 740px;
+        margin: 0 auto;
+      }
+      h1 {
+        margin: 0;
+        font-size: 24px;
+        line-height: 1.2;
+      }
+      header p {
+        margin: 2px 0 0;
+        color: #c4cff0;
+        font-size: 15px;
+      }
+      main {
+        max-width: 740px;
+        margin: 0 auto;
+        min-height: calc(100% - 82px);
+        display: flex;
+        flex-direction: column;
+        padding: 16px 16px 14px;
+      }
+      #chat {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        overflow-y: auto;
+        padding: 2px 2px 12px;
+      }
+      .msg {
+        max-width: 92%;
+        padding: 12px 15px;
+        border-radius: 14px;
+      }
+      .msg.user {
+        align-self: flex-end;
+        background: var(--navy2);
+        color: #fff;
+        border-bottom-right-radius: 4px;
+      }
+      .msg.bot {
+        align-self: flex-start;
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-bottom-left-radius: 4px;
+      }
+      .msg h2 {
+        margin: 0 0 6px;
+        font-size: 17px;
+        color: var(--navy2);
+      }
+      .msg p {
+        margin: 0 0 8px;
+      }
+      .msg ul {
+        margin: 0 0 8px;
+        padding-left: 20px;
+      }
+      .msg li {
+        margin-bottom: 4px;
+      }
+      .note {
+        background: #fff6e5;
+        border-left: 5px solid var(--amber);
+        padding: 8px 12px;
+        border-radius: 4px;
+        margin: 0 0 6px;
+      }
+      .related {
+        margin-top: 10px;
+        padding-top: 8px;
+        border-top: 1px solid var(--line);
+        font-size: 14px;
+        color: var(--dim);
+      }
+      .related button {
+        margin: 6px 6px 0 0;
+      }
+      .trace {
+        margin-top: 10px;
+        padding-top: 8px;
+        border-top: 1px dashed var(--line);
+        font-size: 13px;
+        color: var(--dim);
+      }
+      .trace b {
+        color: var(--ink);
+        font-weight: 600;
+      }
+      .bar {
+        display: inline-block;
+        vertical-align: middle;
+        width: 80px;
+        height: 6px;
+        background: var(--line);
+        border-radius: 3px;
+        margin: 0 6px;
+        overflow: hidden;
+      }
+      .bar i {
+        display: block;
+        height: 100%;
+        background: var(--amber);
+      }
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 0 0 12px;
+      }
+      .chip,
+      .chips button,
+      .related button {
+        background: var(--card);
+        color: var(--navy2);
+        border: 1px solid var(--navy2);
+        border-radius: 999px;
+        padding: 5px 12px;
+        font: inherit;
+        font-size: 14px;
+        cursor: pointer;
+      }
+      .chips button:hover,
+      .related button:hover {
+        background: #e4eafa;
+      }
+      form {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      #text {
+        flex: 1;
+        min-width: 0;
+        background: var(--card);
+        color: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 12px 14px;
+        font: inherit;
+      }
+      button {
+        font: inherit;
+      }
+      #mic {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        border: 2px solid var(--navy2);
+        background: var(--card);
+        color: var(--navy2);
+        font-size: 20px;
+        cursor: pointer;
+        flex: none;
+      }
+      #mic.on {
+        background: var(--amber);
+        border-color: var(--amber);
+        color: var(--navy);
+        animation: pulse 1.2s infinite;
+      }
+      #send {
+        background: var(--navy2);
+        color: #fff;
+        border: 0;
+        border-radius: 10px;
+        padding: 12px 18px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      @keyframes pulse {
+        50% {
+          box-shadow: 0 0 0 8px rgba(244, 166, 42, 0.3);
+        }
+      }
+      .foot {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 10px;
+        font-size: 14px;
+        color: var(--dim);
+      }
+      .foot label {
+        cursor: pointer;
+      }
+      #status {
+        min-height: 1.4em;
+      }
+      .small {
+        margin: 8px 0 0;
+        font-size: 12.5px;
+        color: var(--dim);
+      }
+      :focus-visible {
+        outline: 3px solid #d9480f;
+        outline-offset: 2px;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #mic.on {
+          animation: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div>
+        <h1 id="title">School Helpdesk</h1>
+        <p>
+          Ask about admissions, fees, timings, holidays and more. Type or speak.
+        </p>
+      </div>
+    </header>
+    <main>
+      <div id="chat" aria-live="polite"></div>
+      <div class="chips" id="chips"></div>
+
+      <form id="form" autocomplete="off">
+        <button
+          type="button"
+          id="mic"
+          aria-label="Start or stop listening"
+          title="Click and speak"
+        >
+          &#127908;
+        </button>
+        <input
+          id="text"
+          type="text"
+          placeholder="Example: when is the fee due?"
+          aria-label="Your question"
+        />
+        <button id="send" type="submit">Ask</button>
+      </form>
+
+      <div class="foot">
+        <span id="status"></span>
+        <label
+          ><input type="checkbox" id="speakToggle" checked /> Speak
+          answers</label
+        >
+      </div>
+      <p class="small">
+        Learning project with sample data. Edit CFG and KB in the code to match
+        your school.
+      </p>
+    </main>
+
+    <script>
+      /* ============================================================
+   1. SCHOOL DETAILS (sample values: change to your school)
+   ============================================================ */
+      const CFG = {
+        school: "Sunrise Public School",
+        phone: "0731-000-0000",
+        email: "office@sunrise-school.example",
+        office: "9:00 AM to 3:00 PM, Monday to Saturday",
+      };
+      const fill = (s) => s.replace(/\{(\w+)\}/g, (_, k) => CFG[k] || "");
+
+      /* ============================================================
+   2. KNOWLEDGE BASE (add your own entries!)
+      title = heading   q = typical question   tags = synonyms
+      points = answer lines   note = extra tip (optional)
+      All details below are SAMPLE data.
+   ============================================================ */
+      const KB = [
+        {
+          title: "School timings",
+          q: "What are the school timings?",
+          tags: "time timing hours open close start end begin assembly reach",
+          points: [
+            "Classes run from 8:00 AM to 2:00 PM, Monday to Saturday.",
+            "Morning assembly starts at 7:50 AM. Please reach by 7:45 AM.",
+            "The school office is open {office}.",
+          ],
+        },
+        {
+          title: "Admission process",
+          q: "How can I apply for admission?",
+          tags: "admission apply enroll enrol join new student registration form seat",
+          points: [
+            "Collect the admission form from the office or download it from the school website.",
+            "Fill in the form and submit it with the required documents.",
+            "Students are called for a short interaction and the fee is paid after selection.",
+          ],
+          note: "Ask “documents for admission” to see the list of required papers.",
+        },
+        {
+          title: "Documents for admission",
+          q: "Which documents are needed for admission?",
+          tags: "documents papers certificate birth aadhaar photo marksheet report card transfer required",
+          points: [
+            "Birth certificate.",
+            "Passport size photographs of the student and parents.",
+            "Previous class report card.",
+            "Transfer certificate from the last school.",
+            "Address proof and Aadhaar card of the student.",
+          ],
+        },
+        {
+          title: "Fee payment",
+          q: "How and when do I pay the school fee?",
+          tags: "fee fees payment pay due date amount online late fine installment quarterly challan",
+          points: [
+            "Fees are paid every quarter, on or before the 10th of the first month.",
+            "You can pay online through the school portal or at the fee counter.",
+            "A late fine applies after the due date.",
+            "Keep the fee receipt safe for future use.",
+          ],
+          note: "For the exact fee amount of a class, please contact the accounts office on {phone}.",
+        },
+        {
+          title: "School uniform",
+          q: "What is the school uniform?",
+          tags: "uniform dress shoes tie belt sports house colour wear",
+          points: [
+            "Regular uniform is worn from Monday to Friday.",
+            "Sports uniform is worn on Saturday and on sports days.",
+            "Black shoes, white socks, belt and school ID card are compulsory.",
+          ],
+        },
+        {
+          title: "School transport",
+          q: "How do I get school bus facility?",
+          tags: "transport bus van route pickup drop stop vehicle driver conveyance",
+          points: [
+            "Submit the transport form at the office with your home address.",
+            "The transport in-charge will confirm the route and bus stop.",
+            "Transport fees are paid along with the school fee.",
+          ],
+        },
+        {
+          title: "Holidays and vacations",
+          q: "When are the holidays and vacations?",
+          tags: "holiday holidays vacation break summer winter diwali calendar leave closed off",
+          points: [
+            "Summer vacation is usually in May and June.",
+            "Winter break is around the end of December.",
+            "Festival and national holidays follow the yearly school calendar given at the start of the session.",
+          ],
+          note: "Please check the school notice board or app for exact dates.",
+        },
+        {
+          title: "Exams and results",
+          q: "When are the exams and results?",
+          tags: "exam examination test result results marks timetable datesheet report card unit term annual grade",
+          points: [
+            "There are unit tests, a half-yearly exam and an annual exam.",
+            "The exam time table is shared on the notice board at least two weeks before the exams.",
+            "Report cards are given to parents on the result day.",
+          ],
+        },
+        {
+          title: "Library",
+          q: "What are the library rules?",
+          tags: "library book books borrow issue return reading librarian fine",
+          points: [
+            "Students can borrow one book at a time for 7 days.",
+            "Books can be renewed once if no one else has asked for them.",
+            "A fine applies for lost or late books.",
+          ],
+        },
+        {
+          title: "Transfer certificate",
+          q: "How to get a transfer certificate?",
+          tags: "transfer certificate tc leaving certificate leave school shift cancel withdrawal",
+          points: [
+            "Submit a written application signed by a parent at the office.",
+            "Clear all pending fees and return library books.",
+            "The certificate is usually ready in 3 to 5 working days.",
+          ],
+        },
+        {
+          title: "Leave and absence",
+          q: "How do I apply for leave for my child?",
+          tags: "leave absent absence sick holiday apply application diary fever medical",
+          points: [
+            "Send a leave application through the student diary or school app.",
+            "For leave of more than 3 days, attach a medical certificate.",
+            "Inform the class teacher on the same day for sudden absence.",
+          ],
+        },
+        {
+          title: "Parent teacher meeting",
+          q: "When is the parent teacher meeting?",
+          tags: "ptm parent teacher meeting meet teacher appointment progress",
+          points: [
+            "Parent teacher meetings are held once every term.",
+            "The date and time are sent through the student diary and school app.",
+            "You can also meet a teacher by taking an appointment at the office.",
+          ],
+        },
+        {
+          title: "Canteen and lunch",
+          q: "Is there a canteen and what about lunch?",
+          tags: "canteen lunch food tiffin snacks meal cafeteria eat water bottle",
+          points: [
+            "Students can bring lunch from home or buy healthy snacks from the canteen.",
+            "Please avoid junk food and sweets in the tiffin.",
+            "Students should bring their own water bottle.",
+          ],
+        },
+        {
+          title: "Sports and activities",
+          q: "What sports and activities are available?",
+          tags: "sports games activities club cricket football dance music art competition annual day",
+          points: [
+            "Sports include cricket, football, basketball and athletics.",
+            "Clubs include music, dance, art and science.",
+            "Sports period is held once a week for every class.",
+          ],
+        },
+        {
+          title: "Scholarship",
+          q: "Is any scholarship available?",
+          tags: "scholarship concession discount merit financial aid support free",
+          points: [
+            "Merit scholarships are given to top performing students.",
+            "Fee concession can be requested for students who need financial support.",
+            "Apply at the office with the required proof.",
+          ],
+          note: "Please contact the school office on {phone} for eligibility.",
+        },
+        {
+          title: "Lost ID card",
+          q: "What if my child loses the school ID card?",
+          tags: "id card identity lost duplicate replace new missing",
+          points: [
+            "Inform the class teacher and the office the same day.",
+            "Submit a written request for a duplicate ID card.",
+            "A small fee is charged for the duplicate card.",
+          ],
+        },
+        {
+          title: "Contact the school",
+          q: "How can I contact the school office?",
+          tags: "contact phone call email address office reach principal number mail talk",
+          points: [
+            "Phone: {phone}",
+            "Email: {email}",
+            "Office hours: {office}",
+          ],
+        },
+      ];
+
+      /* ============================================================
+   3. NLP PIPELINE: lowercase -> tokenize -> stopwords -> lemmatize
+   ============================================================ */
+      const STOP = new Set(
+        (
+          "a an the is are was were be been am do does did of in on at to for with and or but if it its " +
+          "this that these those what which who whom how why when where can could would should will shall me my you your " +
+          "tell explain describe define about please give mean meaning i we us they them there then than so as by from into " +
+          "between know get got have has had just need want our school child my kid"
+        ).split(" "),
+      );
+
+      function tokenize(text) {
+        return text.toLowerCase().match(/[a-z0-9]+/g) || [];
+      }
+
+      function lemma(w) {
+        if (w.length > 4 && w.endsWith("ies")) return w.slice(0, -3) + "y";
+        if (w.length > 4 && /(ses|xes|ches|shes)$/.test(w))
+          return w.slice(0, -2);
+        if (w.length > 3 && w.endsWith("s") && !/(ss|us|is)$/.test(w))
+          return w.slice(0, -1);
+        return w;
+      }
+
+      function preprocess(text) {
+        return tokenize(text)
+          .filter((w) => !STOP.has(w))
+          .map(lemma);
+      }
+
+      /* ============================================================
+   4. TF-IDF + COSINE SIMILARITY
+   ============================================================ */
+      const docs = KB.map((k) =>
+        preprocess(k.title + " " + k.q + " " + k.tags),
+      );
+      const N = docs.length;
+      const df = new Map();
+      docs.forEach((d) =>
+        new Set(d).forEach((t) => df.set(t, (df.get(t) || 0) + 1)),
+      );
+      const idf = (t) => Math.log((1 + N) / (1 + (df.get(t) || 0))) + 1;
+
+      function vectorize(tokens) {
+        const tf = new Map();
+        tokens.forEach((t) => tf.set(t, (tf.get(t) || 0) + 1));
+        const v = new Map();
+        let sq = 0;
+        tf.forEach((count, t) => {
+          if (!df.has(t)) return;
+          const w = count * idf(t);
+          v.set(t, w);
+          sq += w * w;
+        });
+        return { v, norm: Math.sqrt(sq) };
+      }
+
+      function cosine(a, b) {
+        if (!a.norm || !b.norm) return 0;
+        let dot = 0;
+        a.v.forEach((w, t) => {
+          if (b.v.has(t)) dot += w * b.v.get(t);
+        });
+        return dot / (a.norm * b.norm);
+      }
+
+      const docVecs = docs.map(vectorize);
+      const THRESHOLD = 0.12;
+
+      function rank(userText) {
+        const tokens = preprocess(userText);
+        const qv = vectorize(tokens);
+        const scored = docVecs
+          .map((dv, i) => ({ i, s: cosine(qv, dv) }))
+          .sort((a, b) => b.s - a.s);
+        return { tokens, scored };
+      }
+
+      /* ============================================================
+   5. INTENTS
+   ============================================================ */
+      const WORDS = {
+        greeting: [
+          "hello",
+          "hi",
+          "hey",
+          "namaste",
+          "good",
+          "morning",
+          "afternoon",
+          "evening",
+          "there",
+        ],
+        goodbye: [
+          "bye",
+          "goodbye",
+          "exit",
+          "quit",
+          "stop",
+          "see",
+          "you",
+          "later",
+          "good",
+        ],
+        thanks: ["thanks", "thank", "you", "so", "much", "a", "lot"],
+        help: [
+          "help",
+          "topics",
+          "what",
+          "can",
+          "you",
+          "do",
+          "me",
+          "know",
+          "menu",
+        ],
+      };
+      const allIn = (words, list) =>
+        words.length > 0 && words.every((w) => list.includes(w));
+
+      function detectIntent(text) {
+        const w = tokenize(text);
+        if (allIn(w, WORDS.greeting)) return "greeting";
+        if (allIn(w, WORDS.goodbye)) return "goodbye";
+        if (allIn(w, WORDS.thanks)) return "thanks";
+        if (allIn(w, WORDS.help)) return "help";
+        return "ask_question";
+      }
+
+      /* ============================================================
+   6. TEXT-TO-SPEECH
+   ============================================================ */
+      const speakToggle = document.getElementById("speakToggle");
+      function speak(text) {
+        if (!speakToggle.checked || !("speechSynthesis" in window)) return;
+        speechSynthesis.cancel();
+        speechSynthesis.speak(new SpeechSynthesisUtterance(text));
+      }
+
+      /* ============================================================
+   7. CHAT UI
+   ============================================================ */
+      const chat = document.getElementById("chat");
+      const statusEl = document.getElementById("status");
+      const input = document.getElementById("text");
+      const esc = (s) =>
+        s.replace(
+          /[&<>"]/g,
+          (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c],
+        );
+
+      document.getElementById("title").textContent = CFG.school + " Helpdesk";
+      document.title = CFG.school + " Helpdesk";
+
+      function el(tag, cls, text) {
+        const e = document.createElement(tag);
+        if (cls) e.className = cls;
+        if (text) e.textContent = text;
+        return e;
+      }
+
+      function addUser(text) {
+        chat.appendChild(el("div", "msg user", text));
+        chat.scrollTop = chat.scrollHeight;
+      }
+
+      function addBot(d) {
+        const box = el("div", "msg bot");
+        if (d.title) box.appendChild(el("h2", "", d.title));
+        if (d.intro) box.appendChild(el("p", "", d.intro));
+        if (d.points) {
+          const ul = el("ul");
+          d.points.forEach((p) => ul.appendChild(el("li", "", p)));
+          box.appendChild(ul);
+        }
+        if (d.note) box.appendChild(el("div", "note", d.note));
+        if (d.related && d.related.length) {
+          const r = el("div", "related", "You may also ask:");
+          r.appendChild(el("br"));
+          d.related.forEach((q) => {
+            const b = el("button", "", q);
+            b.type = "button";
+            b.onclick = () => handle(q);
+            r.appendChild(b);
+          });
+          box.appendChild(r);
+        }
+        if (d.trace) {
+          const t = el("div", "trace");
+          t.innerHTML = d.trace; // built only from our own escaped strings
+          box.appendChild(t);
+        }
+        chat.appendChild(box);
+        chat.scrollTop = chat.scrollHeight;
+
+        speak(
+          [d.title, d.intro]
+            .concat(d.points || [])
+            .concat([d.note])
+            .filter(Boolean)
+            .join(". "),
+        );
+      }
+
+      function reply(text) {
+        const intent = detectIntent(text);
+        if (intent === "greeting")
+          return addBot({
+            intro:
+              "Hello! Welcome to " + CFG.school + ". How can I help you today?",
+          });
+        if (intent === "thanks")
+          return addBot({
+            intro: "You are welcome! Ask me anything else about the school.",
+          });
+        if (intent === "goodbye") {
+          if (listening && rec) rec.stop();
+          return addBot({ intro: "Goodbye! Have a great day." });
+        }
+        if (intent === "help") {
+          return addBot({
+            intro:
+              "I can help with: " +
+              KB.map((k) => k.title.toLowerCase()).join(", ") +
+              ".",
+          });
+        }
+
+        const r = rank(text);
+        const top = r.scored[0];
+        const pct = Math.round(Math.min(top.s, 1) * 100);
+        const trace =
+          "<b>Cleaned words:</b> " +
+          (r.tokens.length ? esc(r.tokens.join(", ")) : "none") +
+          "<br><b>Best match:</b> " +
+          esc(KB[top.i].title) +
+          '<br><b>Similarity:</b><span class="bar"><i style="width:' +
+          pct +
+          '%"></i></span>' +
+          top.s.toFixed(2);
+
+        if (top.s < THRESHOLD) {
+          addBot({
+            intro: fill(
+              "Sorry, I could not find that. Please call the school office on {phone} or email {email}. Office hours: {office}.",
+            ),
+            trace,
+          });
+        } else {
+          const k = KB[top.i];
+          const related = r.scored
+            .slice(1, 3)
+            .filter((x) => x.s >= THRESHOLD)
+            .map((x) => KB[x.i].q);
+          addBot({
+            title: k.title,
+            points: k.points.map(fill),
+            note: k.note ? fill(k.note) : null,
+            related,
+            trace,
+          });
+        }
+      }
+
+      function handle(text) {
+        text = text.trim();
+        if (!text) return;
+        addUser(text);
+        reply(text);
+      }
+
+      document.getElementById("form").addEventListener("submit", (e) => {
+        e.preventDefault();
+        handle(input.value);
+        input.value = "";
+      });
+
+      [
+        "School timings",
+        "When is the fee due?",
+        "How to apply for admission?",
+        "Holiday list",
+      ].forEach((q) => {
+        const b = el("button", "", q);
+        b.type = "button";
+        b.onclick = () => handle(q);
+        document.getElementById("chips").appendChild(b);
+      });
+
+      /* ============================================================
+   8. SPEECH-TO-TEXT (Web Speech API: Chrome / Edge)
+   ============================================================ */
+      const mic = document.getElementById("mic");
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      let rec = null,
+        listening = false;
+
+      if (SR) {
+        rec = new SR();
+        rec.lang = "en-IN";
+        rec.interimResults = true;
+        rec.continuous = false;
+
+        rec.onstart = () => {
+          listening = true;
+          mic.classList.add("on");
+          statusEl.textContent = "Listening...";
+        };
+        rec.onend = () => {
+          listening = false;
+          mic.classList.remove("on");
+          if (statusEl.textContent === "Listening...")
+            statusEl.textContent = "";
+        };
+        rec.onerror = (e) => {
+          statusEl.textContent =
+            {
+              "not-allowed":
+                "Microphone blocked. Allow mic access in the browser address bar.",
+              "service-not-allowed":
+                "Microphone blocked. Allow mic access in the browser address bar.",
+              "no-speech":
+                "I did not hear anything. Click the mic and try again.",
+              "audio-capture": "No microphone found.",
+              network: "Speech recognition needs an internet connection.",
+            }[e.error] || "Mic error: " + e.error;
+        };
+        rec.onresult = (e) => {
+          let t = "";
+          for (let i = 0; i < e.results.length; i++)
+            t += e.results[i][0].transcript;
+          input.value = t;
+          if (e.results[e.results.length - 1].isFinal) {
+            handle(t);
+            input.value = "";
+          }
+        };
+      } else {
+        mic.disabled = true;
+        statusEl.textContent =
+          "Voice input needs Chrome or Edge. You can still type.";
+      }
+
+      mic.addEventListener("click", () => {
+        if (!rec) return;
+        speechSynthesis.cancel();
+        try {
+          listening ? rec.stop() : rec.start();
+        } catch (err) {
+          statusEl.textContent = "Could not start the microphone.";
+        }
+      });
+
+      addBot({
+        intro:
+          "Hello! I am the " +
+          CFG.school +
+          " helpdesk assistant. Press the mic or type your question, for example “when is the fee due?”.",
+      });
+    </script>
+  </body>
+</html>

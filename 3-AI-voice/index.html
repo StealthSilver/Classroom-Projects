@@ -1,0 +1,621 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AI Tutor Voice Assistant</title>
+    <style>
+      :root {
+        --board: #1d3832;
+        --board2: #27483f;
+        --chalk: #f1eee4;
+        --dim: #a9b8b1;
+        --yellow: #f2d36b;
+        --blue: #8cc6e6;
+        --line: #3d5e54;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+      }
+      body {
+        background: var(--board);
+        color: var(--chalk);
+        font:
+          16px/1.55 system-ui,
+          -apple-system,
+          "Segoe UI",
+          Roboto,
+          sans-serif;
+      }
+      main {
+        max-width: 720px;
+        margin: 0 auto;
+        min-height: 100%;
+        display: flex;
+        flex-direction: column;
+        padding: 20px 16px 16px;
+      }
+      h1 {
+        font:
+          700 28px/1.2 Georgia,
+          "Times New Roman",
+          serif;
+        margin: 0 0 4px;
+      }
+      .sub {
+        margin: 0 0 16px;
+        color: var(--dim);
+      }
+      #chat {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        overflow-y: auto;
+        padding: 4px 2px 12px;
+      }
+      .msg {
+        max-width: 88%;
+        padding: 10px 14px;
+        border-radius: 14px;
+        white-space: pre-wrap;
+      }
+      .msg.bot {
+        align-self: flex-start;
+        background: var(--board2);
+        border: 1px solid var(--line);
+      }
+      .msg.user {
+        align-self: flex-end;
+        border: 2px solid var(--yellow);
+        color: var(--yellow);
+      }
+      .trace {
+        margin-top: 8px;
+        padding-top: 8px;
+        border-top: 1px dashed var(--line);
+        font-size: 13px;
+        color: var(--dim);
+        white-space: normal;
+      }
+      .trace b {
+        color: var(--blue);
+        font-weight: 600;
+      }
+      .bar {
+        display: inline-block;
+        vertical-align: middle;
+        width: 80px;
+        height: 6px;
+        background: var(--line);
+        border-radius: 3px;
+        margin: 0 6px;
+        overflow: hidden;
+      }
+      .bar i {
+        display: block;
+        height: 100%;
+        background: var(--yellow);
+      }
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 0 0 12px;
+      }
+      .chips button {
+        background: none;
+        color: var(--blue);
+        border: 1px solid var(--blue);
+        border-radius: 999px;
+        padding: 5px 12px;
+        font: inherit;
+        font-size: 14px;
+        cursor: pointer;
+      }
+      .chips button:hover {
+        background: rgba(140, 198, 230, 0.15);
+      }
+      form {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      #text {
+        flex: 1;
+        min-width: 0;
+        background: var(--board2);
+        color: var(--chalk);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 12px 14px;
+        font: inherit;
+      }
+      #text::placeholder {
+        color: var(--dim);
+      }
+      button {
+        font: inherit;
+      }
+      #mic {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        border: 2px solid var(--yellow);
+        background: none;
+        color: var(--yellow);
+        font-size: 20px;
+        cursor: pointer;
+        flex: none;
+      }
+      #mic.on {
+        background: var(--yellow);
+        color: var(--board);
+        animation: pulse 1.2s infinite;
+      }
+      #send {
+        background: var(--yellow);
+        color: var(--board);
+        border: 0;
+        border-radius: 10px;
+        padding: 12px 18px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      @keyframes pulse {
+        50% {
+          box-shadow: 0 0 0 8px rgba(242, 211, 107, 0.25);
+        }
+      }
+      .foot {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 10px;
+        font-size: 14px;
+        color: var(--dim);
+      }
+      .foot label {
+        cursor: pointer;
+      }
+      #status {
+        min-height: 1.4em;
+      }
+      :focus-visible {
+        outline: 3px solid var(--blue);
+        outline-offset: 2px;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #mic.on {
+          animation: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>AI Tutor</h1>
+      <p class="sub">Ask a DSA or Java question by voice or by typing.</p>
+
+      <div id="chat" aria-live="polite"></div>
+
+      <div class="chips" id="chips"></div>
+
+      <form id="form" autocomplete="off">
+        <button
+          type="button"
+          id="mic"
+          aria-label="Start or stop listening"
+          title="Click and speak"
+        >
+          &#127908;
+        </button>
+        <input
+          id="text"
+          type="text"
+          placeholder="Type a question, or press the mic"
+          aria-label="Your question"
+        />
+        <button id="send" type="submit">Ask</button>
+      </form>
+
+      <div class="foot">
+        <span id="status"></span>
+        <label
+          ><input type="checkbox" id="speakToggle" checked /> Speak
+          answers</label
+        >
+      </div>
+    </main>
+
+    <script>
+      /* ============================================================
+   1. KNOWLEDGE BASE  (teachers/students: add your own entries!)
+      q    = the question
+      a    = the answer the tutor will say
+      tags = extra words that help matching (synonyms, related terms)
+   ============================================================ */
+      const KB = [
+        {
+          q: "What is a stack?",
+          a: "A stack is a linear data structure that follows Last In First Out. The last element added is the first one removed. Main operations are push, pop and peek.",
+          tags: "lifo push pop peek",
+        },
+        {
+          q: "What is a queue?",
+          a: "A queue is a linear data structure that follows First In First Out. Elements are added at the rear and removed from the front. Main operations are enqueue and dequeue.",
+          tags: "fifo enqueue dequeue front rear",
+        },
+        {
+          q: "What is an array?",
+          a: "An array stores elements of the same type in continuous memory. You can access any element by its index in constant time, but the size is fixed once created.",
+          tags: "index contiguous memory fixed size",
+        },
+        {
+          q: "What is a linked list?",
+          a: "A linked list is a chain of nodes. Each node holds data and a reference to the next node. It is easy to insert and delete, but you cannot jump directly to an index.",
+          tags: "node pointer next singly doubly",
+        },
+        {
+          q: "What is the difference between ArrayList and LinkedList?",
+          a: "ArrayList uses a dynamic array and gives fast random access. LinkedList uses nodes and gives fast insertion and deletion. Use ArrayList for reading, LinkedList for frequent inserts and deletes.",
+          tags: "java collection compare vs",
+        },
+        {
+          q: "What is binary search?",
+          a: "Binary search finds an element in a sorted array by repeatedly halving the search range. Its time complexity is O of log n.",
+          tags: "sorted divide halve mid search find",
+        },
+        {
+          q: "What is recursion?",
+          a: "Recursion is when a function calls itself to solve a smaller version of the same problem. Every recursive function needs a base case to stop.",
+          tags: "function calls itself base case",
+        },
+        {
+          q: "What is time complexity?",
+          a: "Time complexity describes how the running time of an algorithm grows as the input size grows. We write it using Big O notation, like O of n or O of n squared.",
+          tags: "big o notation performance efficiency",
+        },
+        {
+          q: "What is a HashMap?",
+          a: "A HashMap stores key and value pairs. It uses a hash function to find the bucket for a key, so get and put are O of 1 on average.",
+          tags: "hash key value map dictionary bucket java",
+        },
+        {
+          q: "What are sorting algorithms?",
+          a: "Sorting algorithms arrange data in order. Bubble sort and insertion sort are simple but slow, O of n squared. Merge sort and quick sort are faster, around O of n log n.",
+          tags: "sort sorting bubble merge quick insertion order arrange",
+        },
+        {
+          q: "What is a binary tree?",
+          a: "A binary tree is a hierarchical structure where each node has at most two children, called left and right. A binary search tree keeps smaller values on the left and bigger values on the right.",
+          tags: "node left right root leaf bst hierarchy",
+        },
+        {
+          q: "What is a graph?",
+          a: "A graph is a set of vertices connected by edges. It can model networks like roads or friendships. Common traversals are BFS, which uses a queue, and DFS, which uses a stack or recursion.",
+          tags: "vertex vertices edge bfs dfs traversal network",
+        },
+        {
+          q: "What is dynamic programming?",
+          a: "Dynamic programming solves a big problem by breaking it into overlapping smaller problems and storing their results, so each one is solved only once. Fibonacci with memoization is a classic example.",
+          tags: "dp memoization overlapping subproblem optimize",
+        },
+        {
+          q: "What is object oriented programming?",
+          a: "Object oriented programming organizes code into objects. Its four pillars are encapsulation, inheritance, polymorphism and abstraction.",
+          tags: "oop class object encapsulation inheritance polymorphism abstraction java",
+        },
+        {
+          q: "What is inheritance in Java?",
+          a: "Inheritance lets a child class reuse the fields and methods of a parent class using the extends keyword. It helps you avoid repeating code.",
+          tags: "extends parent child subclass superclass oop java",
+        },
+        {
+          q: "What is the difference between an interface and an abstract class?",
+          a: "An interface defines a contract that classes implement, and a class can implement many interfaces. An abstract class can hold shared code and state, but a class can extend only one.",
+          tags: "implements extends abstract java compare vs",
+        },
+        {
+          q: "What is the difference between JDK, JRE and JVM?",
+          a: "The JVM runs Java bytecode. The JRE is the JVM plus the standard libraries. The JDK is the JRE plus development tools like the compiler.",
+          tags: "java virtual machine runtime environment development kit compiler bytecode compare vs",
+        },
+      ];
+
+      /* ============================================================
+   2. NLP PIPELINE  (same steps taught in class)
+      lowercase -> tokenize -> remove stopwords -> lemmatize
+   ============================================================ */
+      const STOP = new Set(
+        (
+          "a an the is are was were be been am do does did of in on at to for with and or but if it its " +
+          "this that these those what which who whom how why when where can could would should will shall me my you your " +
+          "tell explain describe define about please give mean meaning i we us they them there then than so as by from into " +
+          "between mention know"
+        ).split(" "),
+      );
+
+      function tokenize(text) {
+        return text.toLowerCase().match(/[a-z0-9]+/g) || [];
+      }
+
+      function lemma(w) {
+        // tiny rule-based lemmatizer (plural -> singular)
+        if (w.length > 4 && w.endsWith("ies")) return w.slice(0, -3) + "y";
+        if (w.length > 4 && /(ses|xes|ches|shes)$/.test(w))
+          return w.slice(0, -2);
+        if (w.length > 3 && w.endsWith("s") && !/(ss|us|is)$/.test(w))
+          return w.slice(0, -1);
+        return w;
+      }
+
+      function preprocess(text) {
+        return tokenize(text)
+          .filter((w) => !STOP.has(w))
+          .map(lemma);
+      }
+
+      /* ============================================================
+   3. TF-IDF + COSINE SIMILARITY
+   ============================================================ */
+      const docs = KB.map((k) => preprocess(k.q + " " + k.tags));
+      const N = docs.length;
+      const df = new Map();
+      docs.forEach((d) =>
+        new Set(d).forEach((t) => df.set(t, (df.get(t) || 0) + 1)),
+      );
+      const idf = (t) => Math.log((1 + N) / (1 + (df.get(t) || 0))) + 1;
+
+      function vectorize(tokens) {
+        const tf = new Map();
+        tokens.forEach((t) => tf.set(t, (tf.get(t) || 0) + 1));
+        const v = new Map();
+        let sq = 0;
+        tf.forEach((count, t) => {
+          if (!df.has(t)) return; // words not in the knowledge base are ignored
+          const w = count * idf(t);
+          v.set(t, w);
+          sq += w * w;
+        });
+        return { v, norm: Math.sqrt(sq) };
+      }
+
+      function cosine(a, b) {
+        if (!a.norm || !b.norm) return 0;
+        let dot = 0;
+        a.v.forEach((w, t) => {
+          if (b.v.has(t)) dot += w * b.v.get(t);
+        });
+        return dot / (a.norm * b.norm);
+      }
+
+      const docVecs = docs.map(vectorize);
+      const THRESHOLD = 0.2; // below this score the tutor says "I don't know"
+
+      function findBest(userText) {
+        const tokens = preprocess(userText);
+        const qv = vectorize(tokens);
+        let best = -1,
+          bestScore = 0;
+        docVecs.forEach((dv, i) => {
+          const s = cosine(qv, dv);
+          if (s > bestScore) {
+            bestScore = s;
+            best = i;
+          }
+        });
+        return { tokens, best, score: bestScore };
+      }
+
+      /* ============================================================
+   4. INTENT DETECTION (keyword based)
+   ============================================================ */
+      const INTENTS = {
+        greeting: [
+          "hello",
+          "hi",
+          "hey",
+          "namaste",
+          "morning",
+          "afternoon",
+          "evening",
+        ],
+        goodbye: ["bye", "goodbye", "exit", "quit", "stop"],
+        thanks: ["thanks", "thank"],
+        help: ["help", "topics"],
+      };
+
+      function detectIntent(text) {
+        const words = tokenize(text);
+        if (words.length > 5) return "ask_question";
+        for (const [intent, keys] of Object.entries(INTENTS))
+          if (keys.some((k) => words.includes(k))) return intent;
+        return "ask_question";
+      }
+
+      /* ============================================================
+   5. TEXT-TO-SPEECH
+   ============================================================ */
+      const speakToggle = document.getElementById("speakToggle");
+      function speak(text) {
+        if (!speakToggle.checked || !("speechSynthesis" in window)) return;
+        speechSynthesis.cancel();
+        speechSynthesis.speak(new SpeechSynthesisUtterance(text));
+      }
+
+      /* ============================================================
+   6. CHAT UI
+   ============================================================ */
+      const chat = document.getElementById("chat");
+      const statusEl = document.getElementById("status");
+      const input = document.getElementById("text");
+
+      function addMessage(role, text, trace) {
+        const el = document.createElement("div");
+        el.className = "msg " + role;
+        el.textContent = text;
+        if (trace) {
+          const t = document.createElement("div");
+          t.className = "trace";
+          t.innerHTML = trace; // trace is built only from our own safe strings
+          el.appendChild(t);
+        }
+        chat.appendChild(el);
+        chat.scrollTop = chat.scrollHeight;
+      }
+
+      const esc = (s) =>
+        s.replace(
+          /[&<>"]/g,
+          (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c],
+        );
+
+      function randomQuestions(n) {
+        return [...KB]
+          .sort(() => Math.random() - 0.5)
+          .slice(0, n)
+          .map((k) => k.q);
+      }
+
+      function reply(userText) {
+        const intent = detectIntent(userText);
+        let answer,
+          trace = "";
+
+        if (intent === "greeting") {
+          answer = "Hi! What would you like to learn today?";
+        } else if (intent === "goodbye") {
+          answer = "Goodbye! Keep practicing.";
+          if (listening && rec) rec.stop();
+        } else if (intent === "thanks") {
+          answer = "You are welcome! Ask me anything else.";
+        } else if (intent === "help") {
+          answer =
+            "I can answer DSA and Java questions. Try: " +
+            randomQuestions(3).join("  |  ");
+        } else {
+          const r = findBest(userText);
+          const pct = Math.round(r.score * 100);
+          trace =
+            "<b>Cleaned words:</b> " +
+            (r.tokens.length ? esc(r.tokens.join(", ")) : "none") +
+            "<br><b>Best match:</b> " +
+            (r.best >= 0 ? esc(KB[r.best].q) : "none") +
+            '<br><b>Similarity:</b><span class="bar"><i style="width:' +
+            pct +
+            '%"></i></span>' +
+            r.score.toFixed(2);
+          if (r.score < THRESHOLD) {
+            answer =
+              "Sorry, I do not know that yet. Try asking about stacks, queues, sorting, recursion or Java basics.";
+          } else {
+            answer = KB[r.best].a;
+          }
+        }
+        addMessage("bot", answer, trace);
+        speak(answer);
+      }
+
+      function handle(text) {
+        text = text.trim();
+        if (!text) return;
+        addMessage("user", text);
+        reply(text);
+      }
+
+      document.getElementById("form").addEventListener("submit", (e) => {
+        e.preventDefault();
+        handle(input.value);
+        input.value = "";
+      });
+
+      /* example question chips */
+      const chips = document.getElementById("chips");
+      randomQuestions(4).forEach((q) => {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.textContent = q;
+        b.onclick = () => handle(q);
+        chips.appendChild(b);
+      });
+
+      /* ============================================================
+   7. SPEECH-TO-TEXT (Web Speech API: Chrome / Edge)
+   ============================================================ */
+      const mic = document.getElementById("mic");
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      let rec = null,
+        listening = false;
+
+      if (SR) {
+        rec = new SR();
+        rec.lang = "en-IN";
+        rec.interimResults = true;
+        rec.continuous = false;
+
+        rec.onstart = () => {
+          listening = true;
+          mic.classList.add("on");
+          statusEl.textContent = "Listening...";
+        };
+        rec.onend = () => {
+          listening = false;
+          mic.classList.remove("on");
+          if (statusEl.textContent === "Listening...")
+            statusEl.textContent = "";
+        };
+        rec.onerror = (e) => {
+          const msg =
+            {
+              "not-allowed":
+                "Microphone blocked. Allow mic access in the browser address bar.",
+              "service-not-allowed":
+                "Microphone blocked. Allow mic access in the browser address bar.",
+              "no-speech":
+                "I did not hear anything. Click the mic and try again.",
+              "audio-capture": "No microphone found.",
+              network: "Speech recognition needs an internet connection.",
+            }[e.error] || "Mic error: " + e.error;
+          statusEl.textContent = msg;
+        };
+        rec.onresult = (e) => {
+          let t = "";
+          for (let i = 0; i < e.results.length; i++)
+            t += e.results[i][0].transcript;
+          input.value = t;
+          if (e.results[e.results.length - 1].isFinal) {
+            handle(t);
+            input.value = "";
+          }
+        };
+      } else {
+        mic.disabled = true;
+        statusEl.textContent =
+          "Voice input needs Chrome or Edge. You can still type.";
+      }
+
+      mic.addEventListener("click", () => {
+        if (!rec) return;
+        speechSynthesis.cancel(); // stop the tutor talking so it does not hear itself
+        try {
+          listening ? rec.stop() : rec.start();
+        } catch (err) {
+          statusEl.textContent = "Could not start the microphone.";
+        }
+      });
+
+      /* first message (browsers only allow speech after a click, so this one is text only) */
+      addMessage(
+        "bot",
+        "Hello, I am your AI tutor. Press the mic and ask a DSA or Java question, or type it below.",
+      );
+    </script>
+  </body>
+</html>

@@ -1,0 +1,3895 @@
+<!doctype html>
+<html lang="hi">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#2f6fed" />
+    <title>संकेतवाणी – हाथ के इशारों से लिखें</title>
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect fill='%23ffe14a' width='32' height='32' rx='8'/%3E%3Crect fill='%231d4e9a' x='7' y='20' width='18' height='5' rx='2.5'/%3E%3C/svg%3E"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --blue: #2f6fed;
+        --ink: #1d4e9a;
+        --yellow: #ffe14a;
+        --text: #1a2b4a;
+        --muted: #5d6e93;
+        --line: #e1eaf8;
+        --soft: #f3f7ff;
+        --coral: #ff6b81;
+        --mint: #22c3a0;
+        --purple: #8b5cf6;
+        --orange: #ff9f43;
+        --sky: #38bdf8;
+        --shadow: 0 12px 32px rgba(47, 111, 237, 0.12);
+        --r: 24px;
+      }
+      * {
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        color: var(--text);
+        background: #fff;
+        line-height: 1.6;
+        overflow-x: hidden;
+        font-family:
+          "Noto Sans Devanagari", "Kohinoor Devanagari", "Devanagari Sangam MN",
+          system-ui, sans-serif;
+      }
+      [hidden] {
+        display: none !important;
+      }
+      button,
+      textarea {
+        font: inherit;
+        color: inherit;
+      }
+      button {
+        cursor: pointer;
+        border: 1px solid var(--line);
+        background: #fff;
+        border-radius: 999px;
+        padding: 11px 18px;
+        min-height: 44px;
+        transition:
+          transform 0.15s,
+          background 0.15s,
+          box-shadow 0.15s;
+      }
+      button:hover {
+        transform: translateY(-2px);
+        background: #fffbe8;
+      }
+      button:active {
+        transform: scale(0.97);
+      }
+      a:focus-visible,
+      button:focus-visible,
+      textarea:focus-visible {
+        outline: 3px solid rgba(47, 111, 237, 0.5);
+        outline-offset: 2px;
+      }
+      .wrap {
+        width: min(1080px, calc(100% - 32px));
+        margin: 0 auto;
+      }
+      .lat {
+        font-family: "Avenir Next", "Segoe UI", system-ui, sans-serif;
+      }
+
+      /* nav */
+      .nav {
+        position: sticky;
+        top: 0;
+        z-index: 50;
+        padding-top: env(safe-area-inset-top, 0);
+        background: rgba(255, 255, 255, 0.88);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--line);
+      }
+      .nav .wrap {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 62px;
+        gap: 10px;
+      }
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 800;
+        font-size: 21px;
+        color: var(--ink);
+        text-decoration: none;
+      }
+      .logo svg {
+        width: 34px;
+        height: 34px;
+        flex: none;
+      }
+      .tabs {
+        display: flex;
+        gap: 4px;
+        padding: 4px;
+        background: var(--soft);
+        border-radius: 999px;
+        border: 1px solid var(--line);
+      }
+      .tabs a {
+        padding: 8px 16px;
+        border-radius: 999px;
+        color: var(--muted);
+        text-decoration: none;
+        font-size: 15px;
+        font-weight: 600;
+        white-space: nowrap;
+      }
+      .tabs a.on {
+        background: var(--blue);
+        color: #fff;
+        box-shadow: 0 6px 14px rgba(47, 111, 237, 0.3);
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 14px 26px;
+        border-radius: 999px;
+        font-weight: 700;
+        font-size: 17px;
+        text-decoration: none;
+        transition:
+          transform 0.15s,
+          box-shadow 0.15s;
+        border: 0;
+        min-height: 48px;
+      }
+      .btn:hover {
+        transform: translateY(-3px);
+      }
+      .btn-p {
+        background: var(--blue);
+        color: #fff;
+        box-shadow: 0 10px 24px rgba(47, 111, 237, 0.32);
+      }
+      .btn-y {
+        background: var(--yellow);
+        color: var(--ink);
+        box-shadow: 0 10px 24px rgba(255, 225, 74, 0.5);
+      }
+      .btn-g {
+        background: #fff;
+        color: var(--ink);
+        border: 2px solid var(--line);
+      }
+
+      /* hero */
+      .hero {
+        position: relative;
+        overflow: hidden;
+        padding: 56px 0 40px;
+        background: linear-gradient(180deg, #eef4ff, #fff);
+      }
+      .blob {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(50px);
+        opacity: 0.55;
+        animation: drift 14s ease-in-out infinite;
+      }
+      .b1 {
+        width: 340px;
+        height: 340px;
+        background: #bcd3ff;
+        top: -80px;
+        right: -60px;
+      }
+      .b2 {
+        width: 260px;
+        height: 260px;
+        background: #fff0a0;
+        bottom: -60px;
+        left: -60px;
+        animation-delay: -5s;
+      }
+      .b3 {
+        width: 200px;
+        height: 200px;
+        background: #ffd0da;
+        top: 40%;
+        left: 42%;
+        animation-delay: -9s;
+        opacity: 0.4;
+      }
+      @keyframes drift {
+        50% {
+          transform: translate(30px, -24px) scale(1.1);
+        }
+      }
+      .hero .wrap {
+        position: relative;
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 36px;
+        align-items: center;
+      }
+      .pill {
+        display: inline-block;
+        padding: 7px 16px;
+        border-radius: 999px;
+        background: #fff;
+        border: 1px solid var(--line);
+        color: var(--ink);
+        font-weight: 600;
+        font-size: 14px;
+        box-shadow: var(--shadow);
+        animation: pop 0.7s both;
+      }
+      .hero h1 {
+        margin: 16px 0 14px;
+        font-size: clamp(36px, 7vw, 64px);
+        line-height: 1.18;
+        letter-spacing: -0.02em;
+        font-weight: 800;
+        animation: pop 0.7s 0.1s both;
+      }
+      .hero h1 .hl {
+        background: linear-gradient(transparent 60%, var(--yellow) 60%);
+        color: var(--ink);
+      }
+      .hero h1 .hl2 {
+        color: var(--coral);
+      }
+      .lead {
+        font-size: 18px;
+        color: var(--muted);
+        max-width: 520px;
+        margin: 0 0 26px;
+        animation: pop 0.7s 0.2s both;
+      }
+      .cta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        animation: pop 0.7s 0.3s both;
+      }
+      @keyframes pop {
+        from {
+          opacity: 0;
+          transform: translateY(22px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+      .stage-card {
+        position: relative;
+        display: grid;
+        place-items: center;
+        min-height: 360px;
+      }
+      .demo {
+        width: min(300px, 86%);
+        aspect-ratio: 4/5;
+        border-radius: 34px;
+        background: linear-gradient(160deg, #fff, #e8f0ff);
+        border: 1px solid var(--line);
+        box-shadow: 0 26px 60px rgba(47, 111, 237, 0.2);
+        display: grid;
+        place-items: center;
+        position: relative;
+        animation: pop 0.8s 0.25s both;
+      }
+      .demo .hand {
+        font-size: 120px;
+        line-height: 1;
+        animation: wave 3.2s ease-in-out infinite;
+        transform-origin: 70% 85%;
+      }
+      @keyframes wave {
+        25% {
+          transform: rotate(10deg);
+        }
+        75% {
+          transform: rotate(-8deg);
+        }
+      }
+      .demo .big {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        min-width: 62px;
+        height: 62px;
+        border-radius: 18px;
+        background: var(--yellow);
+        color: var(--ink);
+        display: grid;
+        place-items: center;
+        font-size: 34px;
+        font-weight: 800;
+        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.1);
+      }
+      .demo .out {
+        position: absolute;
+        left: 16px;
+        right: 16px;
+        bottom: 16px;
+        padding: 10px 14px;
+        border-radius: 16px;
+        background: #fff;
+        border: 1px solid var(--line);
+        font-size: 24px;
+        font-weight: 700;
+        letter-spacing: 0.14em;
+        color: #b7c4da;
+        text-align: center;
+      }
+      .demo .out b {
+        color: var(--blue);
+        background: #e0ebff;
+        border-radius: 6px;
+        padding: 0 3px;
+      }
+      .chip {
+        position: absolute;
+        width: 54px;
+        height: 54px;
+        border-radius: 17px;
+        display: grid;
+        place-items: center;
+        font-size: 25px;
+        font-weight: 800;
+        color: #fff;
+        box-shadow: var(--shadow);
+        animation: float 5s ease-in-out infinite;
+      }
+      .chip.c1 {
+        top: 4%;
+        left: 2%;
+        background: var(--coral);
+      }
+      .chip.c2 {
+        top: 18%;
+        right: 0;
+        background: var(--mint);
+        animation-delay: -1.5s;
+      }
+      .chip.c3 {
+        bottom: 20%;
+        left: -2%;
+        background: var(--purple);
+        animation-delay: -3s;
+      }
+      .chip.c4 {
+        bottom: 6%;
+        right: 6%;
+        background: var(--orange);
+        animation-delay: -2s;
+      }
+      @keyframes float {
+        50% {
+          transform: translateY(-12px) rotate(4deg);
+        }
+      }
+
+      /* marquee */
+      .marq {
+        overflow: hidden;
+        background: var(--blue);
+        padding: 14px 0;
+        transform: rotate(-1deg);
+        margin: 18px -10px 0;
+      }
+      .marq div {
+        display: flex;
+        gap: 12px;
+        width: max-content;
+        animation: scroll 30s linear infinite;
+      }
+      .marq span {
+        width: 44px;
+        height: 44px;
+        border-radius: 13px;
+        display: grid;
+        place-items: center;
+        font-weight: 800;
+        font-size: 20px;
+        color: var(--ink);
+        background: var(--yellow);
+      }
+      .marq span:nth-child(4n + 2) {
+        background: #fff;
+      }
+      .marq span:nth-child(4n + 3) {
+        background: #b8f0e3;
+      }
+      .marq span:nth-child(4n) {
+        background: #ffd0da;
+      }
+      @keyframes scroll {
+        to {
+          transform: translateX(-50%);
+        }
+      }
+
+      /* sections */
+      .block {
+        padding: 64px 0 8px;
+      }
+      .block h2 {
+        margin: 0 0 8px;
+        font-size: clamp(26px, 4.5vw, 38px);
+        line-height: 1.25;
+      }
+      .block .intro {
+        color: var(--muted);
+        max-width: 560px;
+        margin: 0 0 28px;
+      }
+      .grid3 {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+      }
+      .tile {
+        padding: 26px;
+        border-radius: var(--r);
+        background: #fff;
+        border: 1px solid var(--line);
+        box-shadow: var(--shadow);
+        transition: transform 0.2s;
+        position: relative;
+        overflow: hidden;
+      }
+      .tile:hover {
+        transform: translateY(-5px) rotate(-0.4deg);
+      }
+      .tile::after {
+        content: "";
+        position: absolute;
+        inset: 0 0 auto 0;
+        height: 6px;
+        background: var(--c, var(--blue));
+      }
+      .tile .ic {
+        margin-bottom: 14px;
+        display: block;
+      }
+      .tile h3 {
+        margin: 0 0 6px;
+        font-size: 19px;
+      }
+      .tile p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 15px;
+      }
+      .rv {
+        opacity: 0;
+        transform: translateY(26px);
+        transition:
+          opacity 0.6s,
+          transform 0.6s;
+      }
+      .rv.in {
+        opacity: 1;
+        transform: none;
+      }
+      .band {
+        margin: 64px 0 0;
+        padding: 52px 16px;
+        background: linear-gradient(135deg, var(--blue), var(--ink));
+        color: #fff;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+      }
+      .band h2 {
+        margin: 0 0 8px;
+        font-size: clamp(26px, 4.5vw, 38px);
+      }
+      .band p {
+        margin: 0 0 22px;
+        color: #d9e6ff;
+      }
+      footer {
+        padding: 26px 16px calc(34px + env(safe-area-inset-bottom, 0));
+        text-align: center;
+        color: var(--muted);
+        font-size: 14px;
+      }
+
+      /* app pages */
+      .app {
+        background: var(--soft);
+        min-height: calc(100vh - 62px);
+        padding: 26px 0 56px;
+      }
+      .app .wrap {
+        width: min(900px, calc(100% - 28px));
+      }
+      #page-read .wrap,
+      #page-new .wrap {
+        width: calc(100% - 40px);
+        max-width: none;
+      }
+      .app:fullscreen {
+        min-height: 100vh;
+        overflow-y: auto;
+        padding-top: 18px;
+        background: var(--soft);
+      }
+      .app:fullscreen .wrap {
+        width: calc(100% - 48px);
+        max-width: none;
+      }
+      .camera-layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
+        align-items: start;
+        gap: 24px;
+      }
+      .camera-output {
+        min-width: 0;
+      }
+      .camera-output .bar {
+        margin-top: 0;
+      }
+      .fullscreen-btn {
+        flex: none;
+        padding-inline: 14px;
+        color: var(--ink);
+        font-weight: 700;
+      }
+      .head {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+      }
+      .head h2 {
+        margin: 0;
+        font-size: clamp(24px, 5vw, 32px);
+        color: var(--ink);
+        font-weight: 800;
+      }
+      .head p {
+        margin: 2px 0 0;
+        color: var(--muted);
+        font-size: 15px;
+      }
+      #page-read .head h2,
+      #page-new .head h2 {
+        font-size: 20px;
+      }
+      #page-read .head p,
+      #page-new .head p {
+        font-size: 13px;
+      }
+      .status {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 14px;
+        border-radius: 999px;
+        background: #fff;
+        border: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 14px;
+        font-weight: 600;
+        box-shadow: var(--shadow);
+      }
+      .dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        background: #b9c4d8;
+      }
+      .status.live {
+        color: var(--ink);
+      }
+      .status.live .dot {
+        background: var(--mint);
+        box-shadow: 0 0 0 4px rgba(34, 195, 160, 0.25);
+        animation: pulse 1.4s infinite;
+      }
+      @keyframes pulse {
+        50% {
+          box-shadow: 0 0 0 8px rgba(34, 195, 160, 0);
+        }
+      }
+      .banner {
+        display: none;
+        margin-bottom: 14px;
+        padding: 13px 16px;
+        border-radius: 16px;
+        background: #fff3c4;
+        color: #6a5200;
+        font-weight: 500;
+      }
+      .banner.show {
+        display: block;
+      }
+      .guide {
+        display: flex;
+        gap: 10px;
+        overflow-x: auto;
+        margin-bottom: 16px;
+        padding-bottom: 4px;
+      }
+      .guide div {
+        flex: 1 0 170px;
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        padding: 12px 14px;
+        border-radius: 18px;
+        background: #fff;
+        border: 1px solid var(--line);
+        font-size: 14px;
+        font-weight: 600;
+      }
+      .guide b {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        color: #fff;
+        flex: none;
+      }
+      .custom-chart-wrap {
+        margin: 24px 0 0;
+        padding: 16px;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: #fff;
+        box-shadow: var(--shadow);
+      }
+      .custom-chart-title {
+        margin: 0;
+        color: var(--ink);
+        font-size: 18px;
+        font-weight: 800;
+      }
+      .custom-chart-note {
+        margin: 2px 0 12px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .custom-codes {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(82px, 1fr));
+        gap: 8px;
+      }
+      .custom-code {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        min-height: 40px;
+        padding: 6px 10px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: var(--soft);
+      }
+      .custom-code-letter,
+      .custom-code-value {
+        font-weight: 800;
+        white-space: nowrap;
+      }
+      .custom-code-letter {
+        color: var(--ink);
+      }
+      .custom-code-value {
+        display: grid;
+        min-width: 26px;
+        height: 26px;
+        padding: 0 6px;
+        place-items: center;
+        border-radius: 8px;
+        color: #fff;
+        background: var(--blue);
+        font-size: 13px;
+      }
+      .custom-code-value-both {
+        font-size: 11px;
+      }
+      .custom-code:nth-child(6n + 2) {
+        background: #fff1f3;
+      }
+      .custom-code:nth-child(6n + 2) .custom-code-value {
+        background: var(--coral);
+      }
+      .custom-code:nth-child(6n + 3) {
+        background: #e9fbf7;
+      }
+      .custom-code:nth-child(6n + 3) .custom-code-value {
+        background: var(--mint);
+      }
+      .custom-code:nth-child(6n + 4) {
+        background: #f2edff;
+      }
+      .custom-code:nth-child(6n + 4) .custom-code-value {
+        background: var(--purple);
+      }
+      .custom-code:nth-child(6n + 5) {
+        background: #fff5e9;
+      }
+      .custom-code:nth-child(6n + 5) .custom-code-value {
+        background: var(--orange);
+      }
+      .custom-code:nth-child(6n) {
+        background: #eaf8ff;
+      }
+      .custom-code:nth-child(6n) .custom-code-value {
+        background: #168dc2;
+      }
+      .custom-code:nth-child(6n + 1) {
+        background: #fffbe2;
+      }
+      .custom-code:nth-child(6n + 1) .custom-code-value {
+        background: #d4ae00;
+      }
+      .guide div:nth-child(1) b {
+        background: var(--blue);
+      }
+      .guide div:nth-child(2) b {
+        background: var(--coral);
+      }
+      .guide div:nth-child(3) b {
+        background: var(--mint);
+      }
+      .guide div:nth-child(4) b {
+        background: var(--purple);
+      }
+      .stage {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 4/3;
+        margin-inline: auto;
+        border-radius: 28px;
+        overflow: hidden;
+        background: #111;
+        border: 5px solid #fff;
+        box-shadow: 0 20px 46px rgba(29, 78, 154, 0.2);
+      }
+      #video {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 2px;
+        height: 2px;
+        opacity: 0.01;
+        pointer-events: none;
+      }
+      #view {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+      #view.mirror {
+        transform: scaleX(-1);
+      }
+      #customVideo {
+        position: absolute;
+        width: 2px;
+        height: 2px;
+        opacity: 0.01;
+        pointer-events: none;
+      }
+      #customView {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+      #customView.mirror {
+        transform: scaleX(-1);
+      }
+      .empty {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        text-align: center;
+        padding: 24px;
+        color: #cdd8ee;
+        background: radial-gradient(circle at 50% 40%, #2b4a82, #121b2e);
+      }
+      .empty .big {
+        font-size: 54px;
+        display: block;
+        animation: float 4s ease-in-out infinite;
+      }
+      .empty strong {
+        color: #fff;
+        font-size: 19px;
+        display: block;
+      }
+      .stage.live .empty {
+        display: none;
+      }
+      .stage:not(.live) .hud,
+      .stage:not(.live) #flip {
+        display: none;
+      }
+      .hud {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        padding: 5px 13px;
+        border-radius: 999px;
+        background: rgba(0, 0, 0, 0.4);
+        color: #fff;
+        font-size: 13px;
+      }
+      .acts {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        display: flex;
+        gap: 8px;
+      }
+      #start,
+      #customStart {
+        background: var(--yellow);
+        color: var(--ink);
+        border: 0;
+        font-weight: 800;
+        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.25);
+      }
+      #stop,
+      #flip,
+      #customStop,
+      #customFlip {
+        background: rgba(17, 17, 17, 0.7);
+        color: #fff;
+        border: 1px solid rgba(255, 255, 255, 0.35);
+      }
+      .bar {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin: 16px 0 10px;
+      }
+      #letter,
+      #customLetter {
+        min-width: 76px;
+        height: 76px;
+        border-radius: 22px;
+        display: grid;
+        place-items: center;
+        background: var(--blue);
+        color: #fff;
+        font-size: 44px;
+        font-weight: 800;
+        line-height: 1;
+        transition:
+          background 0.2s,
+          transform 0.2s;
+      }
+      #letter.dim,
+      #customLetter.dim {
+        background: #d6e0f3;
+        color: #fff;
+      }
+      #letter.pop,
+      #customLetter.pop {
+        animation: bump 0.3s;
+      }
+      @keyframes bump {
+        50% {
+          transform: scale(1.18) rotate(-4deg);
+        }
+      }
+      .bar p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+      }
+      textarea.box {
+        width: 100%;
+        min-height: 104px;
+        padding: 16px 18px;
+        border: 2px solid var(--line);
+        border-radius: 22px;
+        background: #fff;
+        box-shadow: var(--shadow);
+        resize: vertical;
+        font-size: 26px;
+        line-height: 1.4;
+        letter-spacing: 0.04em;
+        font-family: "Avenir Next", "Segoe UI", system-ui, sans-serif;
+        transition:
+          background 0.3s,
+          border-color 0.3s;
+      }
+      textarea.box:focus {
+        border-color: var(--blue);
+      }
+      #sentence.hit {
+        background: #fffbe8;
+      }
+      .row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 12px;
+      }
+      .row .grow {
+        margin-left: auto;
+      }
+      .cp {
+        background: var(--blue);
+        color: #fff;
+        border-color: var(--blue);
+        font-weight: 700;
+      }
+      .cp:hover {
+        background: #2661d6;
+      }
+      .next {
+        margin-top: 22px;
+        padding: 18px 20px;
+        border-radius: 22px;
+        background: linear-gradient(135deg, #fff6bf, #ffe9ef);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        flex-wrap: wrap;
+        font-weight: 700;
+      }
+      .tipbox {
+        margin-top: 16px;
+        padding: 16px 20px;
+        border-radius: 20px;
+        background: #fff;
+        border: 1px solid var(--line);
+        font-size: 14px;
+        color: var(--muted);
+      }
+      .tipbox strong {
+        color: var(--ink);
+      }
+
+      /* sign page */
+      .actor {
+        position: relative;
+        height: min(420px, 52vh);
+        min-height: 300px;
+        border-radius: 28px;
+        overflow: hidden;
+        border: 4px solid #fff;
+        box-shadow: 0 18px 44px rgba(29, 78, 154, 0.14);
+        background: linear-gradient(135deg, #a6e8f5, #c9d1ff 55%, #ffd3b5);
+      }
+      #actor {
+        width: 100%;
+        height: 100%;
+        display: block;
+      }
+      .badge {
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        min-width: 68px;
+        height: 68px;
+        padding: 0 10px;
+        border-radius: 20px;
+        background: var(--yellow);
+        color: var(--ink);
+        display: grid;
+        place-items: center;
+        font-size: 36px;
+        font-weight: 800;
+        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+      }
+      .spell {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        min-height: 30px;
+        margin-top: 12px;
+        font-size: 16px;
+        font-weight: 600;
+      }
+      .spell span {
+        color: #b7c4da;
+        padding: 0 4px;
+        border-radius: 7px;
+      }
+      .spell span.on {
+        color: var(--ink);
+        background: var(--yellow);
+        font-weight: 800;
+      }
+      #spellText {
+        min-height: 80px;
+        margin-top: 14px;
+        font-size: 24px;
+      }
+      .az {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(46px, 1fr));
+        gap: 8px;
+        margin-top: 6px;
+      }
+      .az button {
+        padding: 0;
+        height: 46px;
+        border-radius: 14px;
+        font-weight: 800;
+        font-size: 18px;
+        color: #fff;
+        border: 0;
+      }
+      .sec {
+        margin: 22px 0 4px;
+        font-weight: 700;
+        color: var(--ink);
+      }
+
+      @media (max-width: 820px) {
+        .hero .wrap {
+          grid-template-columns: 1fr;
+        }
+        .camera-layout {
+          grid-template-columns: 1fr;
+        }
+        .camera-output .bar {
+          margin-top: 12px;
+        }
+        .stage-card {
+          min-height: 320px;
+        }
+        .grid3 {
+          grid-template-columns: 1fr;
+        }
+      }
+      @media (max-width: 560px) {
+        .tabs a {
+          padding: 7px 6px;
+          font-size: 12px;
+        }
+        .tabs {
+          gap: 2px;
+          padding: 3px;
+        }
+        .logo span {
+          display: none;
+        }
+        .hero {
+          padding-top: 34px;
+        }
+        .row .grow {
+          margin-left: 0;
+        }
+        .stage {
+          width: 100%;
+          aspect-ratio: 4/3;
+          max-height: 72vh;
+        }
+        #page-read,
+        #page-new {
+          padding-top: 12px;
+        }
+        #page-read .wrap,
+        #page-new .wrap,
+        .app:fullscreen .wrap {
+          width: calc(100% - 24px);
+        }
+        .camera-layout {
+          gap: 12px;
+        }
+        #page-read .head,
+        #page-new .head {
+          margin-bottom: 8px;
+        }
+        #page-read .guide {
+          margin-bottom: 8px;
+        }
+        #page-read .bar,
+        #page-new .bar {
+          margin: 8px 0 6px;
+        }
+        textarea.box {
+          font-size: 22px;
+        }
+        .btn {
+          width: 100%;
+        }
+        .cta {
+          flex-direction: column;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation: none !important;
+          transition: none !important;
+        }
+        .rv {
+          opacity: 1;
+          transform: none;
+        }
+      }
+
+      .t3 {
+        --s: 56px;
+        --d: 6px;
+        --c1: #5b94ff;
+        --c2: #2f6fed;
+        --c3: #1d4e9a;
+        position: relative;
+        display: inline-grid;
+        place-items: center;
+        flex: none;
+        vertical-align: middle;
+        width: var(--s);
+        height: var(--s);
+        margin-bottom: var(--d);
+        border-radius: calc(var(--s) * 0.32);
+        color: #fff;
+        background: linear-gradient(145deg, var(--c1), var(--c2));
+        box-shadow:
+          inset 0 calc(var(--d) * 0.45) 0 rgba(255, 255, 255, 0.5),
+          inset 0 calc(var(--d) * -0.7) 0 rgba(0, 0, 0, 0.16),
+          0 var(--d) 0 var(--c3),
+          0 calc(var(--d) * 2) calc(var(--d) * 3) rgba(30, 60, 140, 0.28);
+      }
+      .t3::before {
+        content: "";
+        position: absolute;
+        left: 13%;
+        top: 8%;
+        width: 44%;
+        height: 24%;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.42);
+        transform: rotate(-22deg);
+        filter: blur(1px);
+      }
+      .t3 svg {
+        width: 58%;
+        height: 58%;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2.4;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        filter: drop-shadow(0 1.5px 0 rgba(0, 0, 0, 0.28));
+        position: relative;
+      }
+      .t3.xs {
+        --s: 26px;
+        --d: 3px;
+      }
+      .t3.sm {
+        --s: 34px;
+        --d: 3px;
+      }
+      .t3.md {
+        --s: 46px;
+        --d: 5px;
+      }
+      .t3.lg {
+        --s: 58px;
+        --d: 6px;
+      }
+      .t3.xl {
+        --s: 104px;
+        --d: 10px;
+      }
+      .k-coral {
+        --c1: #ff9aa9;
+        --c2: #ff6b81;
+        --c3: #d9435c;
+      }
+      .k-mint {
+        --c1: #62ecd2;
+        --c2: #22c3a0;
+        --c3: #12896f;
+      }
+      .k-purple {
+        --c1: #b49cfb;
+        --c2: #8b5cf6;
+        --c3: #6238c9;
+      }
+      .k-orange {
+        --c1: #ffc782;
+        --c2: #ff9f43;
+        --c3: #d9741a;
+      }
+      .k-sky {
+        --c1: #85d7fd;
+        --c2: #38bdf8;
+        --c3: #1c8ac2;
+      }
+      .k-yellow {
+        --c1: #fff394;
+        --c2: #ffe14a;
+        --c3: #d9b400;
+        color: var(--ink);
+      }
+      .k-yellow svg {
+        filter: drop-shadow(0 1.5px 0 rgba(255, 255, 255, 0.5));
+      }
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding-left: 8px;
+      }
+      .hd {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      button,
+      .cp {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+      .row button {
+        padding-left: 12px;
+      }
+      .empty .big {
+        line-height: 1;
+      }
+    </style>
+  </head>
+  <body>
+    <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+      <defs>
+        <symbol id="g-cam" viewBox="0 0 24 24">
+          <path
+            d="M4 8h3l1.5-2h7L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"
+          />
+          <circle cx="12" cy="13" r="3.5" />
+        </symbol>
+        <symbol id="g-hand" viewBox="0 0 24 24">
+          <path
+            d="M7 12.5V7a1.4 1.4 0 0 1 2.8 0v4.5M9.8 11.5V5.2a1.4 1.4 0 0 1 2.8 0V11M12.6 11V6a1.4 1.4 0 0 1 2.8 0v6M15.4 12V8.2a1.4 1.4 0 0 1 2.8 0v6.3c0 3.9-2.7 6.5-6.2 6.5-2.6 0-4-1.1-5.4-3.2L5 15.2a1.4 1.4 0 0 1 2.2-1.7z"
+          />
+        </symbol>
+        <symbol id="g-pen" viewBox="0 0 24 24">
+          <path d="M4 20l1-4L16 5l3 3L8 19z" />
+          <path d="M14 7l3 3" />
+        </symbol>
+        <symbol id="g-lock" viewBox="0 0 24 24">
+          <rect x="5" y="11" width="14" height="9" rx="2.5" />
+          <path d="M8 11V8a4 4 0 0 1 8 0v3" />
+        </symbol>
+        <symbol id="g-eye" viewBox="0 0 24 24">
+          <path
+            d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"
+          />
+          <circle cx="12" cy="12" r="3" />
+        </symbol>
+        <symbol id="g-note" viewBox="0 0 24 24">
+          <rect x="5" y="3.5" width="14" height="17" rx="2.5" />
+          <path d="M8.5 9h7M8.5 13h7M8.5 17h4" />
+        </symbol>
+        <symbol id="g-rocket" viewBox="0 0 24 24">
+          <path d="M12 3c3 2 5 5 5 9l-2 3H9l-2-3c0-4 2-7 5-9z" />
+          <circle cx="12" cy="10" r="1.6" />
+          <path d="M9 15l-2 4 3-1M15 15l2 4-3-1" />
+        </symbol>
+        <symbol id="g-flip" viewBox="0 0 24 24">
+          <path d="M4 12a8 8 0 0 1 14-5l2 2M20 12a8 8 0 0 1-14 5l-2-2" />
+          <path d="M20 4v5h-5M4 20v-5h5" />
+        </symbol>
+        <symbol id="g-copy" viewBox="0 0 24 24">
+          <rect x="8" y="8" width="12" height="12" rx="2.5" />
+          <path
+            d="M16 8V6.5A2.5 2.5 0 0 0 13.5 4h-7A2.5 2.5 0 0 0 4 6.5v7A2.5 2.5 0 0 0 6.5 16H8"
+          />
+        </symbol>
+        <symbol id="g-trash" viewBox="0 0 24 24">
+          <path d="M5 7h14M10 7V4h4v3M7 7l1 13h8l1-13" />
+        </symbol>
+        <symbol id="g-back" viewBox="0 0 24 24">
+          <path d="M9 6h11v12H9l-6-6z" />
+          <path d="M13 10l4 4M17 10l-4 4" />
+        </symbol>
+        <symbol id="g-space" viewBox="0 0 24 24">
+          <path d="M4 11v5h16v-5" />
+        </symbol>
+        <symbol id="g-check" viewBox="0 0 24 24">
+          <path d="M5 12l4.5 4.5L19 7" />
+        </symbol>
+        <symbol id="g-spark" viewBox="0 0 24 24">
+          <path d="M12 3l2 6 6 2-6 2-2 6-2-6-6-2 6-2z" />
+        </symbol>
+        <symbol id="g-play" viewBox="0 0 24 24">
+          <path d="M8 5l12 7-12 7z" fill="currentColor" />
+        </symbol>
+        <symbol id="g-stop" viewBox="0 0 24 24">
+          <rect x="6" y="6" width="12" height="12" rx="2" fill="currentColor" />
+        </symbol>
+      </defs>
+    </svg>
+    <nav class="nav">
+      <div class="wrap">
+        <a class="logo" href="#home"
+          ><svg viewBox="0 0 32 32" aria-hidden="true">
+            <rect fill="#ffe14a" width="32" height="32" rx="8" />
+            <rect
+              fill="#1d4e9a"
+              x="7"
+              y="20"
+              width="18"
+              height="5"
+              rx="2.5"
+            /></svg
+          ><span>संकेतवाणी</span></a
+        >
+        <div class="tabs">
+          <a href="#home" data-p="home">होम</a>
+          <a href="#read" data-p="read">हाथ से लेख</a>
+          <a href="#sign" data-p="sign">लेख से हाथ</a>
+          <a href="#new" data-p="new">नया संकेत</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- ============ PAGE 1: LANDING ============ -->
+    <div id="page-home">
+      <header class="hero">
+        <i class="blob b1"></i><i class="blob b2"></i><i class="blob b3"></i>
+        <div class="wrap">
+          <div>
+            <span class="pill"
+              ><i data-i="spark" data-k="yellow" data-s="xs"></i>सीखना हुआ आसान
+              और मज़ेदार</span
+            >
+            <h1>हाथ के इशारे, अब <span class="hl">शब्दों</span> में</h1>
+            <p class="lead">
+              कैमरे के सामने A–Z के हाथ-संकेत दिखाइए, संकेतवाणी उन्हें तुरंत लिख
+              देगा। या कुछ लिखिए और देखिए कि हाथ उसे कैसे दिखाता है।
+            </p>
+            <div class="cta">
+              <a class="btn btn-p" href="#read"
+                ><i data-i="cam" data-k="yellow" data-s="xs"></i>कैमरा चालू
+                करें</a
+              >
+              <a class="btn btn-g" href="#sign"
+                ><i data-i="pen" data-k="orange" data-s="xs"></i>लेख से हाथ
+                देखें</a
+              >
+            </div>
+          </div>
+          <div class="stage-card" aria-hidden="true">
+            <span class="chip c1 lat">A</span><span class="chip c2 lat">B</span
+            ><span class="chip c3 lat">C</span
+            ><span class="chip c4 lat">D</span>
+            <div class="demo lat">
+              <div class="big" id="demoL">H</div>
+              <div class="hand">
+                <i data-i="hand" data-k="blue" data-s="xl"></i>
+              </div>
+              <div class="out" id="demoOut">HELLO</div>
+            </div>
+          </div>
+        </div>
+      </header>
+      <div class="marq" aria-hidden="true"><div id="marq"></div></div>
+
+      <section class="block">
+        <div class="wrap">
+          <h2 class="rv">सिर्फ़ तीन आसान कदम</h2>
+          <p class="intro rv">
+            कोई इंस्टॉल नहीं, कोई साइन-अप नहीं। फ़ोन या कंप्यूटर, कहीं भी खोलिए।
+          </p>
+          <div class="grid3">
+            <div class="tile rv" style="--c: var(--blue)">
+              <div class="ic">
+                <i data-i="cam" data-k="blue" data-s="lg"></i>
+              </div>
+              <h3>1. कैमरा चालू करें</h3>
+              <p>“चालू करें” दबाइए और कैमरे की अनुमति दीजिए।</p>
+            </div>
+            <div class="tile rv" style="--c: var(--coral)">
+              <div class="ic">
+                <i data-i="hand" data-k="coral" data-s="lg"></i>
+              </div>
+              <h3>2. अक्षर दिखाएँ</h3>
+              <p>हाथ कैमरे के सामने रखकर किसी भी अक्षर का संकेत बनाइए।</p>
+            </div>
+            <div class="tile rv" style="--c: var(--mint)">
+              <div class="ic">
+                <i data-i="note" data-k="mint" data-s="lg"></i>
+              </div>
+              <h3>3. वाक्य बनाएँ</h3>
+              <p>अक्षर अपने-आप जुड़ते जाते हैं। स्पेस दबाइए, फिर कॉपी कीजिए।</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="block">
+        <div class="wrap">
+          <h2 class="rv">विद्यार्थियों के लिए बनाया गया</h2>
+          <p class="intro rv">
+            सीखने, अभ्यास करने और दूसरों से बात करने का सरल साथी।
+          </p>
+          <div class="grid3">
+            <div class="tile rv" style="--c: var(--purple)">
+              <div class="ic">
+                <i data-i="eye" data-k="purple" data-s="lg"></i>
+              </div>
+              <h3>हाथ से लेख</h3>
+              <p>कैमरा आपके संकेत पहचानकर अक्षर लिख देता है।</p>
+            </div>
+            <div class="tile rv" style="--c: var(--orange)">
+              <div class="ic">
+                <i data-i="pen" data-k="orange" data-s="lg"></i>
+              </div>
+              <h3>लेख से हाथ</h3>
+              <p>कुछ भी टाइप कीजिए, हाथ हर अक्षर का संकेत दिखाएगा।</p>
+            </div>
+            <div class="tile rv" style="--c: var(--sky)">
+              <div class="ic">
+                <i data-i="lock" data-k="sky" data-s="lg"></i>
+              </div>
+              <h3>आपके डिवाइस पर</h3>
+              <p>
+                पहचान आपके ब्राउज़र में होती है। वीडियो कहीं भेजा नहीं जाता।
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="band">
+        <h2>तैयार हैं? चलिए शुरू करें</h2>
+        <p>पहला अक्षर बस एक इशारा दूर है।</p>
+        <a class="btn btn-y" href="#read"
+          >अभी आज़माएँ<i data-i="rocket" data-k="blue" data-s="xs"></i
+        ></a>
+      </div>
+    </div>
+
+    <!-- ============ PAGE 2: HAND → TEXT ============ -->
+    <div id="page-read" class="app" hidden>
+      <div class="wrap">
+        <div class="head">
+          <div>
+            <h2 class="hd">
+              <i data-i="cam" data-k="blue" data-s="md"></i>हाथ से लेख
+            </h2>
+            <p>कैमरे के सामने अक्षर का संकेत दिखाइए</p>
+          </div>
+          <div class="status" id="status">
+            <span class="dot"></span><span id="statusText">तैयार</span>
+          </div>
+          <button class="fullscreen-btn" id="readFullscreen" type="button">
+            पूर्ण स्क्रीन
+          </button>
+        </div>
+        <div id="banner" class="banner" role="alert"></div>
+        <div class="guide">
+          <div><b>1</b>अच्छी रोशनी में बैठें</div>
+          <div><b>2</b>पूरी हथेली दिखाएँ</div>
+          <div><b>3</b>संकेत बदलें; दोहराने से पहले हाथ ढीला करें</div>
+          <div><b>4</b>स्पेस: तर्जनी और छोटी उँगली उठाएँ, अंगूठा फैलाएँ</div>
+        </div>
+        <div class="camera-layout">
+          <section class="stage" id="stage" aria-label="कैमरा">
+            <video
+              id="video"
+              playsinline
+              webkit-playsinline
+              muted
+              autoplay
+            ></video>
+            <canvas id="view" width="640" height="480"></canvas>
+            <div class="empty">
+              <p>
+                <span class="big"
+                  ><i data-i="cam" data-k="blue" data-s="xl"></i></span
+                ><strong>कैमरा बंद है</strong>चालू करने के लिए ऊपर बटन दबाएँ
+              </p>
+            </div>
+            <div class="hud" id="hudText">तैयार</div>
+            <div class="acts">
+              <button id="flip" type="button" aria-label="कैमरा बदलें">
+                <i data-i="flip" data-k="sky" data-s="sm"></i>
+              </button>
+              <button id="start" type="button">चालू करें</button>
+              <button id="stop" type="button" hidden>बंद करें</button>
+            </div>
+          </section>
+          <div class="camera-output">
+            <div class="bar">
+              <div id="letter" class="lat dim" aria-live="polite">—</div>
+              <p>अभी पहचाना गया अक्षर</p>
+            </div>
+            <textarea
+              id="sentence"
+              class="box"
+              rows="3"
+              autocomplete="off"
+              spellcheck="false"
+              aria-label="लेख"
+              placeholder="यहाँ लिखाई आएगी"
+            ></textarea>
+            <div class="row">
+              <button id="space" type="button">
+                <i data-i="space" data-k="purple" data-s="xs"></i>स्पेस
+              </button>
+              <button id="back" type="button">
+                <i data-i="back" data-k="orange" data-s="xs"></i>मिटाएँ
+              </button>
+              <button id="clear" type="button">
+                <i data-i="trash" data-k="coral" data-s="xs"></i>साफ़
+              </button>
+              <button id="copy" class="cp grow" type="button">
+                <i data-i="copy" data-k="yellow" data-s="xs"></i
+                ><span id="copyLbl">कॉपी</span>
+              </button>
+              <button id="speak" type="button">सुनें</button>
+            </div>
+          </div>
+        </div>
+        <div class="next">
+          <span>अब उल्टा करके देखें: लिखिए और हाथ से संकेत देखिए</span
+          ><a class="btn btn-p" href="#sign">लेख से हाथ →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ PAGE 3: TEXT → HAND ============ -->
+    <div id="page-sign" class="app" hidden>
+      <div class="wrap">
+        <div class="head">
+          <div>
+            <h2 class="hd">
+              <i data-i="pen" data-k="orange" data-s="md"></i>लेख से हाथ
+            </h2>
+            <p>अंग्रेज़ी अक्षर (A–Z) लिखिए और संकेत देखिए</p>
+          </div>
+          <div class="status">
+            <span class="dot"></span><span id="signStatus">तैयार</span>
+          </div>
+        </div>
+        <div class="actor">
+          <canvas id="actor" aria-label="संकेत दिखाता हाथ"></canvas>
+          <div class="badge lat" id="badge">—</div>
+        </div>
+        <textarea
+          id="spellText"
+          class="box"
+          rows="2"
+          autocomplete="off"
+          spellcheck="false"
+          aria-label="लेख"
+          placeholder="HELLO"
+        >
+HELLO</textarea
+        >
+        <div class="spell lat" id="spellLine" aria-hidden="true"></div>
+        <div class="row">
+          <button id="playSign" class="cp" type="button">
+            <span id="playIc"
+              ><i data-i="play" data-k="yellow" data-s="xs"></i></span
+            ><span id="playLbl">शुरू करें</span>
+          </button>
+        </div>
+        <div class="sec">किसी भी अक्षर को दबाकर उसका संकेत देखें</div>
+        <div class="az lat" id="az"></div>
+        <div class="next">
+          <span>अब असली अभ्यास करें: कैमरे को अपना संकेत दिखाइए</span
+          ><a class="btn btn-p" href="#read"
+            ><i data-i="cam" data-k="yellow" data-s="xs"></i>हाथ से लेख →</a
+          >
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ PAGE 4: CUSTOM HAND ALPHABET ============ -->
+    <div id="page-new" class="app" hidden>
+      <div class="wrap">
+        <div class="head">
+          <div>
+            <h2 class="hd">
+              <i data-i="cam" data-k="blue" data-s="md"></i>नए हाथ-संकेत (A–Z)
+            </h2>
+            <p>कैमरे के सामने नए संकेत दिखाइए</p>
+          </div>
+          <div class="status" id="customStatus">
+            <span class="dot"></span><span id="customStatusText">तैयार</span>
+          </div>
+          <button class="fullscreen-btn" id="newFullscreen" type="button">
+            पूर्ण स्क्रीन
+          </button>
+        </div>
+        <div id="customBanner" class="banner" role="alert"></div>
+        <div class="camera-layout">
+          <section
+            class="stage"
+            id="customStage"
+            aria-label="नए संकेतों का कैमरा"
+          >
+            <video
+              id="customVideo"
+              class="custom-source"
+              playsinline
+              webkit-playsinline
+              muted
+              autoplay
+            ></video>
+            <canvas
+              id="customView"
+              class="custom-view"
+              width="640"
+              height="480"
+            ></canvas>
+            <div class="empty">
+              <p>
+                <span class="big"
+                  ><i data-i="cam" data-k="blue" data-s="xl"></i></span
+                ><strong>कैमरा बंद है</strong>नए संकेत पहचानने के लिए चालू करें
+              </p>
+            </div>
+            <div class="hud" id="customHud">तैयार</div>
+            <div class="acts">
+              <button id="customFlip" type="button" aria-label="कैमरा बदलें">
+                <i data-i="flip" data-k="sky" data-s="sm"></i>
+              </button>
+              <button id="customStart" type="button">चालू करें</button>
+              <button id="customStop" type="button" hidden>बंद करें</button>
+            </div>
+          </section>
+          <div class="camera-output">
+            <div class="bar">
+              <div id="customLetter" class="lat dim">—</div>
+              <p>पहचाना गया नया अक्षर</p>
+            </div>
+            <textarea
+              id="customText"
+              class="box"
+              rows="3"
+              readonly
+              aria-label="पहचाने गए नए संकेतों का लेख"
+              placeholder="पहचाने गए अक्षर और स्पेस यहाँ जुड़ेंगे"
+            ></textarea>
+            <div class="row">
+              <button id="customSpace" type="button">
+                <i data-i="space" data-k="purple" data-s="xs"></i>स्पेस
+              </button>
+              <button id="customBack" type="button">
+                <i data-i="back" data-k="orange" data-s="xs"></i>मिटाएँ
+              </button>
+              <button id="customClear" type="button">
+                <i data-i="trash" data-k="coral" data-s="xs"></i>साफ़
+              </button>
+              <button id="customCopy" class="cp grow" type="button">
+                <i data-i="copy" data-k="yellow" data-s="xs"></i
+                ><span id="customCopyLbl">कॉपी</span>
+              </button>
+              <button id="customSpeak" type="button">सुनें</button>
+            </div>
+          </div>
+        </div>
+        <section class="custom-chart-wrap" aria-labelledby="customChartTitle">
+          <h3 class="custom-chart-title" id="customChartTitle">
+            हाथ-संकेत कोड चार्ट
+          </h3>
+          <p class="custom-chart-note">
+            अक्षर के सामने सीधी रखी जाने वाली उँगलियों के नंबर हैं। O के लिए
+            मुट्ठी बनाएँ।
+          </p>
+          <div class="custom-codes" role="list" aria-label="अक्षर और उँगली कोड">
+            <div class="custom-code" role="listitem">
+              <span class="custom-code-letter">A</span
+              ><span class="custom-code-value">1</span>
+            </div>
+            <div class="custom-code" role="listitem">
+              <span class="custom-code-letter">B</span
+              ><span class="custom-code-value">2</span>
+            </div>
+            <div class="custom-code" role="listitem">
+              <span class="custom-code-letter">C</span
+              ><span class="custom-code-value">5</span>
+            </div>
+            <div class="custom-code" role="listitem">
+              <span class="custom-code-letter">D</span
+              ><span class="custom-code-value">12</span>
+            </div>
+            <div class="custom-code" role="listitem">
+              <span class="custom-code-letter">E</span
+              ><span class="custom-code-value">123</span>
+            </div>
+            <div class="custom-code" role="listitem">
+              <span class="custom-code-letter">F</span
+              ><span class="custom-code-value">1234</span>
+            </div>
+            <div class="custom-code" role="listitem">
+              <span class="custom-code-letter">G</span
+              ><span class="custom-code-value">12345</span>
+            </div>
+            <div class="custom-code" role="listitem">
+              <span class="custom-code-letter">H</span
+              ><span class="custom-code-value">2345</span>
+            </div>
+            <div class="custom-code" role="listitem">
+              <span class="custom-code-letter">I</span
+              ><span class="custom-code-value">345</span>
+            </div>
+            <div class="custom-code" role="listitem">
+              <span class="custom-code-letter">J</span
+              ><span class="custom-code-value">45</span>
+            </div>
+            <div class="custom-code" role="listitem">
+              <span class="custom-code-letter">K</span
+              ><span class="custom-code-value">15</span>
+            </div>
+            <div class="custom-code" role="listitem">
+              <span class="custom-code-letter">L</span
+              ><span class="custom-code-value">23</span>
+            </div>
+            <div class="custom-code" role="listitem">
+              <span class="custom-code-letter">M</span
+              ><span class="custom-code-value custom-code-value-both"
+                >34, 134</span
+              >
+            </div>
+            <div class="custom-code" role="listitem">
+              <span class="custom-code-letter">N</span
+              ><span class="custom-code-value">234</span>
+            </div>
+            <div class="custom-code" role="listitem">
+              <span class="custom-code-letter">O</span
+              ><span class="custom-code-value">मुट्ठी</span>
+            </div>
+            <div class="custom-code" role="listitem">
+              <span class="custom-code-letter">P</span
+              ><span class="custom-code-value">25</span>
+            </div>
+            <div class="custom-code" role="listitem">
+              <span class="custom-code-letter">Q</span
+              ><span class="custom-code-value">35</span>
+            </div>
+            <div class="custom-code" role="listitem">
+              <span class="custom-code-letter">R</span
+              ><span class="custom-code-value">13</span>
+            </div>
+            <div class="custom-code" role="listitem">
+              <span class="custom-code-letter">S</span
+              ><span class="custom-code-value">4</span>
+            </div>
+            <div class="custom-code" role="listitem">
+              <span class="custom-code-letter">T</span
+              ><span class="custom-code-value">135</span>
+            </div>
+            <div class="custom-code" role="listitem">
+              <span class="custom-code-letter">U</span
+              ><span class="custom-code-value">1345</span>
+            </div>
+            <div class="custom-code" role="listitem">
+              <span class="custom-code-letter">V</span
+              ><span class="custom-code-value">1245</span>
+            </div>
+            <div class="custom-code" role="listitem">
+              <span class="custom-code-letter">W</span
+              ><span class="custom-code-value">24</span>
+            </div>
+            <div class="custom-code" role="listitem">
+              <span class="custom-code-letter">X</span
+              ><span class="custom-code-value">14</span>
+            </div>
+            <div class="custom-code" role="listitem">
+              <span class="custom-code-letter">Y</span
+              ><span class="custom-code-value">124</span>
+            </div>
+            <div class="custom-code" role="listitem">
+              <span class="custom-code-letter">Z</span
+              ><span class="custom-code-value">1235</span>
+            </div>
+            <div class="custom-code" role="listitem">
+              <span class="custom-code-letter">स्पेस</span
+              ><span class="custom-code-value">125</span>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+      /* ---------- helpers & routing ---------- */
+      const $ = (s) => document.querySelector(s);
+      const PAL = [
+        "#2f6fed",
+        "#ff6b81",
+        "#22c3a0",
+        "#8b5cf6",
+        "#ff9f43",
+        "#38bdf8",
+      ];
+      const PAGES = ["home", "read", "sign", "new"];
+      function t3(n, k, sz) {
+        return `<span class="t3 k-${k} ${sz || ""}"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#g-${n}"/></svg></span>`;
+      }
+      document.querySelectorAll("i[data-i]").forEach((el) => {
+        el.outerHTML = t3(el.dataset.i, el.dataset.k, el.dataset.s);
+      });
+      function route() {
+        let p = (location.hash || "#home").slice(1);
+        if (!PAGES.includes(p)) p = "home";
+        PAGES.forEach((n) => {
+          $("#page-" + n).hidden = n !== p;
+        });
+        document
+          .querySelectorAll(".tabs a")
+          .forEach((a) => a.classList.toggle("on", a.dataset.p === p));
+        if (p !== "read" && running) stopCamera();
+        if (p !== "new") stopCustomCamera();
+        if (p !== "sign") stopSigns();
+        signOn = p === "sign";
+        cancelAnimationFrame(signLoopId);
+        if (signOn) signLoopId = requestAnimationFrame(signLoop);
+        window.scrollTo(0, 0);
+      }
+      addEventListener("hashchange", route);
+
+      /* landing: letters marquee, hero demo, reveal */
+      const AZ = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      $("#marq").innerHTML = (AZ + AZ)
+        .split("")
+        .map((c) => `<span class="lat">${c}</span>`)
+        .join("");
+      $("#az").innerHTML = AZ.split("")
+        .map(
+          (c, i) =>
+            `<button type="button" style="background:${PAL[i % 6]}" data-c="${c}">${c}</button>`,
+        )
+        .join("");
+      (function () {
+        const w = "HELLO";
+        let i = 0;
+        setInterval(() => {
+          i = (i + 1) % (w.length + 1);
+          $("#demoL").textContent = w[Math.min(i, w.length - 1)];
+          $("#demoOut").innerHTML =
+            w
+              .slice(0, i)
+              .split("")
+              .map((c, k) => (k === i - 1 ? `<b>${c}</b>` : c))
+              .join("") + w.slice(i).replace(/./g, "·");
+        }, 900);
+      })();
+      const io = new IntersectionObserver(
+        (es) =>
+          es.forEach((e) => {
+            if (e.isIntersecting) {
+              e.target.classList.add("in");
+              io.unobserve(e.target);
+            }
+          }),
+        { threshold: 0.15 },
+      );
+      document.querySelectorAll(".rv").forEach((el, i) => {
+        el.style.transitionDelay = (i % 3) * 90 + "ms";
+        io.observe(el);
+      });
+
+      /* ---------- camera page ---------- */
+      const BONES = [
+        [0, 1],
+        [1, 2],
+        [2, 3],
+        [3, 4],
+        [0, 5],
+        [5, 6],
+        [6, 7],
+        [7, 8],
+        [0, 9],
+        [9, 10],
+        [10, 11],
+        [11, 12],
+        [0, 13],
+        [13, 14],
+        [14, 15],
+        [15, 16],
+        [0, 17],
+        [17, 18],
+        [18, 19],
+        [19, 20],
+        [5, 9],
+        [9, 13],
+        [13, 17],
+      ];
+      const video = $("#video"),
+        view = $("#view"),
+        ctx = view.getContext("2d"),
+        stage = $("#stage"),
+        startBtn = $("#start"),
+        stopBtn = $("#stop"),
+        flipBtn = $("#flip"),
+        letterEl = $("#letter"),
+        sentence = $("#sentence"),
+        statusEl = $("#status"),
+        hudText = $("#hudText"),
+        banner = $("#banner"),
+        copyBtn = $("#copy");
+      let stream = null,
+        running = false,
+        runId = 0,
+        speechRunId = 0,
+        raf = 0,
+        landmarks = [],
+        pending = "",
+        pendingCount = 0,
+        committed = "",
+        armed = true,
+        copyTimer = 0,
+        handLandmarker = null,
+        detectorReady = null,
+        reader = null,
+        facing = "user";
+      const customVideo = $("#customVideo"),
+        customView = $("#customView"),
+        customCtx = customView.getContext("2d"),
+        customStage = $("#customStage"),
+        customStatusText = $("#customStatusText"),
+        customHud = $("#customHud"),
+        customBanner = $("#customBanner"),
+        customStatus = $("#customStatus"),
+        customLetter = $("#customLetter"),
+        customText = $("#customText"),
+        customCopyBtn = $("#customCopy"),
+        customCopyLabel = $("#customCopyLbl"),
+        customSpeakBtn = $("#customSpeak"),
+        customStartBtn = $("#customStart"),
+        customStopBtn = $("#customStop"),
+        customFlipBtn = $("#customFlip");
+      let customStream = null,
+        customRunning = false,
+        customRunId = 0,
+        customRaf = 0,
+        customLandmarks = [],
+        customCandidate = "",
+        customCandidateCount = 0,
+        customLastCommitted = "",
+        customArmed = true,
+        customSpaceLatched = false,
+        customCopyTimer = 0,
+        customSpeechRunId = 0;
+      const EXTENDED_ANGLE = 150,
+        EDGE_PALM = 0.4,
+        DOWN_ANGLE = 145;
+      const MODEL_URL =
+        "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task";
+      const VISION_URL =
+        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.21/vision_bundle.mjs";
+      const WASM_URL =
+        "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.21/wasm";
+
+      const norm2 = (v) => {
+        const l = Math.hypot(v[0], v[1]);
+        return l < 1e-8 ? [1, 0] : [v[0] / l, v[1] / l];
+      };
+      const dist2 = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]);
+      function angleAt(a, b, c) {
+        const v1 = [a[0] - b[0], a[1] - b[1], a[2] - b[2]],
+          v2 = [c[0] - b[0], c[1] - b[1], c[2] - b[2]];
+        const n1 = Math.hypot(...v1) || 1e-8,
+          n2 = Math.hypot(...v2) || 1e-8;
+        return (
+          (Math.acos(
+            Math.max(
+              -1,
+              Math.min(
+                1,
+                (v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2]) / (n1 * n2),
+              ),
+            ),
+          ) *
+            180) /
+          Math.PI
+        );
+      }
+      function extractHand(p) {
+        if (p.length !== 21) return null;
+        const w = p[0],
+          im = p[5],
+          mm = p[9],
+          rm = p[13],
+          pm = p[17];
+        const scale = Math.hypot(mm[0] - w[0], mm[1] - w[1], mm[2] - w[2]);
+        if (scale < 1e-4) return null;
+        const up = norm2([mm[0] - w[0], mm[1] - w[1]]),
+          ra = [im[0] - pm[0], im[1] - pm[1]],
+          al = ra[0] * up[0] + ra[1] * up[1];
+        const across = norm2([ra[0] - al * up[0], ra[1] - al * up[1]]);
+        const L = p.map((q) => {
+          const dx = q[0] - w[0],
+            dy = q[1] - w[1];
+          return [
+            (dx * across[0] + dy * across[1]) / scale,
+            (dx * up[0] + dy * up[1]) / scale,
+            q[2] / scale,
+          ];
+        });
+        const chains = [
+          [5, 6, 7],
+          [9, 10, 11],
+          [13, 14, 15],
+          [17, 18, 19],
+        ];
+        const angles = chains.map(([a, b, c]) => angleAt(L[a], L[b], L[c]));
+        const ext = angles.map((a) => a >= EXTENDED_ANGLE);
+        const ax = im[0] - w[0],
+          ay = im[1] - w[1],
+          bx = pm[0] - w[0],
+          by = pm[1] - w[1];
+        const iT = L[8],
+          mT = L[12],
+          iD = L[7],
+          tT = L[4],
+          tips = [L[8], L[12], L[16], L[20]];
+        const dx = p[8][0] - p[5][0],
+          dy = p[8][1] - p[5][1];
+        return {
+          ext,
+          angles,
+          pinch: dist2(tT, iT),
+          palmArea: Math.abs(ax * by - ay * bx) / (scale * scale),
+          thumbTip: tT,
+          indexTip: iT,
+          middleTip: mT,
+          indexMcp: L[5],
+          middleMcp: L[9],
+          ringMcp: L[13],
+          spread: Math.abs(iT[0] - mT[0]),
+          crossed: iT[0] < mT[0] - 0.02 && L[5][0] > L[9][0] + 0.02,
+          hooked:
+            angles[0] >= 112 &&
+            angles[0] <= 152 &&
+            iT[1] + 0.05 < iD[1] &&
+            angles[1] < 110 &&
+            angles[2] < 110 &&
+            angles[3] < 110,
+          indexAngleImg: dx || dy ? (Math.atan2(dx, -dy) * 180) / Math.PI : 0,
+          meanAngle: angles.reduce((s, a) => s + a, 0) / 4,
+          thumbOut: tT[0] > L[5][0] + 0.08,
+          tipGap: tips.reduce((s, t) => s + dist2(tT, t), 0) / 4,
+        };
+      }
+      function closedLetter(f) {
+        const tx = f.thumbTip[0],
+          ty = f.thumbTip[1];
+        if (f.tipGap <= 0.3 && f.pinch <= 0.3) return ["O", 0.9];
+        if (
+          f.meanAngle >= 100 &&
+          f.meanAngle <= 158 &&
+          f.tipGap > 0.3 &&
+          f.pinch > 0.24
+        )
+          return ["C", 0.88];
+        if (f.tipGap <= 0.3) return ["E", 0.84];
+        if (tx > f.indexMcp[0] + 0.12 && ty < 1.25) return ["A", 0.88];
+        if (ty > 1.05 && tx < f.indexMcp[0]) return ["S", 0.82];
+        if (tx < f.ringMcp[0] + 0.08) return ["M", 0.78];
+        if (tx < f.middleMcp[0] + 0.08) return ["N", 0.76];
+        return ["T", 0.76];
+      }
+      function twoFingers(f) {
+        const edge = f.palmArea < EDGE_PALM,
+          down = Math.abs(f.indexAngleImg) >= DOWN_ANGLE;
+        if (edge && down) return ["P", 0.82];
+        if (f.crossed) return ["R", 0.88];
+        const tx = f.thumbTip[0],
+          ty = f.thumbTip[1],
+          lo = Math.min(f.indexTip[0], f.middleTip[0]) - 0.1,
+          hi = Math.max(f.indexTip[0], f.middleTip[0]) + 0.1;
+        if (ty > 1.05 && lo <= tx && tx <= hi) return ["K", 0.86];
+        if (f.spread >= 0.3) return ["V", 0.9];
+        if (edge) return f.spread < 0.24 ? ["H", 0.86] : ["", 0];
+        if (f.spread >= 0.24) return ["V", 0.9];
+        return ["U", 0.88];
+      }
+      function indexOnly(f) {
+        const edge = f.palmArea < EDGE_PALM,
+          down = Math.abs(f.indexAngleImg) >= DOWN_ANGLE;
+        if (f.hooked) return ["X", 0.84];
+        if (edge && down) return ["Q", 0.82];
+        if (edge) return ["G", 0.84];
+        if (f.thumbOut) return ["L", 0.9];
+        return ["D", 0.88];
+      }
+      function unclear(f) {
+        const mid = f.angles.filter((a) => a >= 130 && a < 158);
+        if (!mid.length) return false;
+        if (
+          mid.length === 4 &&
+          Math.max(...f.angles) - Math.min(...f.angles) <= 18 &&
+          f.pinch >= 0.45 &&
+          f.palmArea >= EDGE_PALM
+        )
+          return false;
+        return true;
+      }
+      function classify(f) {
+        if (f.hooked) return ["X", 0.84];
+        const [i, m, r, p] = f.ext;
+        if (!i && !m && !r && !p) return closedLetter(f);
+        if (unclear(f)) return ["", 0];
+        if (p && !i && !m && !r)
+          return f.thumbTip[0] > 0.7 ? ["Y", 0.9] : ["I", 0.9];
+        if (f.pinch < 0.32 && m && r && p && !i) return ["F", 0.9];
+        if (i && m && r && p)
+          return f.thumbTip[0] < f.indexMcp[0] + 0.05 ? ["B", 0.9] : ["", 0];
+        if (i && m && r && !p) return ["W", 0.88];
+        if (i && m && !r && !p) return twoFingers(f);
+        if (i && !m && !r && !p) return indexOnly(f);
+        return ["", 0];
+      }
+      function pathLength(pts) {
+        let l = 0;
+        for (let i = 1; i < pts.length; i++) l += dist2(pts[i - 1], pts[i]);
+        return l;
+      }
+      function reversals(v) {
+        const s = [];
+        for (let i = 1; i < v.length; i++) {
+          const d = v[i] - v[i - 1];
+          if (Math.abs(d) < 0.008) continue;
+          const g = d > 0 ? 1 : -1;
+          if (!s.length || s[s.length - 1] !== g) s.push(g);
+        }
+        return Math.max(0, s.length - 1);
+      }
+      function SignReader() {
+        this.history = [];
+        this.spaceLatched = false;
+      }
+      SignReader.prototype.miss = function () {
+        this.history = [];
+        this.spaceLatched = false;
+      };
+      SignReader.prototype.read = function (lm) {
+        const pts = lm.map((p) => [p.x, p.y, p.z || 0]);
+        const out = pts.map((p) => [p[0], p[1]]);
+        const f = extractHand(pts);
+        if (!f) {
+          this.miss();
+          return { hand: true, letter: "", confidence: 0, landmarks: out };
+        }
+        let [l, c] = classify(f);
+        [l, c] = this.motion(l, c, pts, f);
+        return { hand: true, letter: l, confidence: c, landmarks: out };
+      };
+      SignReader.prototype.motion = function (l, c, pts, f) {
+        const now = performance.now() / 1000;
+        if (
+          this.history.length &&
+          now - this.history[this.history.length - 1][0] > 0.75
+        )
+          this.history = [];
+        const spacePose =
+          f.ext[0] &&
+          !f.ext[1] &&
+          !f.ext[2] &&
+          f.ext[3] &&
+          f.palmArea >= EDGE_PALM &&
+          f.thumbOut;
+        if (!spacePose) this.spaceLatched = false;
+        this.history.push([
+          now,
+          [pts[8][0], pts[8][1]],
+          [pts[20][0], pts[20][1]],
+          l,
+        ]);
+        if (this.history.length > 24) this.history.shift();
+        if (spacePose && !this.spaceLatched) {
+          this.spaceLatched = true;
+          return [" ", 0.95];
+        }
+        if (l === "I" && this.drawsJ()) return ["J", Math.min(c, 0.84)];
+        if ((l === "D" || l === "G" || l === "X") && this.drawsZ())
+          return ["Z", Math.min(c, 0.8)];
+        return [l, c];
+      };
+      SignReader.prototype.drawsJ = function () {
+        const t = this.history.filter((h) => h[3] === "I").map((h) => h[2]);
+        if (t.length < 8) return false;
+        const len = pathLength(t),
+          net = dist2(t[0], t[t.length - 1]);
+        if (len < 0.18 || net < 0.05) return false;
+        return len / net >= 1.25 && t[t.length - 1][1] - t[0][1] > 0.05;
+      };
+      SignReader.prototype.drawsZ = function () {
+        const t = this.history
+          .filter((h) => h[3] === "D" || h[3] === "G" || h[3] === "X")
+          .map((h) => h[1]);
+        if (t.length < 8) return false;
+        return pathLength(t) >= 0.18 && reversals(t.map((p) => p[0])) >= 2;
+      };
+
+      function showBanner(m) {
+        banner.textContent = m;
+        banner.classList.add("show");
+      }
+      function clearBanner() {
+        banner.classList.remove("show");
+      }
+      function setStatus(t) {
+        $("#statusText").textContent = t;
+        hudText.textContent = t;
+      }
+      function setLive(on) {
+        stage.classList.toggle("live", on);
+        statusEl.classList.toggle("live", on);
+        startBtn.hidden = on;
+        stopBtn.hidden = !on;
+      }
+
+      function loadDetector() {
+        if (detectorReady) return detectorReady;
+        detectorReady = (async () => {
+          const vision = await import(VISION_URL);
+          const fs = await vision.FilesetResolver.forVisionTasks(WASM_URL);
+          const shared = {
+            numHands: 1,
+            runningMode: "VIDEO",
+            minHandDetectionConfidence: 0.6,
+            minHandPresenceConfidence: 0.6,
+            minTrackingConfidence: 0.6,
+          };
+          try {
+            handLandmarker = await vision.HandLandmarker.createFromOptions(fs, {
+              ...shared,
+              baseOptions: { modelAssetPath: MODEL_URL, delegate: "GPU" },
+            });
+          } catch (e) {
+            handLandmarker = await vision.HandLandmarker.createFromOptions(fs, {
+              ...shared,
+              baseOptions: { modelAssetPath: MODEL_URL, delegate: "CPU" },
+            });
+          }
+          reader = new SignReader();
+        })().catch((e) => {
+          detectorReady = null;
+          showBanner(
+            "हाथ पढ़ने वाला मॉडल नहीं खुला। इंटरनेट जाँचें और फिर कोशिश करें।",
+          );
+          throw e;
+        });
+        return detectorReady;
+      }
+      function insertText(t) {
+        const s = sentence.selectionStart ?? sentence.value.length,
+          e = sentence.selectionEnd ?? sentence.value.length;
+        sentence.value =
+          sentence.value.slice(0, s) + t + sentence.value.slice(e);
+        sentence.selectionStart = sentence.selectionEnd = s + t.length;
+        sentence.classList.remove("hit");
+        void sentence.offsetWidth;
+        sentence.classList.add("hit");
+      }
+
+      function fitView() {
+        const r = view.getBoundingClientRect();
+        if (!r.width || !r.height) return;
+        const d = Math.min(devicePixelRatio || 1, 2),
+          w = Math.round(r.width * d),
+          h = Math.round(r.height * d);
+        if (view.width !== w || view.height !== h) {
+          view.width = w;
+          view.height = h;
+        }
+      }
+      function drawFrame() {
+        if (!running) return;
+        fitView();
+        ctx.drawImage(video, 0, 0, view.width, view.height);
+        if (landmarks.length === 21) {
+          const u = view.width / 640;
+          ctx.lineWidth = 2.6 * u;
+          ctx.lineCap = "round";
+          ctx.strokeStyle = "rgba(255,255,255,.92)";
+          ctx.fillStyle = "#ffe14a";
+          ctx.beginPath();
+          BONES.forEach(([a, b]) => {
+            ctx.moveTo(
+              landmarks[a][0] * view.width,
+              landmarks[a][1] * view.height,
+            );
+            ctx.lineTo(
+              landmarks[b][0] * view.width,
+              landmarks[b][1] * view.height,
+            );
+          });
+          ctx.stroke();
+          landmarks.forEach(([x, y]) => {
+            ctx.beginPath();
+            ctx.arc(x * view.width, y * view.height, 3.8 * u, 0, Math.PI * 2);
+            ctx.fill();
+          });
+        }
+        raf = requestAnimationFrame(drawFrame);
+      }
+
+      function detectOnce(id) {
+        if (!running || runId !== id || !handLandmarker || video.readyState < 2)
+          return;
+        const res = handLandmarker.detectForVideo(video, performance.now());
+        if (!running || runId !== id) return;
+        const found = res.landmarks && res.landmarks[0];
+        if (!found) {
+          reader.miss();
+          applyResult({
+            hand: false,
+            letter: "",
+            confidence: 0,
+            landmarks: [],
+          });
+          return;
+        }
+        applyResult(reader.read(found));
+      }
+      function applyResult(d) {
+        landmarks = d.landmarks || [];
+        const known = d.hand && d.letter;
+        const displayLetter = d.letter === " " ? "␣" : d.letter;
+        if (known && letterEl.textContent !== displayLetter) {
+          letterEl.classList.remove("pop");
+          void letterEl.offsetWidth;
+          letterEl.classList.add("pop");
+        }
+        letterEl.textContent = known ? displayLetter : "—";
+        letterEl.classList.toggle("dim", !known);
+        if (!d.hand) {
+          pending = "";
+          pendingCount = 0;
+          armed = true;
+          setStatus("हाथ नहीं दिख रहा");
+          return;
+        }
+        if (!d.letter) {
+          pending = "";
+          pendingCount = 0;
+          armed = true;
+          setStatus("हाथ दिख रहा है");
+          return;
+        }
+        if (d.letter === " ") {
+          pending = "";
+          pendingCount = 0;
+          committed = " ";
+          armed = false;
+          setStatus("स्पेस");
+          insertText(" ");
+          return;
+        }
+        setStatus(d.letter === " " ? "स्पेस" : d.letter);
+        if (d.letter === pending) pendingCount++;
+        else {
+          pending = d.letter;
+          pendingCount = 1;
+        }
+        if (
+          pendingCount >= 3 &&
+          d.confidence >= 0.74 &&
+          (armed || d.letter !== committed)
+        ) {
+          insertText(d.letter);
+          committed = d.letter;
+          armed = false;
+        }
+      }
+      async function detectLoop(id) {
+        while (running && runId === id) {
+          const t0 = performance.now();
+          try {
+            detectOnce(id);
+          } catch (e) {
+            if (running && runId === id) setStatus("रुका");
+          }
+          await new Promise((r) =>
+            setTimeout(r, Math.max(40, 120 - (performance.now() - t0))),
+          );
+        }
+      }
+
+      /* Phone fix: getUserMedia runs FIRST, straight from the tap (iOS/Android need the user gesture),
+   and the heavy model loads only after permission is granted. */
+      async function getStream() {
+        const tries = [
+          {
+            video: {
+              facingMode: { ideal: facing },
+              width: { ideal: 1280 },
+              height: { ideal: 720 },
+            },
+            audio: false,
+          },
+          { video: { facingMode: facing }, audio: false },
+          { video: true, audio: false },
+        ];
+        let last;
+        for (const c of tries) {
+          try {
+            return await navigator.mediaDevices.getUserMedia(c);
+          } catch (e) {
+            last = e;
+            if (
+              e &&
+              (e.name === "NotAllowedError" || e.name === "SecurityError")
+            )
+              break;
+          }
+        }
+        throw last;
+      }
+      function classifyCustomHand(landmarks) {
+        if (!landmarks || landmarks.length !== 21) return "";
+        const pts = landmarks.map((point) => [point.x, point.y, point.z || 0]);
+        const scale = Math.hypot(
+          pts[9][0] - pts[0][0],
+          pts[9][1] - pts[0][1],
+          pts[9][2] - pts[0][2],
+        );
+        if (scale < 1e-4) return "";
+        const chains = [
+          [5, 6, 7],
+          [9, 10, 11],
+          [13, 14, 15],
+          [17, 18, 19],
+        ];
+        const fingers = chains.map(([mcp, pip, dip]) => {
+          const angle = angleAt(pts[mcp], pts[pip], pts[dip]);
+          if (angle >= 160) return "u";
+          if (angle <= 130) return "c";
+          return null;
+        });
+        const thumbAngle = angleAt(pts[2], pts[3], pts[4]);
+        const thumbReach =
+          Math.hypot(
+            pts[4][0] - pts[2][0],
+            pts[4][1] - pts[2][1],
+            pts[4][2] - pts[2][2],
+          ) / scale;
+        let thumb = "c";
+        if (thumbAngle >= 150 && thumbReach >= 0.38) {
+          thumb = "u";
+        } else if (thumbAngle > 125 && thumbReach >= 0.3) {
+          thumb = null;
+        }
+        if (thumb === null || fingers.some((state) => state === null))
+          return "";
+        const [index, middle, ring, pinky] = fingers;
+        const states = [thumb, index, middle, ring, pinky];
+        const upCode = states
+          .map((state, index) => (state === "u" ? String(index + 1) : ""))
+          .join("");
+        const code =
+          upCode || (states.every((state) => state === "c") ? "fist" : "");
+        return (
+          {
+            1: "A",
+            2: "B",
+            5: "C",
+            12: "D",
+            123: "E",
+            1234: "F",
+            12345: "G",
+            2345: "H",
+            345: "I",
+            45: "J",
+            15: "K",
+            23: "L",
+            34: "M",
+            134: "M",
+            234: "N",
+            fist: "O",
+            25: "P",
+            35: "Q",
+            13: "R",
+            4: "S",
+            135: "T",
+            1345: "U",
+            1245: "V",
+            24: "W",
+            14: "X",
+            124: "Y",
+            1235: "Z",
+            125: " ",
+          }[code] || ""
+        );
+      }
+      function setCustomStatus(message) {
+        customStatusText.textContent = message;
+        customHud.textContent = message;
+        customStatus.classList.toggle("live", customRunning);
+      }
+      function showCustomBanner(message) {
+        customBanner.textContent = message;
+        customBanner.classList.add("show");
+      }
+      function clearCustomBanner() {
+        customBanner.classList.remove("show");
+      }
+      async function toggleAppFullscreen(page, showError) {
+        try {
+          if (document.fullscreenElement === page) {
+            await document.exitFullscreen();
+            return;
+          }
+          if (!page.requestFullscreen) {
+            showError("इस ब्राउज़र में पूर्ण स्क्रीन सुविधा उपलब्ध नहीं है।");
+            return;
+          }
+          await page.requestFullscreen();
+        } catch (error) {
+          showError("पूर्ण स्क्रीन मोड शुरू नहीं हो सका।");
+        }
+      }
+      function updateFullscreenButtons() {
+        $("#readFullscreen").textContent =
+          document.fullscreenElement === $("#page-read")
+            ? "पूर्ण स्क्रीन बंद करें"
+            : "पूर्ण स्क्रीन";
+        $("#newFullscreen").textContent =
+          document.fullscreenElement === $("#page-new")
+            ? "पूर्ण स्क्रीन बंद करें"
+            : "पूर्ण स्क्रीन";
+      }
+      document.addEventListener("fullscreenchange", updateFullscreenButtons);
+      document.addEventListener("keydown", async (event) => {
+        if (event.key !== "Escape") return;
+        const page = document.fullscreenElement;
+        if (page !== $("#page-read") && page !== $("#page-new")) return;
+        try {
+          await document.exitFullscreen();
+        } catch (error) {
+          (page.id === "page-read" ? showBanner : showCustomBanner)(
+            "पूर्ण स्क्रीन से बाहर नहीं निकल सका।",
+          );
+        }
+      });
+      function customDrawFrame(id) {
+        if (!customRunning || id !== customRunId) return;
+        if (customVideo.readyState >= 2) {
+          const ratio = Math.min(devicePixelRatio || 1, 2);
+          const width = Math.round(customView.clientWidth * ratio);
+          const height = Math.round(customView.clientHeight * ratio);
+          if (customView.width !== width || customView.height !== height) {
+            customView.width = width;
+            customView.height = height;
+          }
+          customCtx.drawImage(
+            customVideo,
+            0,
+            0,
+            customView.width,
+            customView.height,
+          );
+          if (customLandmarks.length === 21) {
+            const unit = customView.width / 640;
+            customCtx.lineWidth = 2.6 * unit;
+            customCtx.lineCap = "round";
+            customCtx.strokeStyle = "rgba(255,255,255,.92)";
+            customCtx.fillStyle = "#ffe14a";
+            customCtx.beginPath();
+            BONES.forEach(([a, b]) => {
+              customCtx.moveTo(
+                customLandmarks[a][0] * customView.width,
+                customLandmarks[a][1] * customView.height,
+              );
+              customCtx.lineTo(
+                customLandmarks[b][0] * customView.width,
+                customLandmarks[b][1] * customView.height,
+              );
+            });
+            customCtx.stroke();
+            customLandmarks.forEach(([x, y]) => {
+              customCtx.beginPath();
+              customCtx.arc(
+                x * customView.width,
+                y * customView.height,
+                3.8 * unit,
+                0,
+                Math.PI * 2,
+              );
+              customCtx.fill();
+            });
+          }
+        }
+        customRaf = requestAnimationFrame(() => customDrawFrame(id));
+      }
+      function applyCustomResult(landmarks) {
+        customLandmarks = landmarks
+          ? landmarks.map((point) => [point.x, point.y])
+          : [];
+        if (!landmarks) {
+          customCandidate = "";
+          customCandidateCount = 0;
+          customArmed = true;
+          customSpaceLatched = false;
+          customLetter.textContent = "—";
+          customLetter.classList.add("dim");
+          setCustomStatus("हाथ नहीं दिख रहा");
+          return;
+        }
+        const letter = classifyCustomHand(landmarks);
+        if (!letter) {
+          customCandidate = "";
+          customCandidateCount = 0;
+          customArmed = true;
+          customSpaceLatched = false;
+          customLetter.textContent = "—";
+          customLetter.classList.add("dim");
+          setCustomStatus("नया संकेत दिखाएँ");
+          return;
+        }
+        if (letter !== " ") customSpaceLatched = false;
+        const displayLetter = letter === " " ? "␣" : letter;
+        if (customLetter.textContent !== displayLetter) {
+          customLetter.classList.remove("pop");
+          void customLetter.offsetWidth;
+          customLetter.classList.add("pop");
+        }
+        customLetter.textContent = displayLetter;
+        customLetter.classList.remove("dim");
+        setCustomStatus(letter === " " ? "स्पेस" : `पहचाना: ${letter}`);
+        if (letter === customCandidate) customCandidateCount += 1;
+        else {
+          customCandidate = letter;
+          customCandidateCount = 1;
+        }
+        if (letter === " ") {
+          if (customCandidateCount >= 4 && !customSpaceLatched) {
+            customText.value += " ";
+            customSpaceLatched = true;
+            customArmed = false;
+          }
+          return;
+        }
+        if (
+          customCandidateCount >= 4 &&
+          (customArmed || letter !== customLastCommitted)
+        ) {
+          customText.value += letter;
+          customLastCommitted = letter;
+          customArmed = false;
+        }
+      }
+      async function customDetectLoop(id) {
+        while (customRunning && customRunId === id) {
+          const startedAt = performance.now();
+          try {
+            if (handLandmarker && customVideo.readyState >= 2) {
+              const result = handLandmarker.detectForVideo(
+                customVideo,
+                performance.now(),
+              );
+              applyCustomResult(result.landmarks?.[0] || null);
+            }
+          } catch (error) {
+            if (customRunning && customRunId === id) {
+              showCustomBanner(
+                "संकेत पहचानने में समस्या आई। कैमरा बंद करके फिर शुरू करें।",
+              );
+              setCustomStatus("पहचान रुक गई");
+            }
+            return;
+          }
+          await new Promise((resolve) =>
+            setTimeout(
+              resolve,
+              Math.max(40, 120 - (performance.now() - startedAt)),
+            ),
+          );
+        }
+      }
+      async function startCustomCamera() {
+        clearCustomBanner();
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          showCustomBanner(
+            isSecureContext
+              ? "इस ब्राउज़र में कैमरा उपलब्ध नहीं है। Chrome या Safari में खोलें।"
+              : "कैमरे के लिए पेज HTTPS लिंक पर खुलना चाहिए।",
+          );
+          return;
+        }
+        const id = ++customRunId;
+        customStartBtn.disabled = true;
+        setCustomStatus("कैमरा खुल रहा है…");
+        try {
+          customStream = await getStream();
+          if (id !== customRunId) {
+            customStream.getTracks().forEach((track) => track.stop());
+            return;
+          }
+          customVideo.srcObject = customStream;
+          await customVideo.play();
+          if (id !== customRunId) return;
+          customStage.style.aspectRatio = customVideo.videoWidth
+            ? `${customVideo.videoWidth} / ${customVideo.videoHeight}`
+            : "4 / 3";
+          const track = customStream.getVideoTracks()[0];
+          const mode =
+            track && track.getSettings ? track.getSettings().facingMode : "";
+          customView.classList.toggle(
+            "mirror",
+            mode ? mode === "user" : facing === "user",
+          );
+          customRunning = true;
+          customStage.classList.add("live");
+          customStartBtn.hidden = true;
+          customStartBtn.disabled = false;
+          customStopBtn.hidden = false;
+          setCustomStatus("मॉडल लोड हो रहा है…");
+          customDrawFrame(id);
+          await loadDetector();
+          if (!customRunning || id !== customRunId) return;
+          setCustomStatus("नया संकेत दिखाएँ");
+          customDetectLoop(id);
+        } catch (error) {
+          if (id !== customRunId) return;
+          if (customStream)
+            customStream.getTracks().forEach((track) => track.stop());
+          customStream = null;
+          customVideo.srcObject = null;
+          customRunning = false;
+          customStage.classList.remove("live");
+          customStartBtn.hidden = false;
+          customStartBtn.disabled = false;
+          customStopBtn.hidden = true;
+          setCustomStatus("तैयार");
+          showCustomBanner(
+            error && error.name === "NotAllowedError"
+              ? "कैमरे की अनुमति दें, फिर दोबारा कोशिश करें।"
+              : "कैमरा या मॉडल शुरू नहीं हो पाया। इंटरनेट और कैमरा जाँचकर फिर कोशिश करें।",
+          );
+        }
+      }
+      function stopCustomCamera() {
+        customRunId += 1;
+        customRunning = false;
+        cancelAnimationFrame(customRaf);
+        if (customStream)
+          customStream.getTracks().forEach((track) => track.stop());
+        customStream = null;
+        customVideo.srcObject = null;
+        customLandmarks = [];
+        customCandidate = "";
+        customCandidateCount = 0;
+        customLastCommitted = "";
+        customArmed = true;
+        customSpaceLatched = false;
+        customStage.classList.remove("live");
+        customStartBtn.hidden = false;
+        customStartBtn.disabled = false;
+        customStopBtn.hidden = true;
+        customLetter.textContent = "—";
+        customLetter.classList.add("dim");
+        setCustomStatus("तैयार");
+        customCtx.clearRect(0, 0, customView.width, customView.height);
+      }
+      async function startCamera() {
+        clearBanner();
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          showBanner(
+            isSecureContext
+              ? "इस ब्राउज़र में कैमरा उपलब्ध नहीं है। Chrome या Safari में खोलें।"
+              : "कैमरे के लिए पेज HTTPS लिंक पर खुलना चाहिए (जैसे Vercel का लिंक)।",
+          );
+          return;
+        }
+        startBtn.disabled = true;
+        setStatus("कैमरा खुल रहा है…");
+        try {
+          stream = await getStream();
+        } catch (e) {
+          startBtn.disabled = false;
+          setStatus("तैयार");
+          const denied =
+            e && (e.name === "NotAllowedError" || e.name === "SecurityError");
+          showBanner(
+            denied
+              ? "कैमरे की अनुमति नहीं मिली। ब्राउज़र की सेटिंग में कैमरा “अनुमति दें” करें, फिर दोबारा दबाएँ।"
+              : "कैमरा नहीं खुला। जाँचें कि कोई दूसरा ऐप कैमरा इस्तेमाल तो नहीं कर रहा।",
+          );
+          return;
+        }
+        video.setAttribute("playsinline", "");
+        video.setAttribute("muted", "");
+        video.muted = true;
+        video.srcObject = stream;
+        try {
+          await video.play();
+        } catch (e) {}
+        await new Promise((r) => {
+          if (video.videoWidth) r();
+          else video.onloadedmetadata = () => r();
+        });
+        stage.style.aspectRatio = `${video.videoWidth} / ${video.videoHeight}`;
+        const tr = stream.getVideoTracks()[0],
+          fm = tr && tr.getSettings ? tr.getSettings().facingMode : "";
+        view.classList.toggle("mirror", fm ? fm === "user" : facing === "user");
+        running = true;
+        runId++;
+        setLive(true);
+        startBtn.disabled = false;
+        setStatus("मॉडल लोड हो रहा है…");
+        drawFrame();
+        try {
+          await loadDetector();
+        } catch (e) {
+          stopCamera();
+          return;
+        }
+        if (!running) return;
+        reader.miss();
+        setStatus("चालू");
+        detectLoop(runId);
+      }
+      function stopCamera() {
+        running = false;
+        runId++;
+        cancelAnimationFrame(raf);
+        if (stream) stream.getTracks().forEach((t) => t.stop());
+        stream = null;
+        video.srcObject = null;
+        landmarks = [];
+        pending = "";
+        pendingCount = 0;
+        if (reader) reader.miss();
+        letterEl.textContent = "—";
+        letterEl.classList.add("dim");
+        setLive(false);
+        setStatus("तैयार");
+        ctx.clearRect(0, 0, view.width, view.height);
+      }
+
+      startBtn.addEventListener("click", startCamera);
+      stopBtn.addEventListener("click", stopCamera);
+      $("#readFullscreen").addEventListener("click", () =>
+        toggleAppFullscreen($("#page-read"), showBanner),
+      );
+      flipBtn.addEventListener("click", async () => {
+        facing = facing === "user" ? "environment" : "user";
+        if (running) {
+          stopCamera();
+          await startCamera();
+        }
+      });
+      customStartBtn.addEventListener("click", startCustomCamera);
+      customStopBtn.addEventListener("click", stopCustomCamera);
+      $("#newFullscreen").addEventListener("click", () =>
+        toggleAppFullscreen($("#page-new"), showCustomBanner),
+      );
+      customFlipBtn.addEventListener("click", async () => {
+        facing = facing === "user" ? "environment" : "user";
+        if (customRunning) {
+          stopCustomCamera();
+          await startCustomCamera();
+        }
+      });
+      $("#customBack").addEventListener("click", () => {
+        customText.value = customText.value.slice(0, -1);
+        customLastCommitted = "";
+        customArmed = true;
+      });
+      $("#customSpace").addEventListener("click", () => {
+        customText.value += " ";
+        customLastCommitted = "";
+        customArmed = true;
+      });
+      $("#customClear").addEventListener("click", () => {
+        customText.value = "";
+        customLastCommitted = "";
+        customArmed = true;
+        clearCustomBanner();
+      });
+      customCopyBtn.addEventListener("click", async () => {
+        if (!customText.value) {
+          showCustomBanner("कॉपी करने के लिए पहले हाथ के संकेत दिखाएँ।");
+          return;
+        }
+        try {
+          await navigator.clipboard.writeText(customText.value);
+          customCopyLabel.textContent = "कॉपी हो गया";
+          clearTimeout(customCopyTimer);
+          customCopyTimer = setTimeout(
+            () => (customCopyLabel.textContent = "कॉपी"),
+            1400,
+          );
+        } catch (error) {
+          customText.focus();
+          customText.select();
+          showCustomBanner(
+            "कॉपी नहीं हो पाया। लेख चुन लिया है; कॉपी करने के लिए दबाएँ।",
+          );
+        }
+      });
+      customSpeakBtn.addEventListener("click", () => {
+        const text = customText.value.trim();
+        if (!text) {
+          showCustomBanner("पहले हाथ के संकेत दिखाएँ।");
+          return;
+        }
+        if (
+          !("speechSynthesis" in window) ||
+          !("SpeechSynthesisUtterance" in window)
+        ) {
+          showCustomBanner(
+            "इस ब्राउज़र में आवाज़ चलाने की सुविधा उपलब्ध नहीं है।",
+          );
+          return;
+        }
+        const id = ++customSpeechRunId;
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = "en-US";
+        utterance.rate = 0.9;
+        utterance.onerror = () => {
+          if (id === customSpeechRunId)
+            showCustomBanner("आवाज़ नहीं चल पाई। कृपया फिर से कोशिश करें।");
+        };
+        speechSynthesis.cancel();
+        speechSynthesis.speak(utterance);
+      });
+      $("#space").addEventListener("click", () => insertText(" "));
+      $("#back").addEventListener("click", () => {
+        const s = sentence.selectionStart ?? sentence.value.length,
+          e = sentence.selectionEnd ?? sentence.value.length;
+        if (s !== e) {
+          insertText("");
+          return;
+        }
+        if (!s) return;
+        sentence.value =
+          sentence.value.slice(0, s - 1) + sentence.value.slice(e);
+        sentence.selectionStart = sentence.selectionEnd = s - 1;
+      });
+      $("#clear").addEventListener("click", () => {
+        sentence.value = "";
+        committed = "";
+        armed = true;
+      });
+      copyBtn.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(sentence.value);
+          $("#copyLbl").textContent = "कॉपी हो गया";
+          clearTimeout(copyTimer);
+          copyTimer = setTimeout(
+            () => ($("#copyLbl").textContent = "कॉपी"),
+            1400,
+          );
+        } catch (e) {
+          sentence.focus();
+          sentence.select();
+        }
+      });
+      $("#speak").addEventListener("click", () => {
+        const text = sentence.value.trim();
+        if (!text) {
+          showBanner("पहले लेख लिखें या हाथ के संकेत दिखाएँ।");
+          return;
+        }
+        if (
+          !("speechSynthesis" in window) ||
+          !("SpeechSynthesisUtterance" in window)
+        ) {
+          showBanner("इस ब्राउज़र में आवाज़ चलाने की सुविधा उपलब्ध नहीं है।");
+          return;
+        }
+        const id = ++speechRunId;
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = "en-US";
+        utterance.rate = 0.9;
+        utterance.onerror = () => {
+          if (id === speechRunId)
+            showBanner("आवाज़ नहीं चल पाई। कृपया फिर से कोशिश करें।");
+        };
+        speechSynthesis.cancel();
+        speechSynthesis.speak(utterance);
+      });
+      document.addEventListener("keydown", (e) => {
+        if (!running || e.target === sentence || e.target === $("#spellText"))
+          return;
+        if (e.key === " ") {
+          e.preventDefault();
+          insertText(" ");
+        } else if (e.key === "Backspace") {
+          e.preventDefault();
+          $("#back").click();
+        }
+      });
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden && running) stopCamera();
+      });
+
+      /* ---------- text → sign page (original 3D animation) ---------- */
+      const actor = document.querySelector("#actor");
+      const signBadge = document.querySelector("#badge");
+      const spellText = document.querySelector("#spellText");
+      const spellLine = document.querySelector("#spellLine");
+      const playSign = document.querySelector("#playSign");
+      function setSignStatus(t) {
+        $("#signStatus").textContent = t;
+      }
+      function setPlay(on) {
+        $("#playLbl").textContent = on ? "रोकें" : "शुरू करें";
+        $("#playIc").innerHTML = t3(on ? "stop" : "play", "yellow", "xs");
+      }
+
+      const RAD = Math.PI / 180;
+      const NAT = [4, 0, -3, -7];
+      const FS = {
+        s: [0, 0, 0],
+        f: [86, 98, 64],
+        h: [24, 96, 38],
+        c: [46, 54, 40],
+        b: [66, 82, 56],
+        p: [52, 68, 48],
+        r: [6, 12, 8],
+      };
+      // Fingers are index, middle, ring, pinky. Then thumb [out, bend, bend], spread, wrist turn, thumb across palm.
+      const LT = {
+        A: ["ffff", [18, 8, 6]],
+        B: ["ssss", [-70, 28, 18]],
+        C: ["cccc", [52, 28, 22], [6, 0, -4, -8], 18],
+        D: ["sfff", [-28, 36, 28]],
+        E: ["bbbb", [-62, 40, 28], [0, 0, 0, 0], 0, 1],
+        F: ["psss", [24, 42, 30], [0, 4, 12, 16]],
+        G: ["sfff", [8, 6, 4], [0, 0, 0, 0], 86],
+        H: ["ssff", [-48, 28, 18], [2, -2, 0, 0], 86],
+        I: ["fffs", [-58, 28, 18]],
+        J: ["fffs", [-58, 28, 18]],
+        K: ["ssff", [4, 12, 8], [-4, 22, 0, 0]],
+        L: ["sfff", [82, 4, 2]],
+        M: ["ffff", [-18, 36, 30], [0, 0, 0, 0], 0, 1],
+        N: ["ffff", [-8, 36, 30], [0, 0, 0, 0], 0, 1],
+        O: ["pppp", [40, 46, 30]],
+        P: ["ssff", [4, 12, 8], [-4, 22, 0, 0], 168],
+        Q: ["sfff", [8, 6, 4], [0, 0, 0, 0], 150],
+        R: ["ssff", [-42, 28, 18], [-24, 26, 0, 0]],
+        S: ["ffff", [-56, 32, 22]],
+        T: ["ffff", [2, 38, 28]],
+        U: ["ssff", [-52, 28, 18], [-2, 2, 0, 0]],
+        V: ["ssff", [-48, 28, 18], [20, -20, 0, 0]],
+        W: ["sssf", [-54, 22, 16], [26, 0, -24, 0]],
+        X: ["hfff", [-38, 28, 20]],
+        Y: ["fffs", [82, 4, 2], [0, 0, 0, -8]],
+        Z: ["sfff", [-42, 28, 18]],
+      };
+      const MO = {
+        J: {
+          f: 3,
+          fn(u) {
+            const e = ease(u);
+            const k = Math.max(0, (e - 0.55) / 0.45);
+            return [-42 * k, 78 * Math.min(1, e / 0.55), -58 * k];
+          },
+        },
+        Z: {
+          f: 0,
+          fn(u) {
+            if (u < 0.34) return [(86 * u) / 0.34 - 40, 0, 0];
+            if (u < 0.67) {
+              const w = (u - 0.34) / 0.33;
+              return [46 - 86 * w, 64 * w, 0];
+            }
+            const w = (u - 0.67) / 0.33;
+            return [-40 + 86 * w, 64, 0];
+          },
+        },
+      };
+
+      function vec(shape, thumb, spread = [0, 0, 0, 0], rot = 0, across = 0) {
+        const values = [];
+        for (let i = 0; i < 4; i += 1)
+          values.push(spread[i] || 0, ...FS[shape[i]]);
+        return values.concat(thumb[0], thumb[1], thumb[2], rot, across);
+      }
+
+      const V = { rest: vec("rrrr", [36, 10, 8], [8, 2, -2, -8]) };
+      Object.keys(LT).forEach((letter) => {
+        V[letter] = vec(...LT[letter]);
+      });
+
+      let actorOn = false;
+      let signOn = false;
+      let signLoopId = 0;
+      let shownPose = V.rest.slice();
+      let poseFrom = V.rest.slice();
+      let poseTo = V.rest.slice();
+      let play = null;
+      const trail = [];
+      const reduceMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
+
+      function ease(t) {
+        return t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2;
+      }
+
+      function mix(a, b, t) {
+        return a.map((value, index) => value + (b[index] - value) * t);
+      }
+
+      function advancePlay(now) {
+        if (!play) return;
+        if (play.phase === "move") {
+          const t = ease(Math.min(1, (now - play.moveStart) / play.moveMs));
+          shownPose = mix(poseFrom, poseTo, t);
+          if (t >= 1) {
+            play.phase = "hold";
+            play.holdStart = now;
+            shownPose = poseTo.slice();
+          }
+        }
+        if (play.phase === "hold" && now - play.holdStart >= play.holdMs)
+          nextSign(now);
+      }
+
+      function renderSpell(script, index) {
+        spellLine.replaceChildren();
+        [...script].forEach((character, characterIndex) => {
+          const mark = document.createElement("span");
+          mark.textContent = character === " " ? "·" : character;
+          if (characterIndex === index) mark.className = "on";
+          spellLine.appendChild(mark);
+        });
+      }
+
+      function nextSign(now) {
+        play.index += 1;
+        if (play.index >= play.script.length) {
+          const settling = play.settling;
+          setPlay(false);
+          if (!settling) {
+            signBadge.textContent = "—";
+            setSignStatus("तैयार");
+            poseFrom = shownPose.slice();
+            poseTo = V.rest.slice();
+            trail.length = 0;
+            play = {
+              phase: "move",
+              moveStart: now,
+              moveMs: 420,
+              script: "",
+              index: 99,
+              settling: true,
+              holdMs: 1,
+              holdStart: now,
+              motion: null,
+            };
+            return;
+          }
+          play = null;
+          shownPose = V.rest.slice();
+          trail.length = 0;
+          return;
+        }
+        const character = play.script[play.index];
+        renderSpell(play.script, play.index);
+        signBadge.textContent = character === " " ? "␣" : character;
+        setSignStatus(character === " " ? "स्पेस" : character);
+        poseFrom = shownPose.slice();
+        poseTo = (character === " " ? V.rest : V[character] || V.rest).slice();
+        play.motion = MO[character] || null;
+        play.phase = "move";
+        play.moveStart = now;
+        play.moveMs = reduceMotion ? 90 : 520;
+        play.holdMs = character === " " ? 340 : play.motion ? 1600 : 1100;
+        if (reduceMotion) play.holdMs = Math.min(play.holdMs, 480);
+        trail.length = 0;
+      }
+
+      function stopSigns() {
+        play = null;
+        setPlay(false);
+        shownPose = V.rest.slice();
+        poseFrom = shownPose.slice();
+        poseTo = shownPose.slice();
+        signBadge.textContent = "—";
+        spellLine.replaceChildren();
+        trail.length = 0;
+        setSignStatus("तैयार");
+      }
+
+      function startSigns(override) {
+        const script = (override ?? spellText.value)
+          .toUpperCase()
+          .replace(/[^A-Z ]/g, " ")
+          .replace(/ +/g, " ")
+          .trim();
+        if (!script) {
+          signBadge.textContent = "—";
+          setSignStatus(spellText.value.trim() ? "A से Z लिखें" : "लेख लिखें");
+          return;
+        }
+        setPlay(true);
+        trail.length = 0;
+        play = {
+          script,
+          index: -1,
+          phase: "hold",
+          holdStart: performance.now() - 10,
+          holdMs: 0,
+          settling: false,
+          motion: null,
+        };
+        nextSign(performance.now());
+      }
+
+      function actorNote(message) {
+        const note = document.createElement("p");
+        note.className = "note";
+        note.style.cssText =
+          "position:absolute;inset:0;display:grid;place-items:center;margin:0;padding:24px;text-align:center;color:#5d6e93";
+        note.textContent = message;
+        actor.parentElement.appendChild(note);
+      }
+
+      function createScene() {
+        const renderer = new THREE.WebGLRenderer({
+          canvas: actor,
+          antialias: true,
+          alpha: false,
+        });
+        renderer.outputEncoding = THREE.sRGBEncoding;
+        renderer.toneMapping = THREE.ACESFilmicToneMapping;
+        renderer.toneMappingExposure = 0.9;
+        renderer.setClearColor(0xb8e7f4, 1);
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0xb8e7f4);
+        const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 80);
+        const backdropCanvas = document.createElement("canvas");
+        backdropCanvas.width = 1024;
+        backdropCanvas.height = 768;
+        const backdropContext = backdropCanvas.getContext("2d");
+        const backdropGradient = backdropContext.createLinearGradient(
+          0,
+          0,
+          900,
+          768,
+        );
+        backdropGradient.addColorStop(0, "#55c9e8");
+        backdropGradient.addColorStop(0.52, "#859cf3");
+        backdropGradient.addColorStop(1, "#ffae72");
+        backdropContext.fillStyle = backdropGradient;
+        backdropContext.fillRect(
+          0,
+          0,
+          backdropCanvas.width,
+          backdropCanvas.height,
+        );
+        [
+          [120, 160, 190, "rgba(83, 255, 221, 0.38)"],
+          [840, 180, 220, "rgba(255, 202, 117, 0.38)"],
+          [680, 690, 250, "rgba(255, 119, 173, 0.24)"],
+          [90, 700, 210, "rgba(112, 142, 255, 0.26)"],
+        ].forEach(([x, y, radius, color]) => {
+          const glow = backdropContext.createRadialGradient(
+            x,
+            y,
+            0,
+            x,
+            y,
+            radius,
+          );
+          glow.addColorStop(0, color);
+          glow.addColorStop(1, "rgba(255, 255, 255, 0)");
+          backdropContext.fillStyle = glow;
+          backdropContext.fillRect(
+            x - radius,
+            y - radius,
+            radius * 2,
+            radius * 2,
+          );
+        });
+        const backdropTexture = new THREE.CanvasTexture(backdropCanvas);
+        backdropTexture.encoding = THREE.sRGBEncoding;
+        const backdrop = new THREE.Mesh(
+          new THREE.PlaneGeometry(48, 36),
+          new THREE.MeshBasicMaterial({
+            map: backdropTexture,
+            depthTest: false,
+            depthWrite: false,
+            toneMapped: false,
+          }),
+        );
+        backdrop.position.set(0, 3.5, -9);
+        backdrop.renderOrder = -1;
+        scene.add(backdrop);
+        scene.add(new THREE.HemisphereLight(0xfff8ee, 0xb9c7e4, 0.65));
+        const key = new THREE.DirectionalLight(0xfff6ea, 1.05);
+        key.position.set(6, 10, 8);
+        scene.add(key);
+        const fill = new THREE.DirectionalLight(0xd6e4ff, 0.4);
+        fill.position.set(-8, 4, 6);
+        scene.add(fill);
+        const rim = new THREE.DirectionalLight(0xffe14a, 0.45);
+        rim.position.set(-2, 6, -6);
+        scene.add(rim);
+
+        const skin = new THREE.MeshStandardMaterial({
+          color: 0xe89568,
+          roughness: 0.48,
+          metalness: 0,
+        });
+        const skinLight = new THREE.MeshStandardMaterial({
+          color: 0xf7ad80,
+          roughness: 0.4,
+          metalness: 0,
+        });
+        const knuckleMat = new THREE.MeshStandardMaterial({
+          color: 0xd78358,
+          roughness: 0.55,
+          metalness: 0,
+        });
+        const nailMat = new THREE.MeshStandardMaterial({
+          color: 0xffe6d4,
+          roughness: 0.28,
+          metalness: 0.04,
+        });
+        const shirt = new THREE.MeshStandardMaterial({
+          color: 0xc52e51,
+          roughness: 0.72,
+          metalness: 0,
+        });
+        const shirtLight = new THREE.MeshStandardMaterial({
+          color: 0xffd166,
+          roughness: 0.6,
+          metalness: 0,
+        });
+        const hair = new THREE.MeshStandardMaterial({
+          color: 0x3b281f,
+          roughness: 0.6,
+          metalness: 0,
+        });
+        const white = new THREE.MeshStandardMaterial({
+          color: 0xffffff,
+          roughness: 0.25,
+          metalness: 0,
+        });
+        const ink = new THREE.MeshStandardMaterial({
+          color: 0x1a2b4a,
+          roughness: 0.35,
+          metalness: 0,
+        });
+        const mouthMat = new THREE.MeshStandardMaterial({
+          color: 0xe05d70,
+          roughness: 0.5,
+          metalness: 0,
+        });
+        skin.emissive = new THREE.Color(0x5a2c1c);
+        skin.emissiveIntensity = 0.09;
+        skinLight.emissive = new THREE.Color(0x5a2c1c);
+        skinLight.emissiveIntensity = 0.07;
+        shirt.emissive = new THREE.Color(0x5c0b22);
+        shirt.emissiveIntensity = 0.12;
+        shirtLight.emissive = new THREE.Color(0x664000);
+        shirtLight.emissiveIntensity = 0.08;
+
+        const sphere = new THREE.SphereGeometry(1, 28, 18);
+        function ball(rx, ry, rz, material, parent) {
+          const mesh = new THREE.Mesh(sphere, material);
+          mesh.scale.set(rx, ry == null ? rx : ry, rz == null ? rx : rz);
+          if (parent) parent.add(mesh);
+          return mesh;
+        }
+        function limb(radius, material) {
+          const geo = new THREE.CylinderGeometry(radius, radius, 1, 20);
+          geo.translate(0, 0.5, 0);
+          const mesh = new THREE.Mesh(geo, material);
+          scene.add(mesh);
+          return mesh;
+        }
+        const UP = new THREE.Vector3(0, 1, 0);
+        function placeBone(mesh, from, to) {
+          const delta = new THREE.Vector3().subVectors(to, from);
+          const length = Math.max(0.001, delta.length());
+          mesh.position.copy(from);
+          mesh.scale.set(1, length, 1);
+          mesh.quaternion.setFromUnitVectors(
+            UP,
+            delta.multiplyScalar(1 / length),
+          );
+        }
+        function bendElbow(from, to, upper, lower, poleHint) {
+          const delta = new THREE.Vector3().subVectors(to, from);
+          const reach = delta.length() || 0.001;
+          const dist = Math.min(
+            upper + lower - 0.02,
+            Math.max(Math.abs(upper - lower) + 0.02, reach),
+          );
+          const dir = delta.multiplyScalar(1 / reach);
+          const along =
+            (upper * upper - lower * lower + dist * dist) / (2 * dist);
+          const height = Math.sqrt(Math.max(0, upper * upper - along * along));
+          const pole = poleHint
+            .clone()
+            .addScaledVector(dir, -poleHint.dot(dir));
+          if (pole.lengthSq() < 1e-6) pole.set(0, -1, 0.2);
+          pole.normalize();
+          return new THREE.Vector3()
+            .copy(from)
+            .addScaledVector(dir, along)
+            .addScaledVector(pole, height);
+        }
+
+        const sun = new THREE.Mesh(
+          new THREE.CircleGeometry(2.7, 48),
+          new THREE.MeshBasicMaterial({
+            color: 0xffe27a,
+            transparent: true,
+            opacity: 0.62,
+            depthWrite: false,
+          }),
+        );
+        sun.position.set(-3.7, 4.55, -2.6);
+        scene.add(sun);
+        const shadow = new THREE.Mesh(
+          new THREE.CircleGeometry(3.4, 32),
+          new THREE.MeshBasicMaterial({
+            color: 0xd5e1f5,
+            transparent: true,
+            opacity: 0.9,
+            depthWrite: false,
+          }),
+        );
+        shadow.rotation.x = -Math.PI / 2;
+        shadow.position.set(-0.4, -1.55, 1.2);
+        scene.add(shadow);
+
+        const figure = new THREE.Group();
+        figure.position.set(-3.5, -1.55, -0.6);
+        scene.add(figure);
+        ball(2.15, 2.55, 1.25, shirt, figure).position.set(0, 2.7, 0);
+        ball(1.05, 0.72, 0.78, shirt, figure).position.set(-1.85, 4.55, 0);
+        ball(1.05, 0.72, 0.78, shirt, figure).position.set(1.9, 4.55, 0.1);
+        ball(0.42, 0.22, 0.28, shirtLight, figure).position.set(
+          0.15,
+          3.55,
+          1.15,
+        );
+        const neck = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.42, 0.5, 0.7, 16),
+          knuckleMat,
+        );
+        neck.position.set(0, 5.15, 0.08);
+        figure.add(neck);
+
+        const head = new THREE.Group();
+        head.position.set(0, 6.35, 0.12);
+        figure.add(head);
+        ball(1.38, 1.58, 1.32, skin, head);
+        ball(0.22, 0.34, 0.16, skin, head).position.set(-1.38, -0.08, 0);
+        ball(0.22, 0.34, 0.16, skin, head).position.set(1.38, -0.08, 0);
+        ball(1.42, 1.15, 1.2, hair, head).position.set(0, 0.55, -0.28);
+        const cap = new THREE.Mesh(
+          new THREE.SphereGeometry(
+            1,
+            28,
+            16,
+            0,
+            Math.PI * 2,
+            0,
+            Math.PI * 0.52,
+          ),
+          hair,
+        );
+        cap.scale.set(1.42, 1.05, 1.36);
+        cap.position.set(0, 0.42, 0.02);
+        cap.rotation.x = -0.55;
+        head.add(cap);
+        ball(0.85, 0.32, 0.42, hair, head).position.set(-0.25, 1.05, 0.72);
+        const eyes = [-0.46, 0.48].map((x) => {
+          const group = new THREE.Group();
+          group.position.set(x, 0.08, 1.16);
+          head.add(group);
+          ball(0.24, 0.28, 0.12, white, group);
+          ball(0.12, 0.14, 0.08, ink, group).position.set(0.03, 0, 0.08);
+          ball(0.045, 0.045, 0.03, white, group).position.set(
+            -0.02,
+            0.06,
+            0.14,
+          );
+          return group;
+        });
+        const smile = new THREE.Mesh(
+          new THREE.TorusGeometry(0.28, 0.045, 8, 18, Math.PI * 0.72),
+          mouthMat,
+        );
+        smile.position.set(0.04, -0.48, 1.18);
+        smile.rotation.z = -Math.PI / 2 - 0.55;
+        head.add(smile);
+
+        const shoulder = new THREE.Object3D();
+        shoulder.position.set(1.85, 4.45, 0.35);
+        figure.add(shoulder);
+        const upperArm = limb(0.58, shirt);
+        const foreArm = limb(0.42, skin);
+        const elbow = ball(0.5, 0.5, 0.5, shirt);
+        const wrist = ball(0.46, 0.46, 0.46, skin);
+        scene.add(elbow);
+        scene.add(wrist);
+
+        const hand = new THREE.Group();
+        hand.scale.setScalar(0.44);
+        scene.add(hand);
+        ball(2.05, 1.85, 0.82, skin, hand).position.set(0, 2.55, 0);
+        ball(2.28, 0.62, 0.7, skin, hand).position.set(0, 4.15, 0.12);
+        ball(1.55, 0.85, 0.72, skinLight, hand).position.set(0, 1.15, 0.08);
+        ball(0.95, 1.2, 0.7, skin, hand).position.set(1.55, 1.85, 0.42);
+        const wristPost = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.85, 0.95, 1.15, 18),
+          skin,
+        );
+        wristPost.position.y = 0.45;
+        hand.add(wristPost);
+
+        const specs = [
+          {
+            x: 1.62,
+            y: 4.55,
+            z: 0.22,
+            len: [2.55, 1.55, 1.22],
+            rad: [0.5, 0.44, 0.39, 0.34],
+          },
+          {
+            x: 0.52,
+            y: 4.72,
+            z: 0.32,
+            len: [2.9, 1.75, 1.32],
+            rad: [0.54, 0.47, 0.41, 0.36],
+          },
+          {
+            x: -0.55,
+            y: 4.58,
+            z: 0.2,
+            len: [2.7, 1.62, 1.24],
+            rad: [0.49, 0.43, 0.38, 0.33],
+          },
+          {
+            x: -1.58,
+            y: 4.28,
+            z: 0.02,
+            len: [2.1, 1.28, 1.02],
+            rad: [0.42, 0.37, 0.33, 0.29],
+          },
+        ];
+        function addFinger(spec) {
+          const base = new THREE.Group();
+          base.position.set(spec.x, spec.y, spec.z);
+          hand.add(base);
+          base.add(
+            ball(
+              spec.rad[0],
+              spec.rad[0] * 0.92,
+              spec.rad[0] * 0.86,
+              knuckleMat,
+            ),
+          );
+          const curls = [];
+          let node = base;
+          for (let j = 0; j < 3; j += 1) {
+            const curl = new THREE.Group();
+            if (j) curl.position.y = spec.len[j - 1];
+            node.add(curl);
+            curls.push(curl);
+            const mesh = new THREE.Mesh(
+              new THREE.CylinderGeometry(
+                spec.rad[j + 1],
+                spec.rad[j] * 0.96,
+                spec.len[j],
+                16,
+              ),
+              j === 2 ? skinLight : skin,
+            );
+            mesh.position.y = spec.len[j] / 2;
+            curl.add(mesh);
+            node = curl;
+          }
+          const tip = new THREE.Group();
+          tip.position.y = spec.len[2];
+          node.add(tip);
+          tip.add(
+            ball(spec.rad[3], spec.rad[3] * 0.92, spec.rad[3] * 0.9, skinLight),
+          );
+          const nail = ball(
+            spec.rad[3] * 0.62,
+            spec.rad[3] * 0.95,
+            spec.rad[3] * 0.26,
+            nailMat,
+          );
+          nail.position.set(0, spec.rad[3] * 0.08, -spec.rad[3] * 0.72);
+          tip.add(nail);
+          return { base, curls, tip, spec };
+        }
+        const fingers = specs.map(addFinger);
+
+        const thumb = { root: new THREE.Group(), curls: [] };
+        thumb.root.position.set(2.15, 1.7, 0.85);
+        hand.add(thumb.root);
+        thumb.root.add(ball(0.58, 0.5, 0.48, knuckleMat));
+        const thumbLen = [1.7, 1.28, 1.05];
+        const thumbRad = [0.56, 0.48, 0.42, 0.36];
+        let thumbNode = thumb.root;
+        for (let k = 0; k < 3; k += 1) {
+          const curl = new THREE.Group();
+          if (k) curl.position.y = thumbLen[k - 1];
+          thumbNode.add(curl);
+          thumb.curls.push(curl);
+          const mesh = new THREE.Mesh(
+            new THREE.CylinderGeometry(
+              thumbRad[k + 1],
+              thumbRad[k] * 0.96,
+              thumbLen[k],
+              16,
+            ),
+            k === 2 ? skinLight : skin,
+          );
+          mesh.position.y = thumbLen[k] / 2;
+          curl.add(mesh);
+          thumbNode = curl;
+        }
+        const thumbTip = new THREE.Group();
+        thumbTip.position.y = thumbLen[2];
+        thumbNode.add(thumbTip);
+        thumbTip.add(
+          ball(thumbRad[3], thumbRad[3] * 0.9, thumbRad[3] * 0.88, skinLight),
+        );
+        const thumbNail = ball(
+          thumbRad[3] * 0.6,
+          thumbRad[3] * 0.9,
+          thumbRad[3] * 0.24,
+          nailMat,
+        );
+        thumbNail.position.set(0, 0.04, -thumbRad[3] * 0.7);
+        thumbTip.add(thumbNail);
+        thumb.tip = thumbTip;
+
+        const offShoulder = new THREE.Object3D();
+        offShoulder.position.set(-1.85, 4.35, 0.15);
+        figure.add(offShoulder);
+        const offArm = limb(0.46, shirt);
+        const offFore = limb(0.34, skin);
+        const restHand = new THREE.Group();
+        scene.add(restHand);
+        ball(0.62, 0.72, 0.28, skin, restHand);
+        ball(0.24, 0.3, 0.2, skin, restHand).position.set(0.55, -0.05, 0.12);
+        for (let i = 0; i < 4; i += 1) {
+          const stub = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.075, 0.09, 0.48, 10),
+            skin,
+          );
+          stub.position.set(-0.3 + i * 0.2, 0.52, 0.02);
+          stub.rotation.x = 0.15;
+          restHand.add(stub);
+          ball(0.085, 0.085, 0.08, skinLight, restHand).position.set(
+            -0.3 + i * 0.2,
+            0.78,
+            0.06,
+          );
+        }
+        const restThumb = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.08, 0.1, 0.38, 10),
+          skin,
+        );
+        restThumb.position.set(0.48, 0.22, 0.16);
+        restThumb.rotation.z = -0.9;
+        restHand.add(restThumb);
+
+        const dots = Array.from({ length: 90 }, () => {
+          const dot = new THREE.Mesh(
+            new THREE.SphereGeometry(0.09, 10, 8),
+            new THREE.MeshBasicMaterial({
+              color: 0xff5f86,
+              transparent: true,
+              opacity: 0.34,
+            }),
+          );
+          dot.visible = false;
+          scene.add(dot);
+          return dot;
+        });
+
+        const wristPos = new THREE.Vector3();
+        const shoulderPos = new THREE.Vector3();
+        const tipPos = new THREE.Vector3();
+        const pole = new THREE.Vector3(0.4, -1, 0.15);
+        let lookX = 0;
+        let lookY = 0;
+        let pointerX = 0;
+        let pointerY = 0;
+        actor.addEventListener("pointermove", (event) => {
+          const rect = actor.getBoundingClientRect();
+          pointerX = (event.clientX - rect.left) / rect.width - 0.5;
+          pointerY = (event.clientY - rect.top) / rect.height - 0.5;
+        });
+        actor.addEventListener("pointerleave", () => {
+          pointerX = 0;
+          pointerY = 0;
+        });
+
+        function applyPose(v, motion) {
+          fingers.forEach((finger, index) => {
+            finger.base.rotation.z = -(NAT[index] + v[index * 4]) * RAD;
+            finger.base.position.z = finger.spec.z;
+            finger.curls.forEach((curl, joint) => {
+              curl.rotation.x = v[index * 4 + 1 + joint] * RAD;
+            });
+          });
+          if (v[0] < -14) fingers[0].base.position.z += 0.7;
+          if (v[4] > 14) fingers[1].base.position.z -= 0.25;
+          const across = v[20] > 0.5;
+          thumb.root.position.z = across ? 1.35 : 0.85;
+          thumb.root.rotation.order = "YXZ";
+          thumb.root.rotation.y = across ? 0.15 : 0.55;
+          thumb.root.rotation.x = across ? 0.2 : 0.48;
+          thumb.root.rotation.z = -v[16] * RAD;
+          thumb.curls[0].rotation.x = v[17] * RAD;
+          thumb.curls[1].rotation.x = v[18] * RAD;
+          thumb.curls[2].rotation.x = v[18] * 0.65 * RAD;
+          const spin = v[19] + (motion ? motion.ra : 0);
+          const side = Math.min(1, Math.max(0, (Math.abs(spin) - 55) / 40));
+          hand.rotation.order = "YXZ";
+          hand.rotation.x = -0.46;
+          hand.rotation.y = -0.28 - side * 1.05;
+          hand.rotation.z = -spin * RAD;
+        }
+
+        function fit() {
+          const width = actor.clientWidth;
+          const height = actor.clientHeight;
+          if (!width || !height) return;
+          renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+          renderer.setSize(width, height, false);
+          camera.aspect = width / height;
+          camera.updateProjectionMatrix();
+        }
+
+        return function render(now) {
+          fit();
+          const t = now / 1000;
+          const breath = Math.sin(t * 1.6) * 0.06;
+          figure.position.y = -1.55 + breath;
+          head.rotation.y = Math.sin(t * 0.7) * 0.06;
+          head.rotation.z = Math.sin(t * 0.5) * 0.02;
+          const blink = now % 4200 < 130 ? 0.12 : 1;
+          eyes.forEach((eye) => {
+            eye.scale.y = blink;
+          });
+
+          let motion = null;
+          if (play && play.phase === "hold" && play.motion && !play.settling) {
+            const u = Math.min(1, (now - play.holdStart) / play.holdMs);
+            const [dx, dy, ra] = play.motion.fn(u);
+            motion = { dx, dy, ra, trk: play.motion.f, rec: true };
+          }
+          const move = 0.032;
+          hand.position.set(
+            1.7 + (motion ? motion.dx * move : 0),
+            0.55 - (motion ? motion.dy * move : 0) + breath,
+            3.6,
+          );
+          applyPose(shownPose, motion);
+          figure.updateMatrixWorld(true);
+          hand.updateMatrixWorld(true);
+          shoulder.getWorldPosition(shoulderPos);
+          hand.getWorldPosition(wristPos);
+          const elbowPos = bendElbow(shoulderPos, wristPos, 3.7, 3.55, pole);
+          placeBone(upperArm, shoulderPos, elbowPos);
+          placeBone(foreArm, elbowPos, wristPos);
+          elbow.position.copy(elbowPos);
+          wrist.position.copy(wristPos);
+
+          offShoulder.getWorldPosition(shoulderPos);
+          const offElbow = shoulderPos
+            .clone()
+            .add(new THREE.Vector3(-0.85, -1.45, 0.55));
+          const offWrist = shoulderPos
+            .clone()
+            .add(new THREE.Vector3(0.05, -2.75, 1.15));
+          placeBone(offArm, shoulderPos, offElbow);
+          placeBone(offFore, offElbow, offWrist);
+          restHand.position.copy(offWrist);
+          restHand.rotation.z = 0.15;
+          restHand.rotation.x = 0.4;
+
+          if (motion && motion.rec) {
+            const digit =
+              motion.trk === -1 ? thumb.tip : fingers[motion.trk].tip;
+            digit.getWorldPosition(tipPos);
+            const last = trail[trail.length - 1];
+            if (!last || last.distanceTo(tipPos) > 0.07)
+              trail.push(tipPos.clone());
+            if (trail.length > dots.length) trail.shift();
+          }
+          dots.forEach((dot, index) => {
+            const point = trail[index];
+            dot.visible = !!point;
+            if (!point) return;
+            dot.position.copy(point);
+            const fade = (index + 1) / Math.max(1, trail.length);
+            dot.scale.setScalar(0.7 + fade * 1.5);
+            dot.material.opacity = 0.34 + fade * 0.62;
+          });
+
+          const targetX = pointerX * 2.2;
+          const targetY = pointerY * -1.1;
+          lookX += (targetX - lookX) * 0.06;
+          lookY += (targetY - lookY) * 0.06;
+          camera.position.set(0.2 + lookX, 3.35 + lookY, 20.5);
+          camera.lookAt(0.15, 2.55, 0.4);
+          renderer.render(scene, camera);
+        };
+      }
+
+      let drawScene = function () {};
+      if (typeof THREE === "undefined")
+        actorNote("एनिमेशन के लिए इंटरनेट चाहिए।");
+      else {
+        try {
+          drawScene = createScene();
+        } catch (error) {
+          actorNote("एनिमेशन शुरू नहीं हुआ।");
+        }
+      }
+
+      function drawActor(now) {
+        advancePlay(now);
+        drawScene(now);
+      }
+
+      function signLoop(now) {
+        if (!signOn) return;
+        drawActor(now);
+        signLoopId = requestAnimationFrame(signLoop);
+      }
+
+      playSign.addEventListener("click", () => {
+        if (play && !play.settling) stopSigns();
+        else startSigns();
+      });
+      $("#az").addEventListener("click", (e) => {
+        const b = e.target.closest("button");
+        if (b) {
+          spellText.value = b.dataset.c;
+          startSigns(b.dataset.c);
+        }
+      });
+
+      setStatus("तैयार");
+      route();
+      if (location.protocol === "file:")
+        showBanner(
+          "फ़ाइल सीधे खोलने पर कैमरा नहीं चलता। इसे HTTPS लिंक (जैसे Vercel) पर खोलें।",
+        );
+    </script>
+  </body>
+</html>

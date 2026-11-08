@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Claude</title>
+    <style>
+      :root {
+        --bg: #f3f1eb;
+        --panel: rgba(255, 255, 255, 0.74);
+        --panel-strong: #ffffff;
+        --border: rgba(15, 23, 42, 0.08);
+        --text: #1f2937;
+        --muted: #6b7280;
+        --accent: #111827;
+        --accent-soft: #e5e7eb;
+        --shadow: 0 20px 45px rgba(15, 23, 42, 0.08);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background:
+          radial-gradient(
+            circle at top,
+            rgba(255, 255, 255, 0.9),
+            transparent 35%
+          ),
+          linear-gradient(180deg, #f7f5f1 0%, var(--bg) 100%);
+        font-family: Inter, "Segoe UI", sans-serif;
+        color: var(--text);
+        padding: 24px;
+      }
+
+      .app {
+        width: min(720px, 100%);
+        min-height: 80vh;
+        display: flex;
+        flex-direction: column;
+        background: var(--panel);
+        backdrop-filter: blur(10px);
+        border: 1px solid var(--border);
+        border-radius: 26px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
+
+      h1 {
+        margin: 0;
+        padding: 24px 28px 18px;
+        font-size: clamp(2rem, 5vw, 2.5rem);
+        letter-spacing: -0.06em;
+        font-weight: 700;
+      }
+
+      #messages {
+        flex: 1;
+        padding: 0 28px 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        color: var(--muted);
+      }
+
+      #messages:empty::before {
+        content: "Start a conversation…";
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 180px;
+        border: 1px dashed rgba(17, 24, 39, 0.12);
+        border-radius: 18px;
+        background: rgba(255, 255, 255, 0.35);
+        font-size: 0.95rem;
+      }
+
+      form {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 18px 20px 24px;
+        border-top: 1px solid rgba(17, 24, 39, 0.05);
+        background: rgba(255, 255, 255, 0.35);
+      }
+
+      input {
+        flex: 1;
+        border: 1px solid rgba(17, 24, 39, 0.08);
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 14px;
+        padding: 15px 16px;
+        font-size: 1rem;
+        color: var(--text);
+        outline: none;
+        transition:
+          border-color 0.2s ease,
+          box-shadow 0.2s ease,
+          transform 0.2s ease;
+      }
+
+      input:focus {
+        border-color: rgba(17, 24, 39, 0.2);
+        box-shadow: 0 0 0 4px rgba(17, 24, 39, 0.05);
+      }
+
+      button {
+        border: none;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #111827 0%, #374151 100%);
+        color: white;
+        font-weight: 600;
+        padding: 15px 20px;
+        min-width: 96px;
+        cursor: pointer;
+        box-shadow: 0 10px 20px rgba(17, 24, 39, 0.18);
+        transition:
+          transform 0.2s ease,
+          box-shadow 0.2s ease,
+          opacity 0.2s ease;
+      }
+
+      button:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 14px 28px rgba(17, 24, 39, 0.2);
+      }
+
+      button:active {
+        transform: translateY(0);
+      }
+
+      @media (max-width: 640px) {
+        body {
+          padding: 14px;
+        }
+
+        .app {
+          min-height: 100vh;
+          border-radius: 18px;
+        }
+
+        h1 {
+          padding: 20px 20px 14px;
+        }
+
+        form {
+          padding: 14px 16px 18px;
+        }
+
+        #messages {
+          padding: 0 20px 12px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <h1>Claude</h1>
+      <div id="messages"></div>
+      <form id="form" action="">
+        <input id="prompt" type="text" placeholder="Message model ..." />
+        <button>Send</button>
+      </form>
+    </div>
+
+    <script>
+      const form = document.getElementById("form");
+      const promptInput = document.getElementById("prompt");
+      const messages = document.getElementById("messages");
+
+      form.onsubmit = async (e) => {
+        e.preventDefault();
+        const res = await fetch("http://127.0.0.1:8000/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt: promptInput.value }),
+        });
+        const data = await res.json();
+        messages.textContent = data.reply;
+        promptInput.value = "";
+      };
+    </script>
+  </body>
+</html>

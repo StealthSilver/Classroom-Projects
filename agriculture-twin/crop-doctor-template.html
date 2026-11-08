@@ -1,0 +1,1327 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Crop Doctor – Leaf Disease Check</title>
+    <script>/*__ORT_RUNTIME__*/</script>
+    <style>
+      :root {
+        --bg: #eef3ea;
+        --card: #fff;
+        --ink: #17301f;
+        --mute: #5d7064;
+        --line: #d5e0d0;
+        --green: #2f6b3f;
+        --green2: #e1eedc;
+        --rust: #c4542b;
+        --rust2: #f9e6df;
+        --r: 18px;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0f1a13;
+          --card: #16251b;
+          --ink: #e6f0e3;
+          --mute: #93a99a;
+          --line: #27402f;
+          --green: #6fbf84;
+          --green2: #1c3626;
+          --rust: #ef8a62;
+          --rust2: #3a2219;
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family:
+          "Bricolage Grotesque",
+          system-ui,
+          -apple-system,
+          "Segoe UI",
+          sans-serif;
+        line-height: 1.5;
+      }
+      .wrap {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 20px 18px 60px;
+      }
+      .brand {
+        font-size: 26px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 22px;
+      }
+      .brand svg {
+        width: 34px;
+        height: 34px;
+      }
+      h1 {
+        font-size: clamp(28px, 5vw, 42px);
+        line-height: 1.1;
+        letter-spacing: -0.03em;
+        margin: 0 0 8px;
+        font-weight: 800;
+      }
+      h2 {
+        font-size: 22px;
+        margin: 34px 0 12px;
+        letter-spacing: -0.01em;
+      }
+      h3 {
+        font-size: 15px;
+        margin: 18px 0 6px;
+      }
+      p.sub {
+        color: var(--mute);
+        margin: 0 0 22px;
+        max-width: 56ch;
+      }
+      .crops {
+        display: inline-flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 99px;
+        padding: 4px;
+        margin-bottom: 22px;
+      }
+      .crops button {
+        border: 0;
+        background: none;
+        color: var(--mute);
+        font: 600 15px inherit;
+        font-family: inherit;
+        padding: 9px 22px;
+        border-radius: 99px;
+        cursor: pointer;
+      }
+      .crops button.on {
+        background: var(--green);
+        color: #fff;
+      }
+      .card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: var(--r);
+        padding: 22px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+      }
+      @media (max-width: 760px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+        .bar {
+          grid-template-columns: 110px 1fr 40px !important;
+        }
+      }
+      .drop {
+        border: 2px dashed var(--line);
+        border-radius: var(--r);
+        min-height: 280px;
+        display: grid;
+        place-items: center;
+        text-align: center;
+        padding: 18px;
+        overflow: hidden;
+        background: var(--bg);
+        transition: 0.15s;
+      }
+      .drop.over {
+        border-color: var(--green);
+        background: var(--green2);
+      }
+      .drop img {
+        max-width: 100%;
+        max-height: 340px;
+        border-radius: 12px;
+        display: block;
+      }
+      .hint {
+        color: var(--mute);
+      }
+      .hint b {
+        display: block;
+        color: var(--ink);
+        font-size: 18px;
+        margin-bottom: 4px;
+      }
+      .btns {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 14px;
+      }
+      .btn {
+        border: 0;
+        background: var(--green);
+        color: #fff;
+        font: 600 15px inherit;
+        font-family: inherit;
+        padding: 11px 18px;
+        border-radius: 12px;
+        cursor: pointer;
+      }
+      .btn.ghost {
+        background: var(--green2);
+        color: var(--green);
+      }
+      button:focus-visible,
+      summary:focus-visible {
+        outline: 3px solid var(--rust);
+        outline-offset: 2px;
+      }
+      .res-title {
+        font-size: 26px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        margin: 0;
+      }
+      .conf {
+        color: var(--mute);
+        margin: 0 0 14px;
+      }
+      .bar {
+        display: grid;
+        grid-template-columns: 150px 1fr 44px;
+        gap: 10px;
+        align-items: center;
+        font-size: 14px;
+        margin: 6px 0;
+      }
+      .bar i {
+        display: block;
+        height: 9px;
+        border-radius: 9px;
+        background: var(--line);
+        overflow: hidden;
+      }
+      .bar i b {
+        display: block;
+        height: 100%;
+        background: var(--green);
+        border-radius: 9px;
+        transition: width 0.5s;
+      }
+      .bar.top i b {
+        background: var(--rust);
+      }
+      .bar.good.top i b {
+        background: var(--green);
+      }
+      ul {
+        margin: 0;
+        padding-left: 20px;
+      }
+      li {
+        margin: 4px 0;
+      }
+      .warn {
+        background: var(--rust2);
+        color: var(--rust);
+        padding: 10px 14px;
+        border-radius: 12px;
+        font-size: 14px;
+        margin-top: 14px;
+      }
+      .note {
+        font-size: 13px;
+        color: var(--mute);
+        margin-top: 16px;
+      }
+      .empty {
+        color: var(--mute);
+        display: grid;
+        place-items: center;
+        min-height: 240px;
+        text-align: center;
+      }
+      details {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 14px 18px;
+        margin: 10px 0;
+      }
+      summary {
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 16px;
+      }
+      details p {
+        margin: 10px 0 0;
+        color: var(--mute);
+      }
+      dialog {
+        border: 0;
+        border-radius: var(--r);
+        padding: 16px;
+        background: var(--card);
+        color: var(--ink);
+        max-width: 94vw;
+      }
+      dialog::backdrop {
+        background: rgba(0, 0, 0, 0.55);
+      }
+      dialog video {
+        width: min(560px, 86vw);
+        border-radius: 12px;
+        background: #000;
+        display: block;
+      }
+      [hidden] {
+        display: none !important;
+      }
+    </style>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f5f8f4;
+        --card: #fff;
+        --ink: #183522;
+        --mute: #687b6d;
+        --line: #dce7dc;
+        --green: #287044;
+        --green2: #e8f2e8;
+        --rust: #b84f31;
+        --rust2: #fbede8;
+        --r: 20px;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--bg);
+        font-family: "Bricolage Grotesque", system-ui, -apple-system, "Segoe UI",
+          sans-serif;
+      }
+      .hero {
+        position: relative;
+        overflow: hidden;
+        padding: 28px 0 112px;
+        background:
+          radial-gradient(ellipse at 85% 12%, #f8edcc 0, transparent 19rem),
+          linear-gradient(135deg, #e8f2e7, #f8faf6 68%);
+        border-bottom: 1px solid var(--line);
+      }
+      .hero .wrap {
+        max-width: 1040px;
+        padding: 0 22px;
+      }
+      .brand {
+        margin-bottom: 50px;
+        color: var(--green);
+        font-size: 20px;
+      }
+      .brand svg {
+        width: 32px;
+        height: 32px;
+      }
+      .hero .eyebrow {
+        margin: 0 0 10px;
+        color: var(--green);
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+      }
+      .hero h1 {
+        max-width: 15ch;
+        font-size: clamp(34px, 6vw, 56px);
+      }
+      .hero .sub {
+        max-width: 48ch;
+        margin: 0;
+        color: var(--mute);
+        font-size: clamp(16px, 2vw, 18px);
+      }
+      main.wrap {
+        position: relative;
+        max-width: 1040px;
+        margin: -64px auto 0;
+        padding: 0 22px 64px;
+      }
+      .crops {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        margin: 0 0 18px;
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+      }
+      .crops button {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 0;
+        padding: 12px 14px;
+        border: 1px solid var(--line);
+        border-radius: 16px;
+        background: var(--card);
+        box-shadow: 0 6px 20px -16px rgba(19, 54, 32, 0.42);
+        color: var(--ink);
+        text-align: left;
+        font: 600 15px inherit;
+        font-family: inherit;
+        transition: border-color 0.18s, background 0.18s, transform 0.18s;
+      }
+      .crops button:hover {
+        transform: translateY(-2px);
+        border-color: #a9c5ad;
+      }
+      .crops button.on {
+        border-color: var(--green);
+        background: var(--green);
+        color: #fff;
+      }
+      .crops .ico {
+        display: grid;
+        flex: 0 0 42px;
+        width: 42px;
+        height: 42px;
+        place-items: center;
+        border-radius: 12px;
+        background: var(--green2);
+        color: var(--green);
+      }
+      .crops .ico svg,
+      .h2ico svg {
+        width: 28px;
+        height: 28px;
+      }
+      .crops button.on .ico {
+        background: rgba(255, 255, 255, 0.15);
+        color: #f4d67e;
+      }
+      .crop-label {
+        min-width: 0;
+      }
+      .crop-label small {
+        display: block;
+        margin-top: 1px;
+        color: var(--mute);
+        font-size: 12px;
+        font-weight: 400;
+      }
+      .crops button.on .crop-label small {
+        color: rgba(255, 255, 255, 0.75);
+      }
+      .grid {
+        align-items: stretch;
+        gap: 16px;
+      }
+      .card {
+        border-radius: var(--r);
+        padding: 20px;
+        box-shadow: 0 10px 28px -22px rgba(18, 46, 28, 0.48);
+      }
+      .drop {
+        position: relative;
+        min-height: 300px;
+        border-width: 1.5px;
+        border-radius: 16px;
+        background: linear-gradient(180deg, #f7faf6, #fff);
+        cursor: pointer;
+      }
+      .drop:hover,
+      .drop.over {
+        border-color: var(--green);
+        background: var(--green2);
+      }
+      .drop.scan::after {
+        position: absolute;
+        top: 8%;
+        right: 0;
+        left: 0;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, #d6ad48, transparent);
+        content: "";
+        animation: scan 1.2s ease-in-out infinite alternate;
+      }
+      @keyframes scan {
+        to {
+          top: 92%;
+        }
+      }
+      .hint svg {
+        width: 76px;
+        height: 76px;
+        margin-bottom: 12px;
+        color: var(--green);
+      }
+      .hint b {
+        font-size: 17px;
+      }
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 44px;
+        padding: 10px 16px;
+        border-radius: 12px;
+        font-size: 14px;
+        transition: transform 0.15s, filter 0.15s;
+      }
+      .btn:hover {
+        transform: translateY(-1px);
+        filter: brightness(1.04);
+      }
+      .btn svg {
+        width: 18px;
+        height: 18px;
+      }
+      .btn.ghost {
+        border: 1px solid var(--line);
+      }
+      button:focus-visible,
+      summary:focus-visible,
+      .drop:focus-visible {
+        outline: 3px solid #d6ad48;
+        outline-offset: 3px;
+      }
+      #result {
+        min-height: 300px;
+      }
+      .empty {
+        align-content: center;
+        gap: 12px;
+        min-height: 260px;
+        padding: 12px;
+      }
+      .empty-icon {
+        width: 54px;
+        height: 54px;
+        color: #71987a;
+      }
+      .spin {
+        width: 32px;
+        height: 32px;
+        border: 3px solid var(--green2);
+        border-top-color: var(--green);
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .head {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 16px;
+      }
+      .ring {
+        position: relative;
+        flex: 0 0 68px;
+        width: 68px;
+        height: 68px;
+      }
+      .ring svg {
+        width: 100%;
+        height: 100%;
+        transform: rotate(-90deg);
+      }
+      .ring circle {
+        fill: none;
+        stroke-width: 7;
+        stroke-linecap: round;
+      }
+      .ring .trk {
+        stroke: var(--line);
+      }
+      .ring .val {
+        stroke: var(--rust);
+        stroke-dasharray: 188.5;
+        stroke-dashoffset: 188.5;
+        animation: fill 0.9s ease-out forwards;
+      }
+      .ring.good .val {
+        stroke: var(--green);
+      }
+      @keyframes fill {
+        to {
+          stroke-dashoffset: calc(188.5 - 188.5 * var(--p) / 100);
+        }
+      }
+      .ring b {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        font-size: 15px;
+      }
+      .res-title {
+        font-size: clamp(20px, 3vw, 25px);
+        line-height: 1.2;
+      }
+      .conf {
+        margin: 3px 0 0;
+        font-size: 13px;
+      }
+      .bar {
+        grid-template-columns: minmax(84px, 130px) 1fr 40px;
+        gap: 8px;
+        font-size: 13px;
+      }
+      .bar i {
+        height: 8px;
+      }
+      .bar i b {
+        transform-origin: left;
+        animation: grow 0.8s ease both;
+      }
+      @keyframes grow {
+        from {
+          transform: scaleX(0);
+        }
+      }
+      h3 {
+        margin-top: 16px;
+      }
+      .warn {
+        border: 1px solid #f2d4ca;
+      }
+      h2 {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        margin: 40px 0 14px;
+        font-size: clamp(21px, 3vw, 25px);
+      }
+      .h2ico {
+        display: grid;
+        flex: 0 0 42px;
+        width: 42px;
+        height: 42px;
+        place-items: center;
+        border-radius: 12px;
+        background: var(--green2);
+        color: var(--green);
+      }
+      details {
+        padding: 0 16px;
+        border-radius: 14px;
+        transition: box-shadow 0.18s;
+      }
+      details:hover,
+      details[open] {
+        box-shadow: 0 8px 22px -18px rgba(18, 46, 28, 0.5);
+      }
+      summary {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 15px 0;
+        list-style: none;
+      }
+      summary::-webkit-details-marker {
+        display: none;
+      }
+      summary::after {
+        width: 8px;
+        height: 8px;
+        margin-right: 3px;
+        border-right: 2px solid var(--green);
+        border-bottom: 2px solid var(--green);
+        content: "";
+        transform: rotate(45deg);
+        transition: transform 0.2s;
+      }
+      details[open] summary::after {
+        transform: rotate(225deg);
+      }
+      details p {
+        margin: 0;
+        color: var(--mute);
+      }
+      details ul {
+        padding-bottom: 14px;
+      }
+      .credit {
+        margin-top: 28px;
+        text-align: center;
+      }
+      dialog {
+        border: 1px solid var(--line);
+        box-shadow: 0 20px 80px rgba(0, 0, 0, 0.18);
+      }
+      [hidden] {
+        display: none !important;
+      }
+      @media (max-width: 680px) {
+        .hero {
+          padding: 24px 0 94px;
+        }
+        .brand {
+          margin-bottom: 36px;
+        }
+        main.wrap {
+          margin-top: -48px;
+        }
+        .crops {
+          gap: 8px;
+        }
+        .crops button {
+          gap: 8px;
+          padding: 10px;
+        }
+        .crops .ico {
+          flex-basis: 36px;
+          width: 36px;
+          height: 36px;
+        }
+        .grid {
+          grid-template-columns: 1fr;
+        }
+        .drop {
+          min-height: 240px;
+        }
+      }
+      @media (max-width: 420px) {
+        .hero .wrap,
+        main.wrap {
+          padding-right: 16px;
+          padding-left: 16px;
+        }
+        .crops button {
+          font-size: 14px;
+        }
+        .crops .ico {
+          flex-basis: 32px;
+          width: 32px;
+          height: 32px;
+        }
+        .crops .ico svg {
+          width: 23px;
+          height: 23px;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          scroll-behavior: auto !important;
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="hero">
+      <div class="wrap">
+        <div class="brand">
+          <svg
+            viewBox="0 0 40 40"
+            fill="none"
+            stroke-width="2.6"
+            stroke-linecap="round"
+            aria-hidden="true"
+          >
+            <path d="M20 36V10" stroke="#287044" />
+            <path
+              d="M20 16c-6 0-9-4-9-8 6 0 9 3 9 8Zm0 7c6 0 9-4 9-8-6 0-9 3-9 8Zm0 7c-6 0-9-4-9-8 6 0 9 3 9 8Z"
+              stroke="#287044"
+              fill="#e8f2e8"
+            />
+          </svg>
+          Crop Doctor
+        </div>
+        <p class="eyebrow">Plant health · Photo check</p>
+        <h1>Is your crop healthy?</h1>
+        <p class="sub">
+          Choose a crop and add a clear leaf photo for a likely diagnosis and
+          practical next steps.
+        </p>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <div class="crops" id="crops" role="tablist" aria-label="Crop"></div>
+
+      <div class="grid">
+        <div class="card">
+          <div
+            class="drop"
+            id="drop"
+            tabindex="0"
+            role="button"
+            aria-label="Choose a leaf photo"
+          >
+            <div class="hint" id="hint">
+              <svg
+                viewBox="0 0 80 80"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M14 66C9 37 29 16 66 14c1 36-18 57-48 52Z" fill="#e8f2e8" />
+                <path d="M14 66c17-17 33-32 49-48M35 47l15 1m-23 9-3-16m26-8 1-14" />
+              </svg>
+              <b>Drop a leaf photo here</b>or tap to choose one
+            </div>
+            <img id="preview" alt="Selected leaf" hidden />
+          </div>
+          <div class="btns">
+            <button class="btn" id="upBtn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M12 16V4m-5 5 5-5 5 5M5 20h14" />
+              </svg>
+              Upload photo
+            </button>
+            <button class="btn ghost" id="camBtn">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M4 8h3l2-3h6l2 3h3v11H4z" />
+                <circle cx="12" cy="13" r="3.5" />
+              </svg>
+              Take photo
+            </button>
+          </div>
+          <input type="file" id="file" accept="image/*" hidden />
+          <p class="note">
+            Tip: photograph one leaf close up, in daylight, against a plain
+            background.
+          </p>
+        </div>
+        <div class="card" id="result">
+          <div class="empty">
+            <svg class="empty-icon" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="28" cy="28" r="17" />
+              <path d="m40 40 15 15M21 31c3-7 9-10 15-8-1 7-7 12-15 8Z" />
+            </svg>
+            Your diagnosis will appear here.
+          </div>
+        </div>
+      </div>
+
+      <h2>
+        <span class="h2ico" id="guideIco" aria-hidden="true"></span>
+        <span id="guideTitle"></span>
+      </h2>
+      <div id="guide"></div>
+      <p class="note credit">
+        Leaf checks use the open-source “Smart Farming Disease Detection
+        Transformer” by Wambugu Kinyua (Hugging Face: aashituli/promblemo),
+        which covers rice, wheat and maize. The model does not include barley.
+      </p>
+    </main>
+
+    <dialog id="camDlg">
+      <video id="video" autoplay playsinline muted></video>
+      <div class="btns">
+        <button class="btn" id="snap">Capture</button
+        ><button class="btn ghost" id="closeCam">Cancel</button>
+      </div>
+    </dialog>
+
+    <script>
+      /* The pretrained leaf-check model is inserted by crop.py. */
+      const MODEL = /*__MODEL__*/ null;
+      const THRESHOLD = 0.6; // below this, we ask for a clearer photo
+      const loadAsset = (filename, expectedAsset) =>
+        new Promise((resolve, reject) => {
+          const frame = document.createElement("iframe");
+          const timeout = setTimeout(() => {
+            frame.remove();
+            reject(new Error(`Timed out loading ${filename}. Keep all three HTML files together.`));
+          }, 120000);
+          const cleanup = () => {
+            clearTimeout(timeout);
+            window.removeEventListener("message", onMessage);
+            frame.remove();
+          };
+          const onMessage = (event) => {
+            if (event.source !== frame.contentWindow) return;
+            const message = event.data;
+            if (
+              message?.type !== "crop-doctor-asset" ||
+              message.asset !== expectedAsset ||
+              typeof message.data !== "string"
+            )
+              return;
+            cleanup();
+            resolve(message.data);
+          };
+          window.addEventListener("message", onMessage);
+          frame.hidden = true;
+          frame.setAttribute("sandbox", "allow-scripts");
+          frame.src = filename;
+          frame.onerror = () => {
+            cleanup();
+            reject(new Error(`Could not load ${filename}. Keep all three HTML files together.`));
+          };
+          document.body.appendChild(frame);
+        });
+
+      const HEALTHY = {
+        about: "No clear sign of disease on this leaf.",
+        cure: [
+          "Keep scouting weekly, especially in humid weather.",
+          "Maintain balanced fertiliser and even irrigation.",
+        ],
+      };
+      const D = (n, alias, about, cure) => ({ n, alias, about, cure });
+      const KB = {
+        rice: {
+          name: "Rice",
+          d: [
+            D(
+              "Bacterial leaf blight",
+              ["blb", "bacterial"],
+              "Caused by a bacterium. Water-soaked streaks start at leaf tips and edges, then turn yellow-white and wavy as the leaf dries.",
+              [
+                "Remove and destroy badly infected plants; keep fields free of weeds and stubble.",
+                "Drain the field and avoid flooding from infected water; do not clip seedling tips.",
+                "Cut nitrogen, split the dose and add potash.",
+                "If spreading, spray streptocycline with copper oxychloride at the dose your agriculture officer advises.",
+                "Next season use resistant varieties and treated seed.",
+              ],
+            ),
+            D(
+              "Brown spot",
+              [],
+              "A fungal disease. Oval brown spots with grey centres appear on leaves and grains, usually where soil is poor or the crop lacks water or potassium.",
+              [
+                "Apply balanced NPK with enough potash; add compost in poor soil.",
+                "Keep irrigation even; avoid water stress.",
+                "Spray mancozeb or propiconazole at the recommended dose if spots increase.",
+                "Next season treat seed with carbendazim or thiram.",
+              ],
+            ),
+            D(
+              "Leaf smut",
+              [],
+              "A mild fungal disease. Small, angular black spots appear on leaves; heavy infection weakens the plant late in the season.",
+              [
+                "Burn or bury infected residue after harvest.",
+                "Avoid excess nitrogen and give plants enough spacing.",
+                "If severe, spray mancozeb or propiconazole as advised locally.",
+                "Rotate crops and use clean seed.",
+              ],
+            ),
+            D(
+              "Leaf blast",
+              ["blast"],
+              "A fungal disease. Spindle-shaped spots with grey centres and brown edges appear on leaves and can join up to kill the leaf; common with heavy nitrogen and humid, cool nights.",
+              [
+                "Spray tricyclazole at the first spots, at the label dose.",
+                "Split nitrogen and avoid over-feeding.",
+                "Keep seedbeds and fields free of weeds; avoid water stress.",
+                "Next season use resistant varieties and treated seed.",
+              ],
+            ),
+            D(
+              "Hispa",
+              ["hispa"],
+              "An insect pest (rice hispa beetle). Grubs and adults scrape the leaf surface, leaving white streaks and papery, dried patches.",
+              [
+                "Clip leaf tips of seedlings before transplanting to remove eggs.",
+                "Remove grassy weeds on bunds that host the beetle.",
+                "If damage is heavy, spray a recommended insecticide such as chlorpyrifos or quinalphos at the label dose.",
+                "Avoid excess nitrogen.",
+              ],
+            ),
+            D(
+              "Neck blast",
+              ["neckblast"],
+              "A fungal disease that attacks the neck below the panicle, which turns dark and breaks, leaving empty grains.",
+              [
+                "Spray tricyclazole or a recommended fungicide at booting and again at heading.",
+                "Avoid excess nitrogen.",
+                "Use resistant varieties next season.",
+              ],
+            ),
+          ],
+        },
+        wheat: {
+          name: "Wheat",
+          d: [
+            D(
+              "Brown rust",
+              ["leafrust"],
+              "A fungal disease. Small round orange-brown pustules scatter across the upper leaf surface; it spreads quickly in warm, humid weather.",
+              [
+                "Spray propiconazole or tebuconazole at first pustules, at the label dose.",
+                "Avoid late sowing and over-use of nitrogen.",
+                "Grow rust-resistant varieties and remove volunteer wheat.",
+              ],
+            ),
+            D(
+              "Yellow rust",
+              ["stripe"],
+              "A fungal disease of cool, damp weather. Yellow stripes of powdery pustules run along the leaf veins.",
+              [
+                "Spray propiconazole or tebuconazole as soon as stripes appear.",
+                "Scout fields weekly in cool, foggy weeks.",
+                "Choose resistant varieties and avoid dense sowing.",
+              ],
+            ),
+            D(
+              "Stem rust",
+              ["blackrust"],
+              "A fungal disease. Dark reddish-brown pustules break through stems and leaf sheaths, weakening the stem; it thrives in warm, humid weather.",
+              [
+                "Spray propiconazole or tebuconazole at first signs.",
+                "Remove volunteer wheat and nearby barberry.",
+                "Plant resistant varieties and avoid late sowing.",
+              ],
+            ),
+            D(
+              "Septoria leaf blotch",
+              ["septoria"],
+              "A fungal disease. Yellow-brown blotches with tiny black dots appear, starting on lower leaves and moving up after rain.",
+              [
+                "Remove crop residue and rotate with a non-cereal crop.",
+                "Spray a recommended fungicide (such as propiconazole) when lesions reach upper leaves.",
+                "Use certified seed and avoid dense stands.",
+              ],
+            ),
+            D(
+              "Powdery mildew",
+              ["mildew"],
+              "A fungal disease. White powdery patches form on leaves and stems, mostly in cool, humid, crowded crops.",
+              [
+                "Spray sulphur or a recommended fungicide such as propiconazole.",
+                "Reduce nitrogen and thin dense stands for airflow.",
+                "Use resistant varieties next season.",
+              ],
+            ),
+          ],
+        },
+        maize: {
+          name: "Maize",
+          d: [
+            D(
+              "Common rust",
+              ["rust"],
+              "A fungal disease. Small, dusty, cinnamon-brown pustules appear on both sides of the leaf, mostly in cool, humid weather.",
+              [
+                "Spray mancozeb or a recommended fungicide if it appears before tasselling.",
+                "Plant resistant hybrids and avoid late sowing.",
+                "Keep fields weed-free for better airflow.",
+              ],
+            ),
+            D(
+              "Gray leaf spot",
+              ["cercospora", "grayleaf"],
+              "A fungal disease. Narrow, rectangular grey-tan lesions run between the veins, mostly in warm, humid fields.",
+              [
+                "Rotate with a non-host crop and bury residue after harvest.",
+                "Spray a recommended fungicide (such as azoxystrobin) at early lesions.",
+                "Use tolerant hybrids and avoid dense planting.",
+              ],
+            ),
+            D(
+              "Northern leaf blight",
+              ["blight"],
+              "A fungal disease. Long, cigar-shaped grey-green lesions, 2–15 cm, appear on leaves and spread upward in cool, wet weather.",
+              [
+                "Rotate crops and plough in residue after harvest.",
+                "Spray a recommended fungicide such as propiconazole at early lesions.",
+                "Plant resistant hybrids.",
+              ],
+            ),
+          ],
+        },
+      };
+      const norm = (s) => s.toLowerCase().replace(/[^a-z]/g, "");
+      function info(crop, label) {
+        const l = norm(label);
+        if (l.includes("healthy"))
+          return { title: "Looks healthy", healthy: true, ...HEALTHY };
+        const hit = KB[crop].d.find((x) =>
+          [x.n, ...x.alias].some((a) => l.includes(norm(a))),
+        );
+        return hit
+          ? { title: hit.n, ...hit }
+          : {
+              title: label,
+              about: "We don't have a detailed guide for this one yet.",
+              cure: [
+                "Show the leaf to your local agriculture extension officer for advice.",
+              ],
+            };
+      }
+
+      const $ = (id) => document.getElementById(id);
+      const CROP_ICONS = {
+        rice: `<svg viewBox="0 0 48 48" fill="currentColor" stroke="currentColor" stroke-linecap="round" aria-hidden="true"><path d="M10 44C14 28 22 17 37 13" fill="none" stroke-width="2.4"/><ellipse cx="37" cy="13" rx="3.4" ry="1.9" transform="rotate(-14 37 13)" stroke="none"/><ellipse cx="32" cy="16" rx="3.4" ry="1.9" transform="rotate(-24 32 16)" stroke="none"/><ellipse cx="28" cy="20" rx="3.4" ry="1.9" transform="rotate(-40 28 20)" stroke="none"/><ellipse cx="24" cy="25" rx="3.4" ry="1.9" transform="rotate(-55 24 25)" stroke="none"/><ellipse cx="20" cy="31" rx="3.4" ry="1.9" transform="rotate(-65 20 31)" stroke="none"/></svg>`,
+        wheat: `<svg viewBox="0 0 48 48" fill="currentColor" stroke="currentColor" stroke-linecap="round" aria-hidden="true"><path d="M24 45V16" fill="none" stroke-width="2.4"/><ellipse cx="24" cy="10" rx="2.6" ry="5" stroke="none"/><g stroke="none"><ellipse cx="19" cy="19" rx="2.4" ry="4.6" transform="rotate(-32 19 19)"/><ellipse cx="29" cy="19" rx="2.4" ry="4.6" transform="rotate(32 29 19)"/><ellipse cx="19" cy="27" rx="2.4" ry="4.6" transform="rotate(-32 19 27)"/><ellipse cx="29" cy="27" rx="2.4" ry="4.6" transform="rotate(32 29 27)"/><ellipse cx="19" cy="35" rx="2.4" ry="4.6" transform="rotate(-32 19 35)"/><ellipse cx="29" cy="35" rx="2.4" ry="4.6" transform="rotate(32 29 35)"/></g></svg>`,
+        maize: `<svg viewBox="0 0 48 48" fill="currentColor" stroke="none" aria-hidden="true"><ellipse cx="24" cy="21" rx="6.5" ry="14"/><path d="M24 45C9 41 6 24 15 11C17 26 21 36 24 45Z" opacity=".55"/><path d="M24 45C39 41 42 24 33 11C31 26 27 36 24 45Z" opacity=".55"/></svg>`,
+      };
+      let crop = "rice",
+        lastImg = null,
+        token = 0;
+
+      function renderCrops() {
+        $("crops").innerHTML = Object.keys(KB)
+          .map((k) => {
+            const available = MODEL?.map.some((item) => item.crop === k);
+            return `<button role="tab" aria-selected="${k === crop}" data-k="${k}" class="${k === crop ? "on" : ""}"><span class="ico">${CROP_ICONS[k]}</span><span class="crop-label">${KB[k].name}${available ? "<small>Photo check</small>" : ""}</span></button>`;
+          })
+          .join("");
+        $("crops")
+          .querySelectorAll("button")
+          .forEach(
+            (b) =>
+              (b.onclick = () => {
+                crop = b.dataset.k;
+                renderCrops();
+                renderGuide();
+                lastImg
+                  ? analyse(lastImg)
+                  : ($("result").innerHTML =
+                      `<div class="empty"><svg class="empty-icon" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="28" cy="28" r="17"/><path d="m40 40 15 15M21 31c3-7 9-10 15-8-1 7-7 12-15 8Z"/></svg>Your diagnosis will appear here.</div>`);
+              }),
+          );
+      }
+      function renderGuide() {
+        const c = KB[crop];
+        $("guideIco").innerHTML = CROP_ICONS[crop];
+        $("guideTitle").textContent = `Common ${c.name.toLowerCase()} problems`;
+        $("guide").innerHTML = c.d
+          .map(
+            (x) =>
+              `<details><summary>${x.n}</summary><p>${x.about}</p><h3>What to do</h3><ul>${x.cure.map((s) => `<li>${s}</li>`).join("")}</ul></details>`,
+          )
+          .join("");
+      }
+
+      let sessionP = null;
+      function getSession() {
+        if (!MODEL) return Promise.resolve(null);
+        return (sessionP ||= (async () => {
+          try {
+            ort.env.wasm.numThreads = 1;
+            const [modelData, wasmData] = await Promise.all([
+              loadAsset(MODEL.modelFile, "model"),
+              loadAsset(MODEL.runtimeFile, "runtime"),
+            ]);
+            const wasmModule = Uint8Array.from(atob(MODEL.mjs), (c) =>
+              c.charCodeAt(0),
+            );
+            ort.env.wasm.wasmPaths = {
+              mjs: URL.createObjectURL(
+                new Blob([wasmModule], { type: "text/javascript" }),
+              ),
+            };
+            ort.env.wasm.wasmBinary = Uint8Array.from(atob(wasmData), (c) =>
+              c.charCodeAt(0),
+            );
+            const bin = Uint8Array.from(atob(modelData), (c) =>
+              c.charCodeAt(0),
+            );
+            return await ort.InferenceSession.create(bin, {
+              executionProviders: ["wasm"],
+            });
+          } catch (e) {
+            console.error(e);
+            return null;
+          }
+        })());
+      }
+      const loadImg = (src) =>
+        new Promise((res, rej) => {
+          const i = new Image();
+          i.onload = () => res(i);
+          i.onerror = rej;
+          i.src = src;
+        });
+      function toTensor(img) {
+        const s = MODEL.size,
+          c = document.createElement("canvas");
+        c.width = c.height = s;
+        const ctx = c.getContext("2d");
+        ctx.drawImage(img, 0, 0, s, s);
+        const px = ctx.getImageData(0, 0, s, s).data,
+          n = s * s,
+          out = new Float32Array(3 * n);
+        for (let i = 0; i < n; i++)
+          for (let k = 0; k < 3; k++)
+            out[k * n + i] =
+              (px[i * 4 + k] / 255 - MODEL.mean[k]) / MODEL.std[k];
+        return new ort.Tensor("float32", out, [1, 3, s, s]);
+      }
+      const softmax = (a) => {
+        const m = Math.max(...a),
+          e = a.map((v) => Math.exp(v - m)),
+          s = e.reduce((x, y) => x + y, 0);
+        return e.map((v) => v / s);
+      };
+      const cropName = (c) =>
+        KB[c] ? KB[c].name : c.charAt(0).toUpperCase() + c.slice(1);
+
+      async function analyse(img) {
+        drop.classList.add("scan");
+        try {
+          await analysePhoto(img);
+        } finally {
+          drop.classList.remove("scan");
+        }
+      }
+
+      async function analysePhoto(img) {
+        const my = ++token,
+          name = KB[crop].name,
+          box = $("result");
+        const idx = MODEL
+          ? MODEL.map
+              .map((m, i) => (m.crop === crop && !m.invalid ? i : -1))
+              .filter((i) => i >= 0)
+          : [];
+        if (!idx.length) {
+          box.innerHTML = `<div class="empty">Leaf checks for ${name.toLowerCase()} aren't available yet.<br>You can still read the guide below.</div>`;
+          return;
+        }
+        box.innerHTML = `<div class="empty"><div class="spin" aria-hidden="true"></div>Checking your ${name.toLowerCase()} leaf…</div>`;
+        await new Promise((r) => setTimeout(r, 30));
+        const sess = await getSession();
+        if (my !== token) return;
+        if (!sess) {
+          box.innerHTML = `<div class="empty">The leaf check could not start. Check that crop-doctor.html, crop-model.html and crop-runtime.html are together, then reload this page.</div>`;
+          return;
+        }
+        let logits;
+        try {
+          const res = await sess.run({ [sess.inputNames[0]]: toTensor(img) });
+          logits = Array.from(res[sess.outputNames[0]].data);
+        } catch (e) {
+          console.error(e);
+          box.innerHTML = `<div class="empty">Could not read this photo. Please try another one.</div>`;
+          return;
+        }
+        if (my !== token) return;
+
+        const all = softmax(logits),
+          allTop = all.indexOf(Math.max(...all)),
+          at = MODEL.map[allTop];
+        const sub = softmax(idx.map((i) => logits[i])),
+          order = [...sub.keys()].sort((a, b) => sub[b] - sub[a]),
+          top = order[0];
+        const d = info(crop, MODEL.map[idx[top]].disease),
+          conf = sub[top] * 100;
+        let warn = "";
+        if (at.invalid && all[allTop] > 0.5)
+          warn =
+            "This doesn't look like a leaf of a supported crop. Take a close, clear photo of one leaf.";
+        else if (at.crop !== crop && all[allTop] > 0.6)
+          warn = KB[at.crop]
+            ? `This photo looks more like ${cropName(at.crop)}. Switch the crop above if that's right.`
+            : "This photo does not look like a supported crop. Select rice, wheat or maize and try again.";
+        else if (sub[top] < THRESHOLD)
+          warn =
+            "Not sure about this one. Retake the photo closer, in better light, and check that the right crop is selected.";
+        box.innerHTML = `
+    <div class="head"><div class="ring ${d.healthy ? "good" : ""}"><svg viewBox="0 0 68 68" aria-hidden="true"><circle class="trk" cx="34" cy="34" r="30"/><circle class="val" cx="34" cy="34" r="30" style="--p:${conf.toFixed(0)}"/></svg><b>${conf.toFixed(0)}%</b></div><div><p class="res-title">${d.title}</p><p class="conf">${name} · ${d.healthy ? "no disease found" : "most likely disease"}</p></div></div>
+    ${order
+      .slice(0, 4)
+      .map((i) => {
+        const x = info(crop, MODEL.map[idx[i]].disease);
+        return `<div class="bar ${i === top ? "top" : ""} ${d.healthy ? "good" : ""}"><span>${x.healthy ? "Healthy" : x.title}</span><i><b style="width:${(sub[i] * 100).toFixed(0)}%"></b></i><span>${(sub[i] * 100).toFixed(0)}%</span></div>`;
+      })
+      .join("")}
+    ${warn ? `<div class="warn">${warn}</div>` : ""}
+    <h3>${d.healthy ? "Summary" : "What it is"}</h3><p style="margin:0">${d.about}</p>
+    <h3>${d.healthy ? "Keep it healthy" : "What to do"}</h3><ul>${d.cure.map((s) => `<li>${s}</li>`).join("")}</ul>
+    <p class="note">This is a guide, not a lab test. For chemical doses, check with your local agriculture extension officer.</p>`;
+      }
+
+      /* ---------- photo input ---------- */
+      const drop = $("drop"),
+        file = $("file");
+      async function showSrc(src) {
+        lastImg = await loadImg(src);
+        $("preview").src = src;
+        $("preview").hidden = false;
+        $("hint").hidden = true;
+        analyse(lastImg);
+      }
+      const showFile = (f) =>
+        f.type.startsWith("image/") && showSrc(URL.createObjectURL(f));
+      $("upBtn").onclick = (e) => {
+        e.stopPropagation();
+        file.click();
+      };
+      drop.onclick = () => file.click();
+      drop.onkeydown = (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          file.click();
+        }
+      };
+      file.onchange = () => file.files[0] && showFile(file.files[0]);
+      ["dragover", "dragenter"].forEach((ev) =>
+        drop.addEventListener(ev, (e) => {
+          e.preventDefault();
+          drop.classList.add("over");
+        }),
+      );
+      ["dragleave", "drop"].forEach((ev) =>
+        drop.addEventListener(ev, (e) => {
+          e.preventDefault();
+          drop.classList.remove("over");
+        }),
+      );
+      drop.addEventListener(
+        "drop",
+        (e) => e.dataTransfer.files[0] && showFile(e.dataTransfer.files[0]),
+      );
+
+      let stream;
+      function stopCam() {
+        stream && stream.getTracks().forEach((t) => t.stop());
+        stream = null;
+        $("camDlg").close();
+      }
+      $("camBtn").onclick = async () => {
+        try {
+          stream = await navigator.mediaDevices.getUserMedia({
+            video: { facingMode: "environment" },
+          });
+          $("video").srcObject = stream;
+          $("camDlg").showModal();
+        } catch (e) {
+          file.setAttribute("capture", "environment");
+          file.click();
+          file.removeAttribute("capture");
+        }
+      };
+      $("snap").onclick = () => {
+        const v = $("video"),
+          c = document.createElement("canvas");
+        c.width = v.videoWidth;
+        c.height = v.videoHeight;
+        c.getContext("2d").drawImage(v, 0, 0);
+        stopCam();
+        showSrc(c.toDataURL("image/jpeg", 0.92));
+      };
+      $("closeCam").onclick = stopCam;
+
+      renderCrops();
+      renderGuide();
+      getSession();
+    </script>
+  </body>
+</html>

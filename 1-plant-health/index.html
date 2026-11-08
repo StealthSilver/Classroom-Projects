@@ -1,0 +1,570 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>LeafCheck</title>
+    <style>
+      :root {
+        --bg1: #eef6ee;
+        --bg2: #dcefe0;
+        --card: #ffffff;
+        --text: #14231a;
+        --muted: #6a7d70;
+        --line: #e2eae4;
+        --accent: #2f8f5b;
+        --accent-d: #237246;
+        --soft: #f4f9f5;
+        --ok: #2f8f5b;
+        --ok-bg: #e3f4ea;
+        --bad: #d04a3a;
+        --bad-bg: #fdebe8;
+        --warn: #b7791f;
+        --warn-bg: #fdf3dc;
+        --shadow: 0 10px 40px rgba(30, 70, 45, 0.12);
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg1: #0f1913;
+          --bg2: #14241a;
+          --card: #18251d;
+          --text: #e9f1ec;
+          --muted: #8fa395;
+          --line: #2a3b30;
+          --accent: #43b67a;
+          --accent-d: #369c67;
+          --soft: #1d2d23;
+          --ok: #5fd08f;
+          --ok-bg: #1c3a29;
+          --bad: #f08577;
+          --bad-bg: #3d211d;
+          --warn: #f0c36a;
+          --warn-bg: #3a3018;
+          --shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+        }
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+      }
+      body {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        background: linear-gradient(160deg, var(--bg1), var(--bg2));
+        color: var(--text);
+        font-family:
+          system-ui,
+          -apple-system,
+          "Segoe UI",
+          Roboto,
+          sans-serif;
+      }
+      .app {
+        width: 100%;
+        max-width: 440px;
+      }
+      header {
+        text-align: center;
+        margin-bottom: 22px;
+      }
+      .logo {
+        width: 52px;
+        height: 52px;
+        border-radius: 16px;
+        background: var(--accent);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 12px;
+        box-shadow: var(--shadow);
+      }
+      .logo svg {
+        width: 28px;
+        height: 28px;
+        stroke: #fff;
+      }
+      h1 {
+        font-size: 26px;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+      }
+      header p {
+        color: var(--muted);
+        font-size: 15px;
+        margin-top: 6px;
+      }
+
+      .card {
+        background: var(--card);
+        border-radius: 22px;
+        padding: 22px;
+        box-shadow: var(--shadow);
+      }
+
+      .drop {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        min-height: 230px;
+        border: 2px dashed var(--line);
+        border-radius: 16px;
+        background: var(--soft);
+        cursor: pointer;
+        transition: 0.2s;
+        overflow: hidden;
+        text-align: center;
+        padding: 16px;
+      }
+      .drop:hover,
+      .drop.over {
+        border-color: var(--accent);
+        background: var(--bg1);
+      }
+      .drop svg {
+        width: 40px;
+        height: 40px;
+        stroke: var(--accent);
+      }
+      .drop strong {
+        font-size: 15px;
+      }
+      .drop span {
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .drop img {
+        width: 100%;
+        max-height: 300px;
+        object-fit: cover;
+        border-radius: 12px;
+      }
+
+      .btn {
+        width: 100%;
+        margin-top: 16px;
+        padding: 14px;
+        border: 0;
+        border-radius: 14px;
+        cursor: pointer;
+        background: var(--accent);
+        color: #fff;
+        font-size: 16px;
+        font-weight: 600;
+        transition: 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+      }
+      .btn:hover:not(:disabled) {
+        background: var(--accent-d);
+        transform: translateY(-1px);
+      }
+      .btn:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+      }
+      .btn.ghost {
+        background: transparent;
+        color: var(--accent);
+        border: 1.5px solid var(--line);
+      }
+      .btn.ghost:hover:not(:disabled) {
+        background: var(--soft);
+        transform: none;
+      }
+
+      .spinner {
+        width: 18px;
+        height: 18px;
+        border: 2.5px solid rgba(255, 255, 255, 0.4);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: spin 0.7s linear infinite;
+        display: none;
+      }
+      .loading .spinner {
+        display: block;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      .error {
+        margin-top: 14px;
+        padding: 12px 14px;
+        border-radius: 12px;
+        background: var(--bad-bg);
+        color: var(--bad);
+        font-size: 14px;
+        display: none;
+      }
+
+      .result {
+        display: none;
+        animation: fade 0.4s ease;
+      }
+      @keyframes fade {
+        from {
+          opacity: 0;
+          transform: translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+      .result img {
+        width: 100%;
+        height: 190px;
+        object-fit: cover;
+        border-radius: 14px;
+      }
+      .pill {
+        display: inline-block;
+        margin-top: 16px;
+        padding: 6px 14px;
+        border-radius: 999px;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
+      }
+      .pill.ok {
+        background: var(--ok-bg);
+        color: var(--ok);
+      }
+      .pill.bad {
+        background: var(--bad-bg);
+        color: var(--bad);
+      }
+      .name {
+        font-size: 22px;
+        font-weight: 700;
+        margin-top: 10px;
+        letter-spacing: -0.3px;
+      }
+      .plant {
+        color: var(--muted);
+        font-size: 14px;
+        margin-top: 2px;
+      }
+      .meter {
+        margin-top: 16px;
+      }
+      .meter-top {
+        display: flex;
+        justify-content: space-between;
+        font-size: 13px;
+        color: var(--muted);
+        margin-bottom: 6px;
+      }
+      .bar {
+        height: 8px;
+        background: var(--soft);
+        border-radius: 99px;
+        overflow: hidden;
+      }
+      .fill {
+        height: 100%;
+        width: 0;
+        border-radius: 99px;
+        background: var(--accent);
+        transition: width 0.8s ease;
+      }
+      .fill.bad {
+        background: var(--bad);
+      }
+      .warn {
+        margin-top: 14px;
+        padding: 10px 12px;
+        border-radius: 10px;
+        background: var(--warn-bg);
+        color: var(--warn);
+        font-size: 13px;
+        display: none;
+      }
+      .tip {
+        margin-top: 16px;
+        padding: 14px;
+        border-radius: 12px;
+        background: var(--soft);
+        font-size: 14px;
+        line-height: 1.55;
+      }
+      .others {
+        margin-top: 14px;
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .others div {
+        display: flex;
+        justify-content: space-between;
+        padding: 5px 0;
+        border-bottom: 1px solid var(--line);
+      }
+      .others div:last-child {
+        border: 0;
+      }
+      footer {
+        text-align: center;
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: 18px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <header>
+        <div class="logo">
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path
+              d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.5 19 2c1 2 2 4.2 2 8 0 5.5-4.8 10-10 10z"
+            />
+            <path d="M2 21c0-3 1.9-5.4 5.1-6.2C9.4 14.2 12 13 13 11" />
+          </svg>
+        </div>
+        <h1>LeafCheck</h1>
+        <p>
+          Check a leaf photo in your browser. The AI model (about 85 MB)
+          downloads the first time you use it.
+        </p>
+      </header>
+
+      <div class="card">
+        <!-- Upload view -->
+        <div id="uploadView">
+          <label class="drop" id="drop">
+            <div id="placeholder" style="display: contents">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect x="3" y="3" width="18" height="18" rx="3" />
+                <circle cx="9" cy="9" r="1.5" />
+                <path d="m21 15-5-5L5 21" />
+              </svg>
+              <strong>Click to upload or drag a photo here</strong>
+              <span>JPG or PNG, one leaf in clear light works best</span>
+            </div>
+            <img id="preview" hidden alt="Selected leaf" />
+            <input type="file" id="file" accept="image/*" hidden />
+          </label>
+          <button class="btn" id="btn" disabled>
+            <div class="spinner"></div>
+            <span id="btnText">Check Plant</span>
+          </button>
+          <div class="error" id="error"></div>
+        </div>
+
+        <!-- Result view -->
+        <div class="result" id="resultView">
+          <img id="resultImg" alt="Your leaf" />
+          <span class="pill" id="pill"></span>
+          <div class="name" id="name"></div>
+          <div class="plant" id="plant"></div>
+          <div class="meter">
+            <div class="meter-top">
+              <span>Confidence</span><span id="confText"></span>
+            </div>
+            <div class="bar"><div class="fill" id="fill"></div></div>
+          </div>
+          <div class="warn" id="warn">
+            Low confidence. Try a clearer, closer photo of a single leaf.
+          </div>
+          <div class="tip" id="tip"></div>
+          <div class="others" id="others"></div>
+          <button class="btn ghost" id="again">Check another plant</button>
+        </div>
+      </div>
+      <footer>
+        For learning purposes. Not a substitute for expert diagnosis.
+      </footer>
+    </div>
+
+    <script>
+      const $ = (id) => document.getElementById(id);
+      const MODEL_ID = "rodynaemad/plant-disease-dinov2-small";
+      let selected = null;
+      let classifierPromise = null;
+
+      function getClassifier() {
+        if (!classifierPromise) {
+          classifierPromise = import(
+            "https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.7.2"
+          ).then(async ({ pipeline, RawImage }) => ({
+            pipeline: await pipeline("image-classification", MODEL_ID, {
+              dtype: "fp32",
+              model_file_name: "model_with_features",
+            }),
+            RawImage,
+          }))
+            .catch((error) => {
+              classifierPromise = null;
+              throw new Error(
+                "Could not load the AI model. Connect to the internet and try again.",
+                { cause: error },
+              );
+            });
+        }
+        return classifierPromise;
+      }
+
+      function splitLabel(label) {
+        const [rawPlant, rawCondition] = label.split("___", 2);
+        const clean = (text) =>
+          text.replaceAll("_", " ").replaceAll(",", "").replace(/\s+/g, " ").trim();
+        const healthy = label.toLowerCase().includes("healthy");
+        const plant = rawCondition ? clean(rawPlant) : "";
+        const condition = rawCondition
+          ? clean(rawCondition)
+          : healthy
+            ? "Healthy"
+            : label;
+        return {
+          healthy,
+          plant,
+          condition,
+        };
+      }
+
+      function setFile(file) {
+        if (!file) return;
+        if (!file.type.startsWith("image/")) {
+          $("error").textContent = "Choose a JPG, PNG, or other image file.";
+          $("error").style.display = "block";
+          return;
+        }
+        selected = file;
+        $("preview").src = URL.createObjectURL(file);
+        $("preview").hidden = false;
+        $("placeholder").style.display = "none";
+        $("btn").disabled = false;
+        $("error").style.display = "none";
+      }
+
+      function reset() {
+        selected = null;
+        $("file").value = "";
+        $("preview").hidden = true;
+        $("placeholder").style.display = "contents";
+        $("btn").disabled = true;
+        $("resultView").style.display = "none";
+        $("uploadView").style.display = "block";
+      }
+
+      $("file").addEventListener("change", (e) => setFile(e.target.files[0]));
+      $("drop").addEventListener("dragover", (e) => {
+        e.preventDefault();
+        $("drop").classList.add("over");
+      });
+      $("drop").addEventListener("dragleave", () =>
+        $("drop").classList.remove("over"),
+      );
+      $("drop").addEventListener("drop", (e) => {
+        e.preventDefault();
+        $("drop").classList.remove("over");
+        setFile(e.dataTransfer.files[0]);
+      });
+      $("again").addEventListener("click", reset);
+
+      $("btn").addEventListener("click", async () => {
+        if (!selected) {
+          $("error").textContent = "Choose an image before checking your plant.";
+          $("error").style.display = "block";
+          return;
+        }
+
+        $("btn").disabled = true;
+        $("btn").classList.add("loading");
+        $("btnText").textContent = "Loading AI model...";
+        $("error").style.display = "none";
+        try {
+          await $("preview").decode();
+          const { pipeline, RawImage } = await getClassifier();
+          $("btnText").textContent = "Analyzing image...";
+          const image = await RawImage.fromURL($("preview").src);
+          const predictions = await pipeline(image, { top_k: 3 });
+          if (!Array.isArray(predictions) || predictions.length === 0) {
+            throw new Error("The model did not return a result. Try another image.");
+          }
+
+          const top = predictions[0];
+          const parsed = splitLabel(top.label);
+          const d = {
+            ...parsed,
+            confidence: Math.round(top.score * 1000) / 10,
+            tip: parsed.healthy
+              ? "This leaf looks healthy. Keep up regular watering, good sunlight and airflow."
+              : "Signs of disease detected. Isolate the plant, remove affected leaves, avoid wetting the foliage and consider a suitable treatment or a local expert's advice.",
+            others: predictions.map((prediction) => {
+              const match = splitLabel(prediction.label);
+              return {
+                name: [match.plant, match.condition].filter(Boolean).join(" - "),
+                score: Math.round(prediction.score * 1000) / 10,
+              };
+            }),
+          };
+          show(d);
+        } catch (err) {
+          $("error").textContent =
+            err instanceof Error
+              ? err.message
+              : "Could not analyze the image. Check your connection and try again.";
+          $("error").style.display = "block";
+        } finally {
+          $("btn").disabled = false;
+          $("btn").classList.remove("loading");
+          $("btnText").textContent = "Check Plant";
+        }
+      });
+
+      function show(d) {
+        $("resultImg").src = $("preview").src;
+        $("pill").textContent = d.healthy ? "Healthy" : "Disease detected";
+        $("pill").className = "pill " + (d.healthy ? "ok" : "bad");
+        $("name").textContent = d.healthy ? "Looking good" : d.condition;
+        $("plant").textContent = d.plant ? "Plant: " + d.plant : "";
+        $("confText").textContent = d.confidence + "%";
+        $("fill").className = "fill" + (d.healthy ? "" : " bad");
+        $("fill").style.width = "0";
+        setTimeout(() => ($("fill").style.width = d.confidence + "%"), 50);
+        $("warn").style.display = d.confidence < 60 ? "block" : "none";
+        $("tip").textContent = d.tip;
+        $("others").replaceChildren();
+        const matchesTitle = document.createElement("strong");
+        matchesTitle.textContent = "Top matches";
+        matchesTitle.style.color = "var(--text)";
+        $("others").append(matchesTitle);
+        d.others.forEach((match) => {
+          const row = document.createElement("div");
+          const name = document.createElement("span");
+          const score = document.createElement("span");
+          name.textContent = match.name;
+          score.textContent = `${match.score}%`;
+          row.append(name, score);
+          $("others").append(row);
+        });
+        $("uploadView").style.display = "none";
+        $("resultView").style.display = "block";
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,893 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>AI First Aid Kit Doctor Assistant</title>
+    <style>
+      :root {
+        --bg: #f3f7f9;
+        --card: #ffffff;
+        --ink: #14232b;
+        --dim: #5b6f79;
+        --line: #d3dfe5;
+        --red: #c4161c;
+        --redbg: #fdecec;
+        --teal: #0f6b6e;
+        --tealbg: #e3f2f2;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+      }
+      body {
+        background: var(--bg);
+        color: var(--ink);
+        font:
+          16px/1.55 system-ui,
+          -apple-system,
+          "Segoe UI",
+          Roboto,
+          sans-serif;
+      }
+      .sos {
+        background: var(--red);
+        color: #fff;
+        text-align: center;
+        padding: 9px 12px;
+        font-weight: 600;
+        font-size: 15px;
+      }
+      main {
+        max-width: 740px;
+        margin: 0 auto;
+        min-height: calc(100% - 40px);
+        display: flex;
+        flex-direction: column;
+        padding: 18px 16px 14px;
+      }
+      h1 {
+        margin: 0 0 2px;
+        font-size: 26px;
+        line-height: 1.2;
+        letter-spacing: -0.01em;
+      }
+      .sub {
+        margin: 0 0 14px;
+        color: var(--dim);
+      }
+      #chat {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        overflow-y: auto;
+        padding: 2px 2px 12px;
+      }
+      .msg {
+        max-width: 92%;
+        padding: 12px 15px;
+        border-radius: 12px;
+      }
+      .msg.user {
+        align-self: flex-end;
+        background: var(--teal);
+        color: #fff;
+      }
+      .msg.bot {
+        align-self: flex-start;
+        background: var(--card);
+        border: 1px solid var(--line);
+      }
+      .msg h2 {
+        margin: 0 0 6px;
+        font-size: 17px;
+        color: var(--teal);
+      }
+      .msg p {
+        margin: 0 0 8px;
+      }
+      .msg ol {
+        margin: 0 0 10px;
+        padding-left: 22px;
+      }
+      .msg li {
+        margin-bottom: 5px;
+      }
+      .alert {
+        background: var(--redbg);
+        border-left: 5px solid var(--red);
+        color: #7d0b10;
+        font-weight: 600;
+        padding: 9px 12px;
+        margin: 0 0 10px;
+        border-radius: 4px;
+      }
+      .warn {
+        background: var(--tealbg);
+        border-left: 5px solid var(--teal);
+        padding: 9px 12px;
+        margin: 0 0 4px;
+        border-radius: 4px;
+      }
+      .trace {
+        margin-top: 10px;
+        padding-top: 8px;
+        border-top: 1px dashed var(--line);
+        font-size: 13px;
+        color: var(--dim);
+      }
+      .trace b {
+        color: var(--ink);
+        font-weight: 600;
+      }
+      .bar {
+        display: inline-block;
+        vertical-align: middle;
+        width: 80px;
+        height: 6px;
+        background: var(--line);
+        border-radius: 3px;
+        margin: 0 6px;
+        overflow: hidden;
+      }
+      .bar i {
+        display: block;
+        height: 100%;
+        background: var(--teal);
+      }
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 0 0 12px;
+      }
+      .chips button {
+        background: var(--card);
+        color: var(--teal);
+        border: 1px solid var(--teal);
+        border-radius: 999px;
+        padding: 5px 12px;
+        font: inherit;
+        font-size: 14px;
+        cursor: pointer;
+      }
+      .chips button:hover {
+        background: var(--tealbg);
+      }
+      form {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      #text {
+        flex: 1;
+        min-width: 0;
+        background: var(--card);
+        color: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 12px 14px;
+        font: inherit;
+      }
+      button {
+        font: inherit;
+      }
+      #mic {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        border: 2px solid var(--red);
+        background: var(--card);
+        color: var(--red);
+        font-size: 20px;
+        cursor: pointer;
+        flex: none;
+      }
+      #mic.on {
+        background: var(--red);
+        color: #fff;
+        animation: pulse 1.2s infinite;
+      }
+      #send {
+        background: var(--teal);
+        color: #fff;
+        border: 0;
+        border-radius: 10px;
+        padding: 12px 18px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      @keyframes pulse {
+        50% {
+          box-shadow: 0 0 0 8px rgba(196, 22, 28, 0.2);
+        }
+      }
+      .foot {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 10px;
+        font-size: 14px;
+        color: var(--dim);
+      }
+      .foot label {
+        cursor: pointer;
+      }
+      #status {
+        min-height: 1.4em;
+      }
+      .note {
+        margin: 8px 0 0;
+        font-size: 12.5px;
+        color: var(--dim);
+      }
+      :focus-visible {
+        outline: 3px solid #1b6fd6;
+        outline-offset: 2px;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #mic.on {
+          animation: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="sos">
+      In an emergency call 112 (India) or your local emergency number first.
+    </div>
+    <main>
+      <h1>First Aid Assistant</h1>
+      <p class="sub">
+        Describe what happened by voice or text and get simple first aid steps.
+      </p>
+
+      <div id="chat" aria-live="polite"></div>
+      <div class="chips" id="chips"></div>
+
+      <form id="form" autocomplete="off">
+        <button
+          type="button"
+          id="mic"
+          aria-label="Start or stop listening"
+          title="Click and speak"
+        >
+          &#127908;
+        </button>
+        <input
+          id="text"
+          type="text"
+          placeholder="Example: my friend has a burn on his hand"
+          aria-label="Describe the situation"
+        />
+        <button id="send" type="submit">Ask</button>
+      </form>
+
+      <div class="foot">
+        <span id="status"></span>
+        <label
+          ><input type="checkbox" id="speakToggle" checked /> Speak
+          answers</label
+        >
+      </div>
+      <p class="note">
+        Learning project, not a doctor. These are basic first aid steps and do
+        not replace professional medical care.
+      </p>
+    </main>
+
+    <script>
+      /* ============================================================
+   1. KNOWLEDGE BASE  (add your own entries!)
+      title = heading shown to the user      q = typical question
+      tags  = synonyms and related words     steps = what to do
+      warn  = when to get professional help
+   ============================================================ */
+      const KB = [
+        {
+          title: "Minor burn",
+          q: "How to treat a burn?",
+          tags: "burnt burned scald hot water fire skin blister hand",
+          steps: [
+            "Cool the burn under cool running water for 20 minutes.",
+            "Take off rings or tight items near the burn before it swells.",
+            "Cover loosely with a clean, non-fluffy cloth or cling film.",
+            "Do not use ice, butter or toothpaste, and do not burst blisters.",
+          ],
+          warn: "Get medical help if the burn is large, deep, on the face, hands or genitals, caused by chemicals or electricity, or if the patient is a child.",
+        },
+        {
+          title: "Bleeding from a cut",
+          q: "How to stop bleeding from a cut?",
+          tags: "cut wound blood bleed bleeding injury knife scrape scratch",
+          steps: [
+            "Wear gloves if you can, then press firmly on the wound with a clean cloth for at least 10 minutes.",
+            "If blood soaks through, add more cloth on top. Do not remove the first one.",
+            "Raise the injured limb if possible, then bandage firmly.",
+            "Do not pull out any object stuck in the wound.",
+          ],
+          warn: "Call 112 if bleeding is heavy, spurting, or does not stop after 10 minutes of pressure.",
+        },
+        {
+          title: "Nosebleed",
+          q: "What to do for a nosebleed?",
+          tags: "nose blood bleeding bleed",
+          steps: [
+            "Sit upright and lean slightly forward.",
+            "Pinch the soft part of the nose for 10 minutes and breathe through the mouth.",
+            "Do not tilt the head back.",
+            "Place a cold cloth on the bridge of the nose.",
+          ],
+          warn: "Get medical help if bleeding lasts more than 20 minutes or follows a head injury.",
+        },
+        {
+          title: "Choking (adult)",
+          q: "What to do if an adult is choking?",
+          tags: "choke choking food stuck throat cannot breathe cough heimlich swallowed",
+          steps: [
+            "Ask “Are you choking?” If they can cough, encourage them to keep coughing.",
+            "If they cannot cough, speak or breathe, give 5 firm back blows between the shoulder blades.",
+            "Then give 5 abdominal thrusts: stand behind, place a fist above the navel, and pull inward and upward.",
+            "Repeat 5 back blows and 5 thrusts until the object comes out or help arrives.",
+            "If the person becomes unresponsive, start CPR.",
+          ],
+          warn: "Call 112 at once if they cannot breathe. For babies under 1 year, give 5 back blows and 5 chest thrusts, never abdominal thrusts.",
+        },
+        {
+          title: "CPR (adult)",
+          q: "How to do CPR?",
+          tags: "cpr unconscious not breathing heart stopped cardiac arrest resuscitation chest compressions unresponsive collapsed",
+          steps: [
+            "Check the area is safe. Tap the person and shout. If there is no response and no normal breathing, call 112 or ask someone to call.",
+            "Place the heel of one hand on the centre of the chest and the other hand on top.",
+            "Push hard and fast: about 5 to 6 cm deep, 100 to 120 times per minute, letting the chest rise fully each time.",
+            "Do not stop until the person moves, trained help takes over, or an AED is ready.",
+            "If an AED is available, switch it on and follow its voice instructions.",
+          ],
+          warn: "Start compressions immediately. Do not wait to be sure.",
+        },
+        {
+          title: "Fainting",
+          q: "What to do if someone faints?",
+          tags: "faint fainting dizzy collapse dizziness black out",
+          steps: [
+            "Lay the person flat on their back and raise their legs about 30 cm.",
+            "Loosen tight clothing and make sure they get fresh air.",
+            "Do not give food or drink until they are fully awake.",
+            "Help them sit up slowly once they recover.",
+          ],
+          warn: "Call 112 if they do not wake within 1 minute, are not breathing normally, or were hurt in the fall.",
+        },
+        {
+          title: "Sprain",
+          q: "How to treat a sprain?",
+          tags: "sprain twisted ankle swelling strain joint wrist muscle pain ice",
+          steps: [
+            "Rest the injured part and avoid using it.",
+            "Apply an ice pack wrapped in cloth for 20 minutes, several times a day.",
+            "Wrap with an elastic bandage, firm but not tight.",
+            "Raise the injured part above heart level.",
+          ],
+          warn: "See a doctor if you cannot put weight on it, the joint looks bent, or there is numbness.",
+        },
+        {
+          title: "Broken bone",
+          q: "What to do for a broken bone?",
+          tags: "fracture broken bone crack deformed splint leg arm",
+          steps: [
+            "Keep the person still and support the injured part in the position you found it. Do not straighten it.",
+            "If you must move them, support the limb with padding and a splint above and below the break.",
+            "Apply a cold pack wrapped in cloth to reduce swelling.",
+            "Cover any open wound with a clean cloth without pressing on the bone.",
+          ],
+          warn: "Call 112 for open fractures, heavy bleeding, or a suspected neck or back injury. Do not move a person with a possible spine injury.",
+        },
+        {
+          title: "Fever",
+          q: "What to do for a fever?",
+          tags: "fever temperature hot high child warm",
+          steps: [
+            "Rest and drink plenty of fluids.",
+            "Wear light clothing and keep the room cool.",
+            "Use paracetamol only as directed on the label if needed.",
+            "Check the temperature regularly.",
+          ],
+          warn: "See a doctor urgently if a baby under 3 months has any fever, the temperature is above 39.5 °C (103 °F), fever lasts over 3 days, or there is a stiff neck, rash, confusion or seizure.",
+        },
+        {
+          title: "Snake bite",
+          q: "What to do for a snake bite?",
+          tags: "snake bite venom cobra viper krait bitten",
+          steps: [
+            "Keep the person calm and as still as possible.",
+            "Keep the bitten limb still and remove rings and watches before swelling starts.",
+            "Do not cut, suck, tie a tight band, apply ice or use herbal remedies.",
+            "Take the person to a hospital immediately for antivenom.",
+          ],
+          warn: "Every snake bite is an emergency. Call 112 and get to a hospital right away.",
+        },
+        {
+          title: "Animal or dog bite",
+          q: "What to do for a dog bite?",
+          tags: "dog bite animal cat monkey rabies scratch bitten",
+          steps: [
+            "Wash the wound with soap and running water for 15 minutes.",
+            "Apply an antiseptic and cover with a clean dressing.",
+            "See a doctor the same day for rabies and tetanus vaccination.",
+            "Do not delay, even if the wound looks small.",
+          ],
+          warn: "Get urgent help if the bite is deep, on the face or neck, or bleeding heavily.",
+        },
+        {
+          title: "Poisoning",
+          q: "What to do for poisoning?",
+          tags: "poison swallowed chemical medicine overdose pesticide kerosene toxic tablets drank",
+          steps: [
+            "Call 112 or a poison information centre straight away.",
+            "Keep the container or label to show the doctor.",
+            "Do not make the person vomit, and do not give food, milk or drinks unless told to.",
+            "If they are unconscious but breathing, lay them on their side. If a chemical is on the skin, remove clothing and rinse with water.",
+          ],
+          warn: "Call 112 at once if the person is drowsy, unconscious or has trouble breathing.",
+        },
+        {
+          title: "Heat stroke",
+          q: "What to do for heat stroke?",
+          tags: "heat stroke sun hot dizzy dehydration summer sunstroke",
+          steps: [
+            "Move the person to cool shade or an air-conditioned room.",
+            "Remove extra clothing.",
+            "Cool the skin with wet cloths, fanning or cool water.",
+            "Give small sips of water only if they are fully awake.",
+          ],
+          warn: "Call 112 if there is confusion, fits or unconsciousness.",
+        },
+        {
+          title: "Seizure",
+          q: "What to do during a seizure?",
+          tags: "seizure fit epilepsy convulsion shaking fits",
+          steps: [
+            "Stay calm and note the time it started.",
+            "Move hard objects away and cushion the head.",
+            "Do not hold the person down and do not put anything in their mouth.",
+            "When shaking stops, turn them onto their side and stay until they are fully awake.",
+          ],
+          warn: "Call 112 if it lasts over 5 minutes, repeats, is the person’s first seizure, or breathing is difficult.",
+        },
+        {
+          title: "Severe allergic reaction",
+          q: "What to do for a severe allergic reaction?",
+          tags: "allergy allergic anaphylaxis swelling hives sting bee wasp peanut rash throat",
+          steps: [
+            "Call 112 if there is swelling of the face or throat, trouble breathing or dizziness.",
+            "Use an adrenaline auto-injector if the person has one.",
+            "Lay them flat with legs raised. If breathing is hard, let them sit up.",
+            "If a bee sting is the cause, scrape the stinger out with a card and stay with the person.",
+          ],
+          warn: "This can become life threatening within minutes. Do not wait for symptoms to improve.",
+        },
+        {
+          title: "Chemical in the eye",
+          q: "What to do if a chemical gets in the eye?",
+          tags: "eye chemical splash irritation dust acid bleach",
+          steps: [
+            "Rinse the eye with clean running water for 15 to 20 minutes.",
+            "Hold the eyelid open and let water flow away from the other eye.",
+            "Take out contact lenses if they come out easily.",
+            "Do not rub the eye. Cover it with a clean cloth and go to a hospital.",
+          ],
+          warn: "Get medical help for any chemical splash, even if the pain fades.",
+        },
+        {
+          title: "Electric shock",
+          q: "What to do for an electric shock?",
+          tags: "electric shock electrocution current wire socket electrocuted",
+          steps: [
+            "Do not touch the person until the power is off.",
+            "Switch off at the mains, or push the wire away with a dry wooden stick.",
+            "Call 112.",
+            "If they are not breathing, start CPR. Cover burns with a clean cloth.",
+          ],
+          warn: "Every serious electric shock needs a hospital check, even if the person feels fine.",
+        },
+        {
+          title: "Heart attack",
+          q: "What to do for a heart attack?",
+          tags: "heart attack chest pain pressure arm jaw sweating cardiac angina",
+          steps: [
+            "Call 112 immediately.",
+            "Sit the person down, keep them calm and still, and loosen tight clothing.",
+            "If they are not allergic, give one 300 mg aspirin to chew slowly.",
+            "If they become unresponsive and stop breathing normally, start CPR.",
+          ],
+          warn: "Do not wait. Chest pain, sweating, or pain spreading to the arm or jaw needs an ambulance.",
+        },
+        {
+          title: "Stroke",
+          q: "How to recognise a stroke?",
+          tags: "stroke face drooping arm weakness speech slurred paralysis brain numb",
+          steps: [
+            "Check FAST: Face drooping, Arm weak, Speech slurred or confused.",
+            "If any sign is present, Time matters: call 112 at once.",
+            "Note the time the symptoms started.",
+            "Keep the person comfortable and give no food, drink or medicine.",
+          ],
+          warn: "Every minute counts. Go to a hospital that treats stroke.",
+        },
+        {
+          title: "Vomiting and loose motions",
+          q: "What to do for vomiting and loose motions?",
+          tags: "diarrhoea diarrhea vomiting loose motions dehydration ors stomach upset",
+          steps: [
+            "Give ORS solution in small, frequent sips.",
+            "Continue light food if the person can tolerate it.",
+            "Let them rest and wash hands often.",
+            "Watch for signs of dehydration.",
+          ],
+          warn: "See a doctor if there is blood in the stool, very dry mouth, little urine, drowsiness, or if it lasts over 2 days. Babies need a doctor early.",
+        },
+      ];
+
+      /* ============================================================
+   2. NLP PIPELINE: lowercase -> tokenize -> stopwords -> lemmatize
+   ============================================================ */
+      const STOP = new Set(
+        (
+          "a an the is are was were be been am do does did of in on at to for with and or but if it its " +
+          "this that these those what which who whom how why when where can could would should will shall me my you your " +
+          "tell explain describe define about please give mean meaning i we us they them there then than so as by from into " +
+          "between know someone somebody he she his her got get have has had just person happen happened happens very some " +
+          "now need want"
+        ).split(" "),
+      );
+
+      function tokenize(text) {
+        return text.toLowerCase().match(/[a-z0-9]+/g) || [];
+      }
+
+      function lemma(w) {
+        if (w.length > 4 && w.endsWith("ies")) return w.slice(0, -3) + "y";
+        if (w.length > 4 && /(ses|xes|ches|shes)$/.test(w))
+          return w.slice(0, -2);
+        if (w.length > 3 && w.endsWith("s") && !/(ss|us|is)$/.test(w))
+          return w.slice(0, -1);
+        return w;
+      }
+
+      function preprocess(text) {
+        return tokenize(text)
+          .filter((w) => !STOP.has(w))
+          .map(lemma);
+      }
+
+      /* ============================================================
+   3. TF-IDF + COSINE SIMILARITY
+   ============================================================ */
+      const docs = KB.map((k) =>
+        preprocess(k.title + " " + k.q + " " + k.tags),
+      );
+      const N = docs.length;
+      const df = new Map();
+      docs.forEach((d) =>
+        new Set(d).forEach((t) => df.set(t, (df.get(t) || 0) + 1)),
+      );
+      const idf = (t) => Math.log((1 + N) / (1 + (df.get(t) || 0))) + 1;
+
+      function vectorize(tokens) {
+        const tf = new Map();
+        tokens.forEach((t) => tf.set(t, (tf.get(t) || 0) + 1));
+        const v = new Map();
+        let sq = 0;
+        tf.forEach((count, t) => {
+          if (!df.has(t)) return;
+          const w = count * idf(t);
+          v.set(t, w);
+          sq += w * w;
+        });
+        return { v, norm: Math.sqrt(sq) };
+      }
+
+      function cosine(a, b) {
+        if (!a.norm || !b.norm) return 0;
+        let dot = 0;
+        a.v.forEach((w, t) => {
+          if (b.v.has(t)) dot += w * b.v.get(t);
+        });
+        return dot / (a.norm * b.norm);
+      }
+
+      const docVecs = docs.map(vectorize);
+      const THRESHOLD = 0.12;
+
+      function findBest(userText) {
+        const tokens = preprocess(userText);
+        const qv = vectorize(tokens);
+        let best = -1,
+          bestScore = 0;
+        docVecs.forEach((dv, i) => {
+          const s = cosine(qv, dv);
+          if (s > bestScore) {
+            bestScore = s;
+            best = i;
+          }
+        });
+        return { tokens, best, score: bestScore };
+      }
+
+      /* ============================================================
+   4. INTENTS + SAFETY CHECKS
+   ============================================================ */
+      const WORDS = {
+        greeting: [
+          "hello",
+          "hi",
+          "hey",
+          "namaste",
+          "good",
+          "morning",
+          "afternoon",
+          "evening",
+          "there",
+        ],
+        goodbye: [
+          "bye",
+          "goodbye",
+          "exit",
+          "quit",
+          "stop",
+          "see",
+          "you",
+          "later",
+          "good",
+        ],
+        thanks: ["thanks", "thank", "you", "so", "much", "a", "lot"],
+        help: ["help", "topics", "what", "can", "you", "do", "me", "know"],
+      };
+      const allIn = (words, list) =>
+        words.length > 0 && words.every((w) => list.includes(w));
+
+      function detectIntent(text) {
+        const w = tokenize(text);
+        if (allIn(w, WORDS.greeting)) return "greeting";
+        if (allIn(w, WORDS.goodbye)) return "goodbye";
+        if (allIn(w, WORDS.thanks)) return "thanks";
+        if (allIn(w, WORDS.help)) return "help";
+        return "ask_question";
+      }
+
+      const EMERGENCY =
+        /not breathing|stopped breathing|isn.?t breathing|can.?t breathe|cannot breathe|unconscious|unresponsive|chest pain|heart attack|stroke|severe bleeding|heavy bleeding|bleeding heavily|won.?t stop bleeding|choking|poison|overdose|snake|seizure|anaphyla|electric shock|electrocut|drown/;
+      const SELFHARM = /suicid|kill myself|end my life|want to die|self.?harm/;
+      const ALERT =
+        "This may be an emergency. Call 112 now (India) or your local emergency number.";
+
+      /* ============================================================
+   5. TEXT-TO-SPEECH
+   ============================================================ */
+      const speakToggle = document.getElementById("speakToggle");
+      function speak(text) {
+        if (!speakToggle.checked || !("speechSynthesis" in window)) return;
+        speechSynthesis.cancel();
+        speechSynthesis.speak(new SpeechSynthesisUtterance(text));
+      }
+
+      /* ============================================================
+   6. CHAT UI
+   ============================================================ */
+      const chat = document.getElementById("chat");
+      const statusEl = document.getElementById("status");
+      const input = document.getElementById("text");
+      const esc = (s) =>
+        s.replace(
+          /[&<>"]/g,
+          (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c],
+        );
+
+      function el(tag, cls, text) {
+        const e = document.createElement(tag);
+        if (cls) e.className = cls;
+        if (text) e.textContent = text;
+        return e;
+      }
+
+      function addUser(text) {
+        chat.appendChild(el("div", "msg user", text));
+        chat.scrollTop = chat.scrollHeight;
+      }
+
+      function addBot(d) {
+        const box = el("div", "msg bot");
+        if (d.alert) box.appendChild(el("div", "alert", d.alert));
+        if (d.title) box.appendChild(el("h2", "", d.title));
+        if (d.intro) box.appendChild(el("p", "", d.intro));
+        if (d.steps) {
+          const ol = el("ol");
+          d.steps.forEach((s) => ol.appendChild(el("li", "", s)));
+          box.appendChild(ol);
+        }
+        if (d.warn) box.appendChild(el("div", "warn", d.warn));
+        if (d.trace) {
+          const t = el("div", "trace");
+          t.innerHTML = d.trace; // built only from our own escaped strings
+          box.appendChild(t);
+        }
+        chat.appendChild(box);
+        chat.scrollTop = chat.scrollHeight;
+
+        const spoken = [d.alert, d.title, d.intro]
+          .concat((d.steps || []).map((s, i) => "Step " + (i + 1) + ". " + s))
+          .concat([d.warn])
+          .filter(Boolean)
+          .join(" ");
+        speak(spoken);
+      }
+
+      function reply(text) {
+        const low = text.toLowerCase();
+        const intent = detectIntent(text);
+
+        if (SELFHARM.test(low)) {
+          addBot({
+            alert: "You are not alone.",
+            intro:
+              "I am sorry you are going through this. Please reach out right now: call 112 if you are in immediate danger, or call Tele-MANAS at 14416 (India) to talk to a trained counsellor. If you can, stay with someone you trust.",
+          });
+          return;
+        }
+        if (intent === "greeting")
+          return addBot({
+            intro:
+              "Hello! Tell me what happened, for example “someone has a burn” or “nosebleed”.",
+          });
+        if (intent === "thanks")
+          return addBot({ intro: "You are welcome. Stay safe!" });
+        if (intent === "goodbye") {
+          if (listening && rec) rec.stop();
+          return addBot({
+            intro: "Goodbye! Keep a first aid kit at home and learn CPR.",
+          });
+        }
+        if (intent === "help") {
+          return addBot({
+            intro:
+              "I can guide you on: " +
+              KB.map((k) => k.title.toLowerCase()).join(", ") +
+              ".",
+          });
+        }
+
+        const r = findBest(text);
+        const pct = Math.round(Math.min(r.score, 1) * 100);
+        const trace =
+          "<b>Cleaned words:</b> " +
+          (r.tokens.length ? esc(r.tokens.join(", ")) : "none") +
+          "<br><b>Best match:</b> " +
+          (r.best >= 0 ? esc(KB[r.best].title) : "none") +
+          '<br><b>Similarity:</b><span class="bar"><i style="width:' +
+          pct +
+          '%"></i></span>' +
+          r.score.toFixed(2);
+
+        const alert = EMERGENCY.test(low) ? ALERT : null;
+
+        if (r.score < THRESHOLD) {
+          addBot({
+            alert,
+            intro:
+              "Sorry, I do not have first aid steps for that. Try describing it differently, like “burn”, “cut”, “choking” or “fever”. If it is serious, call 112 now.",
+            trace,
+          });
+        } else {
+          const k = KB[r.best];
+          addBot({
+            alert,
+            title: k.title,
+            steps: k.steps,
+            warn: k.warn,
+            trace,
+          });
+        }
+      }
+
+      function handle(text) {
+        text = text.trim();
+        if (!text) return;
+        addUser(text);
+        reply(text);
+      }
+
+      document.getElementById("form").addEventListener("submit", (e) => {
+        e.preventDefault();
+        handle(input.value);
+        input.value = "";
+      });
+
+      [
+        "How to treat a burn?",
+        "Someone is choking",
+        "I have a nosebleed",
+        "My friend got a snake bite",
+      ].forEach((q) => {
+        const b = el("button", "", q);
+        b.type = "button";
+        b.onclick = () => handle(q);
+        document.getElementById("chips").appendChild(b);
+      });
+
+      /* ============================================================
+   7. SPEECH-TO-TEXT (Web Speech API: Chrome / Edge)
+   ============================================================ */
+      const mic = document.getElementById("mic");
+      const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+      let rec = null,
+        listening = false;
+
+      if (SR) {
+        rec = new SR();
+        rec.lang = "en-IN";
+        rec.interimResults = true;
+        rec.continuous = false;
+
+        rec.onstart = () => {
+          listening = true;
+          mic.classList.add("on");
+          statusEl.textContent = "Listening...";
+        };
+        rec.onend = () => {
+          listening = false;
+          mic.classList.remove("on");
+          if (statusEl.textContent === "Listening...")
+            statusEl.textContent = "";
+        };
+        rec.onerror = (e) => {
+          statusEl.textContent =
+            {
+              "not-allowed":
+                "Microphone blocked. Allow mic access in the browser address bar.",
+              "service-not-allowed":
+                "Microphone blocked. Allow mic access in the browser address bar.",
+              "no-speech":
+                "I did not hear anything. Click the mic and try again.",
+              "audio-capture": "No microphone found.",
+              network: "Speech recognition needs an internet connection.",
+            }[e.error] || "Mic error: " + e.error;
+        };
+        rec.onresult = (e) => {
+          let t = "";
+          for (let i = 0; i < e.results.length; i++)
+            t += e.results[i][0].transcript;
+          input.value = t;
+          if (e.results[e.results.length - 1].isFinal) {
+            handle(t);
+            input.value = "";
+          }
+        };
+      } else {
+        mic.disabled = true;
+        statusEl.textContent =
+          "Voice input needs Chrome or Edge. You can still type.";
+      }
+
+      mic.addEventListener("click", () => {
+        if (!rec) return;
+        speechSynthesis.cancel();
+        try {
+          listening ? rec.stop() : rec.start();
+        } catch (err) {
+          statusEl.textContent = "Could not start the microphone.";
+        }
+      });
+
+      addBot({
+        intro:
+          "Hello, I am your first aid assistant. Press the mic or type what happened, for example “my friend has a burn on his hand”.",
+      });
+    </script>
+  </body>
+</html>
