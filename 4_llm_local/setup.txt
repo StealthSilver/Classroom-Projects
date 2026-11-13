@@ -1,0 +1,80 @@
+STUDENT GPT - SETUP GUIDE
+========================
+
+This project uses a small FastAPI backend and a single HTML page. The backend
+sends your prompt to Claude using an Anthropic API key stored locally in .env.
+
+1. REQUIREMENTS
+---------------
+
+- Python 3.10 or newer
+- An Anthropic API key
+- Terminal (the commands below are for macOS/Linux)
+
+2. CREATE OR OPEN THE PROJECT FOLDER
+------------------------------------
+
+To create the folder from the Scrum workspace:
+
+    cd /Users/rajatsaraswat/Desktop/Scrum/Projects
+    mkdir -p 11_llm_local
+    cd 11_llm_local
+
+If the project files are already there, just open the folder:
+
+    cd /Users/rajatsaraswat/Desktop/Scrum/Projects/11_llm_local
+
+3. CREATE A PYTHON ENVIRONMENT AND INSTALL PACKAGES
+---------------------------------------------------
+
+Run these commands from inside the 11_llm_local folder:
+
+    python3 -m venv .venv
+    source .venv/bin/activate
+    python -m pip install --upgrade pip
+    pip install -r requirements.txt
+
+The virtual environment keeps this project's Python packages separate from
+other projects.
+
+4. ADD YOUR ANTHROPIC API KEY
+-----------------------------
+
+Open the .env file:
+
+    nano .env
+
+Add your own key on this line (do not include quotes or share the key):
+
+    ANTHROPIC_API_KEY=put-your-own-key-here
+
+Save and close nano: press Control+O, press Enter, then press Control+X.
+Do not paste your API key into index.html or commit the .env file. The
+.gitignore file is set up to exclude .env.
+
+5. START THE PROJECT
+--------------------
+
+From inside the project folder, with the virtual environment activated:
+
+    uvicorn main:app --reload
+
+6. OPEN THE APP
+---------------
+
+Open this address in your browser:
+
+    http://127.0.0.1:8000/
+
+Type a prompt and press Send. To stop the server, return to the terminal and
+press Control+C.
+
+7. START IT AGAIN LATER
+-----------------------
+
+    cd /Users/rajatsaraswat/Desktop/Scrum/Projects/11_llm_local
+    source .venv/bin/activate
+    uvicorn main:app --reload
+
+If the .venv folder does not exist, repeat the environment and package
+installation steps above.

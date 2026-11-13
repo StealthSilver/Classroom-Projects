@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Student GPT</title>
+    <style>
+      body {
+        max-width: 700px;
+        margin: 60px auto;
+        padding: 0 20px;
+        color: #222;
+        font-family: Arial, sans-serif;
+      }
+
+      form { display: flex; gap: 8px; }
+      input { flex: 1; padding: 10px; border: 1px solid #aaa; border-radius: 4px; }
+      button { padding: 10px 16px; color: white; background: #222; border: 0; border-radius: 4px; }
+      #response { margin-top: 24px; line-height: 1.5; white-space: pre-wrap; }
+    </style>
+  </head>
+  <body>
+    <h1>Student GPT</h1>
+    <form id="chat-form">
+      <input id="prompt" placeholder="Type your prompt" required />
+      <button type="submit">Send</button>
+    </form>
+    <div id="response"></div>
+
+    <script>
+      // Send the prompt to the backend and show Claude's response.
+      document.querySelector("#chat-form").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const prompt = document.querySelector("#prompt").value;
+        const result = await fetch("/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt }),
+        });
+        const answer = await result.json();
+        document.querySelector("#response").textContent = answer.response;
+      });
+    </script>
+  </body>
+</html>
