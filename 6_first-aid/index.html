@@ -60,6 +60,23 @@
         margin: 0 0 14px;
         color: var(--dim);
       }
+      .language {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+        color: var(--dim);
+        font-size: 14px;
+      }
+      .language select {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--card);
+        color: var(--ink);
+        padding: 6px 10px;
+        font: inherit;
+      }
       #chat {
         flex: 1;
         display: flex;
@@ -239,12 +256,19 @@
     </style>
   </head>
   <body>
-    <div class="sos">
+    <div class="sos" id="sos">
       In an emergency call 112 (India) or your local emergency number first.
     </div>
     <main>
-      <h1>First Aid Assistant</h1>
-      <p class="sub">
+      <div class="language">
+        <label for="language" id="languageLabel">Language</label>
+        <select id="language" aria-label="Language">
+          <option value="en">English</option>
+          <option value="hi">हिन्दी</option>
+        </select>
+      </div>
+      <h1 id="heading">First Aid Assistant</h1>
+      <p class="sub" id="subtitle">
         Describe what happened by voice or text and get simple first aid steps.
       </p>
 
@@ -272,11 +296,10 @@
       <div class="foot">
         <span id="status"></span>
         <label
-          ><input type="checkbox" id="speakToggle" checked /> Speak
-          answers</label
+          ><input type="checkbox" id="speakToggle" checked /> <span id="speakLabel">Speak answers</span></label
         >
       </div>
-      <p class="note">
+      <p class="note" id="note">
         Learning project, not a doctor. These are basic first aid steps and do
         not replace professional medical care.
       </p>
@@ -534,6 +557,357 @@
         },
       ];
 
+      const HI_KB = {
+        "Minor burn": {
+          title: "हल्की जलन",
+          q: "जलने पर क्या करें?",
+          tags: "जलना जला जल गई गर्म पानी आग त्वचा छाला हाथ",
+          steps: [
+            "जले हुए हिस्से को 20 मिनट तक ठंडे बहते पानी के नीचे रखें।",
+            "सूजन आने से पहले जले हुए हिस्से के पास की अंगूठी या तंग चीज़ें हटा दें।",
+            "साफ़, रोएँ-रहित कपड़े या क्लिंग फ़िल्म से ढीला ढकें।",
+            "बर्फ़, मक्खन या टूथपेस्ट न लगाएँ और छालों को न फोड़ें।",
+          ],
+          warn: "अगर जलन बड़ी या गहरी हो, चेहरे, हाथ या जननांगों पर हो, रसायन या बिजली से हुई हो, या घायल बच्चा हो तो चिकित्सा सहायता लें।",
+        },
+        "Bleeding from a cut": {
+          title: "कटने से खून बहना",
+          q: "कटने पर खून कैसे रोकें?",
+          tags: "कट घाव खून रक्तस्राव चोट चाकू खरोंच",
+          steps: [
+            "हो सके तो दस्ताने पहनें और साफ़ कपड़े से घाव पर कम-से-कम 10 मिनट तक मज़बूती से दबाव डालें।",
+            "कपड़े से खून रिसे तो उसके ऊपर और कपड़ा रखें। पहला कपड़ा न हटाएँ।",
+            "हो सके तो घायल अंग को ऊपर उठाएँ और फिर कसकर पट्टी बाँधें।",
+            "घाव में फँसी किसी चीज़ को बाहर न खींचें।",
+          ],
+          warn: "खून बहुत तेज़ बह रहा हो, फुहार की तरह निकल रहा हो या 10 मिनट दबाव देने के बाद भी न रुके तो 112 पर कॉल करें।",
+        },
+        Nosebleed: {
+          title: "नाक से खून बहना",
+          q: "नाक से खून आए तो क्या करें?",
+          tags: "नाक खून रक्तस्राव नकसीर",
+          steps: [
+            "सीधे बैठें और थोड़ा आगे की ओर झुकें।",
+            "नाक के नरम हिस्से को 10 मिनट तक दबाएँ और मुँह से साँस लें।",
+            "सिर को पीछे न झुकाएँ।",
+            "नाक की ऊपरी हड्डी पर ठंडा कपड़ा रखें।",
+          ],
+          warn: "खून 20 मिनट से ज़्यादा बहे या सिर पर चोट के बाद शुरू हो तो चिकित्सा सहायता लें।",
+        },
+        "Choking (adult)": {
+          title: "दम घुटना (वयस्क)",
+          q: "किसी वयस्क का दम घुटे तो क्या करें?",
+          tags: "दम घुटना खाना गले में फँसना साँस नहीं खाँसी निगलना",
+          steps: [
+            "पूछें, “क्या आपका दम घुट रहा है?” अगर वे खाँस पा रहे हैं, तो उन्हें खाँसते रहने के लिए कहें।",
+            "अगर वे खाँस, बोल या साँस नहीं ले पा रहे हैं, तो कंधों के बीच पीठ पर 5 बार मज़बूती से थपकी दें।",
+            "फिर पेट पर 5 दबाव दें: पीछे खड़े होकर नाभि के ऊपर मुट्ठी रखें और अंदर तथा ऊपर की ओर खींचें।",
+            "वस्तु बाहर आने या मदद पहुँचने तक 5 थपकी और 5 पेट के दबाव दोहराएँ।",
+            "व्यक्ति बेहोश हो जाए तो CPR शुरू करें।",
+          ],
+          warn: "साँस न ले पा रहे हों तो तुरंत 112 पर कॉल करें। 1 साल से छोटे शिशु को पेट पर दबाव न दें; उन्हें 5 पीठ की थपकियाँ और 5 छाती के दबाव दें।",
+        },
+        "CPR (adult)": {
+          title: "CPR (वयस्क)",
+          q: "CPR कैसे करें?",
+          tags: "सीपीआर बेहोश साँस नहीं हृदय बंद कार्डियक अरेस्ट छाती दबाव",
+          steps: [
+            "जाँचें कि जगह सुरक्षित है। व्यक्ति को थपथपाकर आवाज़ दें। जवाब न मिले और सामान्य साँस न हो तो 112 पर कॉल करें या किसी से करवाएँ।",
+            "एक हाथ की एड़ी छाती के बीच में रखें और दूसरा हाथ उसके ऊपर रखें।",
+            "तेज़ और मज़बूती से दबाएँ: लगभग 5 से 6 सेमी गहराई तक, प्रति मिनट 100 से 120 बार। हर बार छाती को पूरी तरह ऊपर आने दें।",
+            "व्यक्ति के हिलने, प्रशिक्षित मदद के आने या AED तैयार होने तक न रुकें।",
+            "AED उपलब्ध हो तो उसे चालू करें और उसके आवाज़ वाले निर्देशों का पालन करें।",
+          ],
+          warn: "छाती दबाना तुरंत शुरू करें। पुष्टि होने का इंतज़ार न करें।",
+        },
+        Fainting: {
+          title: "बेहोशी",
+          q: "कोई बेहोश हो जाए तो क्या करें?",
+          tags: "बेहोश चक्कर गिरना चक्कर आना",
+          steps: [
+            "व्यक्ति को पीठ के बल लिटाएँ और पैर लगभग 30 सेमी ऊपर उठाएँ।",
+            "तंग कपड़े ढीले करें और ताज़ी हवा आने दें।",
+            "पूरी तरह होश में आने तक खाना या पीना न दें।",
+            "ठीक होने पर उन्हें धीरे-धीरे बैठने में मदद करें।",
+          ],
+          warn: "1 मिनट में होश न आए, सामान्य साँस न हो या गिरने से चोट लगी हो तो 112 पर कॉल करें।",
+        },
+        Sprain: {
+          title: "मोच",
+          q: "मोच आने पर क्या करें?",
+          tags: "मोच टखना मुड़ना सूजन खिंचाव जोड़ कलाई मांसपेशी दर्द बर्फ़",
+          steps: [
+            "घायल हिस्से को आराम दें और उसका इस्तेमाल न करें।",
+            "कपड़े में लपेटा हुआ आइस पैक 20 मिनट के लिए दिन में कई बार लगाएँ।",
+            "इलास्टिक पट्टी मज़बूती से बाँधें, लेकिन इतनी कसकर नहीं कि दबाव पड़े।",
+            "घायल हिस्से को हृदय के स्तर से ऊपर उठाएँ।",
+          ],
+          warn: "उस पर भार न डाल पाएँ, जोड़ मुड़ा हुआ दिखे या सुन्नपन हो तो डॉक्टर को दिखाएँ।",
+        },
+        "Broken bone": {
+          title: "हड्डी टूटना",
+          q: "हड्डी टूटने पर क्या करें?",
+          tags: "फ्रैक्चर टूटी हड्डी टेढ़ी स्प्लिंट पैर हाथ",
+          steps: [
+            "व्यक्ति को स्थिर रखें और घायल हिस्से को उसी स्थिति में सहारा दें जिसमें वह मिला था। उसे सीधा न करें।",
+            "हिलाना ज़रूरी हो तो टूटे हिस्से के ऊपर और नीचे गद्दी और स्प्लिंट से सहारा दें।",
+            "सूजन कम करने के लिए कपड़े में लपेटा ठंडा पैक लगाएँ।",
+            "खुले घाव को हड्डी पर दबाव डाले बिना साफ़ कपड़े से ढकें।",
+          ],
+          warn: "खुले फ्रैक्चर, तेज़ रक्तस्राव या गर्दन/पीठ की चोट की आशंका में 112 पर कॉल करें। रीढ़ की चोट की आशंका वाले व्यक्ति को न हिलाएँ।",
+        },
+        Fever: {
+          title: "बुखार",
+          q: "बुखार होने पर क्या करें?",
+          tags: "बुखार तापमान गर्म तेज़ बच्चा",
+          steps: [
+            "आराम करें और पर्याप्त तरल पदार्थ पिएँ।",
+            "हल्के कपड़े पहनें और कमरे को ठंडा रखें।",
+            "ज़रूरत हो तो लेबल पर दिए निर्देश के अनुसार ही पैरासिटामोल लें।",
+            "तापमान नियमित रूप से जाँचें।",
+          ],
+          warn: "3 महीने से छोटे बच्चे को बुखार हो, तापमान 39.5 °C (103 °F) से ऊपर हो, बुखार 3 दिन से ज़्यादा रहे, या गर्दन अकड़े, दाने, भ्रम या दौरा हो तो तुरंत डॉक्टर से संपर्क करें।",
+        },
+        "Snake bite": {
+          title: "साँप का काटना",
+          q: "साँप काट ले तो क्या करें?",
+          tags: "साँप काटना ज़हर कोबरा करैत वाइपर",
+          steps: [
+            "व्यक्ति को शांत रखें और जितना हो सके स्थिर रखें।",
+            "काटे गए अंग को स्थिर रखें और सूजन से पहले अंगूठी तथा घड़ी हटा दें।",
+            "घाव न काटें, ज़हर न चूसें, कसकर पट्टी न बाँधें, बर्फ़ या घरेलू नुस्खे न लगाएँ।",
+            "एंटीवेनम के लिए व्यक्ति को तुरंत अस्पताल ले जाएँ।",
+          ],
+          warn: "साँप का हर काटना आपातस्थिति है। 112 पर कॉल करें और तुरंत अस्पताल जाएँ।",
+        },
+        "Animal or dog bite": {
+          title: "जानवर या कुत्ते का काटना",
+          q: "कुत्ता काट ले तो क्या करें?",
+          tags: "कुत्ता जानवर बिल्ली बंदर काटना रेबीज़ खरोंच",
+          steps: [
+            "घाव को साबुन और बहते पानी से 15 मिनट तक धोएँ।",
+            "एंटीसेप्टिक लगाएँ और साफ़ पट्टी से ढकें।",
+            "रेबीज़ और टिटनेस के टीके के लिए उसी दिन डॉक्टर को दिखाएँ।",
+            "घाव छोटा दिखे तब भी देर न करें।",
+          ],
+          warn: "काटना गहरा हो, चेहरे या गर्दन पर हो, या बहुत खून बह रहा हो तो तुरंत मदद लें।",
+        },
+        Poisoning: {
+          title: "ज़हर का असर",
+          q: "ज़हर निगलने पर क्या करें?",
+          tags: "ज़हर निगला रसायन दवा ओवरडोज़ कीटनाशक मिट्टी का तेल ज़हरीली गोली",
+          steps: [
+            "तुरंत 112 या ज़हर सूचना केंद्र पर कॉल करें।",
+            "डॉक्टर को दिखाने के लिए कंटेनर या लेबल साथ रखें।",
+            "व्यक्ति को उल्टी न करवाएँ और निर्देश के बिना खाना, दूध या पेय न दें।",
+            "बेहोश हो लेकिन साँस ले रहा हो तो करवट पर लिटाएँ। त्वचा पर रसायन लगा हो तो कपड़े हटाकर पानी से धोएँ।",
+          ],
+          warn: "व्यक्ति को उनींदापन हो, बेहोशी हो या साँस लेने में परेशानी हो तो तुरंत 112 पर कॉल करें।",
+        },
+        "Heat stroke": {
+          title: "लू लगना",
+          q: "लू लगने पर क्या करें?",
+          tags: "लू गर्मी धूप चक्कर निर्जलीकरण गर्मी का दौरा",
+          steps: [
+            "व्यक्ति को ठंडी छाँव या एयर-कंडीशन वाले कमरे में ले जाएँ।",
+            "अतिरिक्त कपड़े हटा दें।",
+            "गीले कपड़े, हवा करने या ठंडे पानी से त्वचा ठंडी करें।",
+            "पूरी तरह होश में होने पर ही पानी के छोटे घूँट दें।",
+          ],
+          warn: "भ्रम, दौरा या बेहोशी हो तो 112 पर कॉल करें।",
+        },
+        Seizure: {
+          title: "दौरा पड़ना",
+          q: "दौरा पड़ने पर क्या करें?",
+          tags: "दौरा मिर्गी ऐंठन झटके",
+          steps: [
+            "शांत रहें और दौरा शुरू होने का समय नोट करें।",
+            "सख़्त चीज़ें दूर करें और सिर के नीचे नरम सहारा दें।",
+            "व्यक्ति को दबाकर न पकड़ें और मुँह में कुछ न डालें।",
+            "झटके रुकने पर उन्हें करवट पर लिटाएँ और पूरी तरह होश में आने तक साथ रहें।",
+          ],
+          warn: "दौरा 5 मिनट से ज़्यादा चले, बार-बार आए, यह पहला दौरा हो या साँस लेने में परेशानी हो तो 112 पर कॉल करें।",
+        },
+        "Severe allergic reaction": {
+          title: "गंभीर एलर्जी प्रतिक्रिया",
+          q: "गंभीर एलर्जी होने पर क्या करें?",
+          tags: "एलर्जी एनाफिलैक्सिस सूजन पित्ती मधुमक्खी ततैया मूँगफली दाने गला",
+          steps: [
+            "चेहरे या गले में सूजन, साँस लेने में परेशानी या चक्कर हो तो 112 पर कॉल करें।",
+            "व्यक्ति के पास एड्रेनालिन ऑटो-इंजेक्टर हो तो उसका इस्तेमाल करें।",
+            "उन्हें पैर ऊपर करके लिटाएँ। साँस लेने में परेशानी हो तो बैठने दें।",
+            "मधुमक्खी ने डंक मारा हो तो कार्ड से डंक को खुरचकर निकालें और व्यक्ति के साथ रहें।",
+          ],
+          warn: "यह कुछ ही मिनटों में जानलेवा हो सकता है। लक्षणों के ठीक होने का इंतज़ार न करें।",
+        },
+        "Chemical in the eye": {
+          title: "आँख में रसायन जाना",
+          q: "आँख में रसायन चला जाए तो क्या करें?",
+          tags: "आँख रसायन छींटा जलन धूल एसिड ब्लीच",
+          steps: [
+            "आँख को साफ़ बहते पानी से 15 से 20 मिनट तक धोएँ।",
+            "पलक खुली रखें और पानी को दूसरी आँख से दूर बहने दें।",
+            "कॉन्टैक्ट लेंस आसानी से निकलें तो उन्हें निकाल दें।",
+            "आँख न रगड़ें। साफ़ कपड़े से ढकें और अस्पताल जाएँ।",
+          ],
+          warn: "रसायन आँख में जाने पर, दर्द कम हो जाने पर भी चिकित्सा सहायता लें।",
+        },
+        "Electric shock": {
+          title: "बिजली का झटका",
+          q: "बिजली का झटका लगने पर क्या करें?",
+          tags: "बिजली का झटका करंट तार सॉकेट इलेक्ट्रोक्यूशन",
+          steps: [
+            "बिजली बंद होने तक व्यक्ति को न छुएँ।",
+            "मुख्य स्विच बंद करें या सूखी लकड़ी की छड़ी से तार को दूर करें।",
+            "112 पर कॉल करें।",
+            "साँस न ले रहे हों तो CPR शुरू करें। जलन को साफ़ कपड़े से ढकें।",
+          ],
+          warn: "गंभीर बिजली के झटके के बाद व्यक्ति ठीक महसूस करे तब भी अस्पताल में जाँच ज़रूरी है।",
+        },
+        "Heart attack": {
+          title: "दिल का दौरा",
+          q: "दिल का दौरा पड़ने पर क्या करें?",
+          tags: "दिल का दौरा सीने में दर्द दबाव बाँह जबड़ा पसीना हृदय",
+          steps: [
+            "तुरंत 112 पर कॉल करें।",
+            "व्यक्ति को बैठाएँ, शांत और स्थिर रखें तथा तंग कपड़े ढीले करें।",
+            "अगर उन्हें एस्पिरिन से एलर्जी नहीं है, तो 300 mg की एक एस्पिरिन धीरे-धीरे चबाने को दें।",
+            "वे बेहोश हो जाएँ और सामान्य साँस न लें तो CPR शुरू करें।",
+          ],
+          warn: "इंतज़ार न करें। सीने में दर्द, पसीना या बाँह/जबड़े तक फैलता दर्द हो तो एम्बुलेंस बुलाएँ।",
+        },
+        Stroke: {
+          title: "स्ट्रोक",
+          q: "स्ट्रोक के लक्षण कैसे पहचानें?",
+          tags: "स्ट्रोक चेहरा टेढ़ा बाँह कमज़ोर बोली लड़खड़ाना लकवा सुन्न",
+          steps: [
+            "FAST जाँचें: चेहरा टेढ़ा होना (Face), बाँह कमज़ोर होना (Arm), बोली लड़खड़ाना या भ्रम (Speech)।",
+            "कोई भी लक्षण हो तो समय बहुत अहम है (Time): तुरंत 112 पर कॉल करें।",
+            "लक्षण शुरू होने का समय नोट करें।",
+            "व्यक्ति को आरामदायक रखें और खाना, पेय या दवा न दें।",
+          ],
+          warn: "हर मिनट मायने रखता है। स्ट्रोक का इलाज करने वाले अस्पताल जाएँ।",
+        },
+        "Vomiting and loose motions": {
+          title: "उल्टी और दस्त",
+          q: "उल्टी और दस्त होने पर क्या करें?",
+          tags: "दस्त उल्टी पतले दस्त निर्जलीकरण ओआरएस पेट खराब",
+          steps: [
+            "थोड़ी-थोड़ी मात्रा में बार-बार ORS घोल दें।",
+            "व्यक्ति सहन कर सके तो हल्का भोजन जारी रखें।",
+            "उन्हें आराम करने दें और बार-बार हाथ धुलवाएँ।",
+            "निर्जलीकरण के लक्षणों पर नज़र रखें।",
+          ],
+          warn: "मल में खून, मुँह बहुत सूखा, पेशाब कम, उनींदापन हो या समस्या 2 दिन से ज़्यादा रहे तो डॉक्टर को दिखाएँ। शिशुओं को जल्दी डॉक्टर के पास ले जाएँ।",
+        },
+      };
+
+      const COPY = {
+        en: {
+          title: "AI First Aid Kit Doctor Assistant",
+          sos: "In an emergency call 112 (India) or your local emergency number first.",
+          language: "Language",
+          heading: "First Aid Assistant",
+          subtitle:
+            "Describe what happened by voice or text and get simple first aid steps.",
+          mic: "Start or stop listening",
+          micTitle: "Click and speak",
+          placeholder: "Example: my friend has a burn on his hand",
+          describe: "Describe the situation",
+          ask: "Ask",
+          speak: "Speak answers",
+          note:
+            "Learning project, not a doctor. These are basic first aid steps and do not replace professional medical care.",
+          listening: "Listening...",
+          micBlocked:
+            "Microphone blocked. Allow mic access in the browser address bar.",
+          noSpeech: "I did not hear anything. Click the mic and try again.",
+          noMicrophone: "No microphone found.",
+          speechNetwork: "Speech recognition needs an internet connection.",
+          micError: "Mic error: ",
+          browserVoice: "Voice input needs Chrome or Edge. You can still type.",
+          micStartError: "Could not start the microphone.",
+          cleanedWords: "Cleaned words:",
+          bestMatch: "Best match:",
+          similarity: "Similarity:",
+          step: "Step",
+          emergency:
+            "This may be an emergency. Call 112 now (India) or your local emergency number.",
+          noMatch:
+            "Sorry, I do not have first aid steps for that. Try describing it differently, like “burn”, “cut”, “choking” or “fever”. If it is serious, call 112 now.",
+          selfHarmTitle: "You are not alone.",
+          selfHarm:
+            "I am sorry you are going through this. Please reach out right now: call 112 if you are in immediate danger, or call Tele-MANAS at 14416 (India) to talk to a trained counsellor. If you can, stay with someone you trust.",
+          greeting:
+            "Hello! Tell me what happened, for example “someone has a burn” or “nosebleed”.",
+          thanks: "You are welcome. Stay safe!",
+          goodbye: "Goodbye! Keep a first aid kit at home and learn CPR.",
+          help: "I can guide you on: ",
+          fallback: "none",
+          chips: [
+            "How to treat a burn?",
+            "Someone is choking",
+            "I have a nosebleed",
+            "My friend got a snake bite",
+          ],
+          welcome:
+            "Hello, I am your first aid assistant. Press the mic or type what happened, for example “my friend has a burn on his hand”.",
+        },
+        hi: {
+          title: "AI प्राथमिक उपचार सहायक",
+          sos: "आपातस्थिति में पहले 112 (भारत) या अपने स्थानीय आपातकालीन नंबर पर कॉल करें।",
+          language: "भाषा",
+          heading: "प्राथमिक उपचार सहायक",
+          subtitle:
+            "क्या हुआ, आवाज़ से या लिखकर बताएँ और प्राथमिक उपचार के आसान निर्देश पाएँ।",
+          mic: "सुनना शुरू या बंद करें",
+          micTitle: "बोलने के लिए क्लिक करें",
+          placeholder: "उदाहरण: मेरे दोस्त के हाथ में जलन हो गई है",
+          describe: "स्थिति बताएँ",
+          ask: "पूछें",
+          speak: "जवाब बोलकर सुनाएँ",
+          note:
+            "यह सीखने के लिए बनाया गया प्रोजेक्ट है, डॉक्टर नहीं। ये प्राथमिक उपचार के बुनियादी निर्देश हैं और पेशेवर चिकित्सा देखभाल का विकल्प नहीं हैं।",
+          listening: "सुन रहा है...",
+          micBlocked:
+            "माइक्रोफ़ोन बंद है। ब्राउज़र के एड्रेस बार में माइक्रोफ़ोन की अनुमति दें।",
+          noSpeech: "कुछ सुनाई नहीं दिया। माइक्रोफ़ोन पर क्लिक करके फिर कोशिश करें।",
+          noMicrophone: "माइक्रोफ़ोन नहीं मिला।",
+          speechNetwork: "आवाज़ पहचानने के लिए इंटरनेट कनेक्शन ज़रूरी है।",
+          micError: "माइक्रोफ़ोन त्रुटि: ",
+          browserVoice: "आवाज़ से लिखने के लिए Chrome या Edge चाहिए। आप लिखकर पूछ सकते हैं।",
+          micStartError: "माइक्रोफ़ोन शुरू नहीं हो सका।",
+          cleanedWords: "साफ़ किए गए शब्द:",
+          bestMatch: "सबसे अच्छा मिलान:",
+          similarity: "समानता:",
+          step: "चरण",
+          emergency:
+            "यह आपातस्थिति हो सकती है। अभी 112 (भारत) या अपने स्थानीय आपातकालीन नंबर पर कॉल करें।",
+          noMatch:
+            "माफ़ करें, इसके लिए मेरे पास प्राथमिक उपचार के निर्देश नहीं हैं। अलग तरह से बताएँ, जैसे “जलना”, “कटना”, “दम घुटना” या “बुखार”। स्थिति गंभीर हो तो अभी 112 पर कॉल करें।",
+          selfHarmTitle: "आप अकेले नहीं हैं।",
+          selfHarm:
+            "मुझे दुख है कि आप इस मुश्किल से गुज़र रहे हैं। कृपया अभी किसी से संपर्क करें: तत्काल खतरा हो तो 112 पर कॉल करें, या प्रशिक्षित परामर्शदाता से बात करने के लिए टेली-मानस 14416 (भारत) पर कॉल करें। हो सके तो किसी भरोसेमंद व्यक्ति के साथ रहें।",
+          greeting:
+            "नमस्ते! बताएँ क्या हुआ, उदाहरण के लिए “किसी को जल गया है” या “नाक से खून आ रहा है”।",
+          thanks: "आपका स्वागत है। सुरक्षित रहें!",
+          goodbye: "अलविदा! घर पर प्राथमिक उपचार किट रखें और CPR सीखें।",
+          help: "मैं इन विषयों पर मार्गदर्शन दे सकता हूँ: ",
+          fallback: "कोई नहीं",
+          chips: [
+            "जलने पर क्या करें?",
+            "किसी का दम घुट रहा है",
+            "मेरी नाक से खून आ रहा है",
+            "मेरे दोस्त को साँप ने काट लिया",
+          ],
+          welcome:
+            "नमस्ते, मैं आपका प्राथमिक उपचार सहायक हूँ। माइक्रोफ़ोन दबाएँ या क्या हुआ लिखें, उदाहरण के लिए “मेरे दोस्त के हाथ में जलन हो गई है”।",
+        },
+      };
+
+      let language = "en";
+      const copy = () => COPY[language];
+
       /* ============================================================
    2. NLP PIPELINE: lowercase -> tokenize -> stopwords -> lemmatize
    ============================================================ */
@@ -543,12 +917,12 @@
           "this that these those what which who whom how why when where can could would should will shall me my you your " +
           "tell explain describe define about please give mean meaning i we us they them there then than so as by from into " +
           "between know someone somebody he she his her got get have has had just person happen happened happens very some " +
-          "now need want"
+          "now need want मुझे मेरा मेरी मैं तुम आप क्या कैसे कब कहाँ कौन क्यों और है हैं था थी थे यह वह को का की के से में पर नहीं करें बताएं कोई"
         ).split(" "),
       );
 
       function tokenize(text) {
-        return text.toLowerCase().match(/[a-z0-9]+/g) || [];
+        return text.toLowerCase().match(/[a-z0-9\u0900-\u097f]+/g) || [];
       }
 
       function lemma(w) {
@@ -569,9 +943,12 @@
       /* ============================================================
    3. TF-IDF + COSINE SIMILARITY
    ============================================================ */
-      const docs = KB.map((k) =>
-        preprocess(k.title + " " + k.q + " " + k.tags),
-      );
+      const docs = KB.map((k) => {
+        const hindi = HI_KB[k.title];
+        return preprocess(
+          [k.title, k.q, k.tags, hindi.title, hindi.q, hindi.tags].join(" "),
+        );
+      });
       const N = docs.length;
       const df = new Map();
       docs.forEach((d) =>
@@ -634,6 +1011,8 @@
           "afternoon",
           "evening",
           "there",
+          "नमस्ते",
+          "नमस्कार",
         ],
         goodbye: [
           "bye",
@@ -645,15 +1024,39 @@
           "you",
           "later",
           "good",
+          "अलविदा",
+          "बाय",
         ],
-        thanks: ["thanks", "thank", "you", "so", "much", "a", "lot"],
-        help: ["help", "topics", "what", "can", "you", "do", "me", "know"],
+        thanks: [
+          "thanks",
+          "thank",
+          "you",
+          "so",
+          "much",
+          "a",
+          "lot",
+          "धन्यवाद",
+          "शुक्रिया",
+        ],
+        help: [
+          "help",
+          "topics",
+          "what",
+          "can",
+          "you",
+          "do",
+          "me",
+          "know",
+          "मदद",
+          "सहायता",
+          "बताइए",
+        ],
       };
       const allIn = (words, list) =>
         words.length > 0 && words.every((w) => list.includes(w));
 
       function detectIntent(text) {
-        const w = tokenize(text);
+        const w = preprocess(text);
         if (allIn(w, WORDS.greeting)) return "greeting";
         if (allIn(w, WORDS.goodbye)) return "goodbye";
         if (allIn(w, WORDS.thanks)) return "thanks";
@@ -662,10 +1065,9 @@
       }
 
       const EMERGENCY =
-        /not breathing|stopped breathing|isn.?t breathing|can.?t breathe|cannot breathe|unconscious|unresponsive|chest pain|heart attack|stroke|severe bleeding|heavy bleeding|bleeding heavily|won.?t stop bleeding|choking|poison|overdose|snake|seizure|anaphyla|electric shock|electrocut|drown/;
-      const SELFHARM = /suicid|kill myself|end my life|want to die|self.?harm/;
-      const ALERT =
-        "This may be an emergency. Call 112 now (India) or your local emergency number.";
+        /not breathing|stopped breathing|isn.?t breathing|can.?t breathe|cannot breathe|unconscious|unresponsive|chest pain|heart attack|stroke|severe bleeding|heavy bleeding|bleeding heavily|won.?t stop bleeding|choking|poison|overdose|snake|seizure|anaphyla|electric shock|electrocut|drown|साँस नहीं|सांस नहीं|बेहोश|सीने में दर्द|दिल का दौरा|स्ट्रोक|खून नहीं रुक|बहुत खून|दम घुट|ज़हर|जहर|ओवरडोज़|साँप ने काट|सांप ने काट|दौरा|बिजली का झटका|डूब/;
+      const SELFHARM =
+        /suicid|kill myself|end my life|want to die|self.?harm|आत्महत्या|खुदकुशी|मरना चाहता|मरना चाहती|जीना नहीं चाहता|जीना नहीं चाहती/;
 
       /* ============================================================
    5. TEXT-TO-SPEECH
@@ -674,7 +1076,9 @@
       function speak(text) {
         if (!speakToggle.checked || !("speechSynthesis" in window)) return;
         speechSynthesis.cancel();
-        speechSynthesis.speak(new SpeechSynthesisUtterance(text));
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = language === "hi" ? "hi-IN" : "en-IN";
+        speechSynthesis.speak(utterance);
       }
 
       /* ============================================================
@@ -683,6 +1087,7 @@
       const chat = document.getElementById("chat");
       const statusEl = document.getElementById("status");
       const input = document.getElementById("text");
+      const languageSelect = document.getElementById("language");
       const esc = (s) =>
         s.replace(
           /[&<>"]/g,
@@ -702,7 +1107,7 @@
       }
 
       function addBot(d) {
-        const box = el("div", "msg bot");
+        const box = el("div", d.welcome ? "msg bot welcome-msg" : "msg bot");
         if (d.alert) box.appendChild(el("div", "alert", d.alert));
         if (d.title) box.appendChild(el("h2", "", d.title));
         if (d.intro) box.appendChild(el("p", "", d.intro));
@@ -721,7 +1126,11 @@
         chat.scrollTop = chat.scrollHeight;
 
         const spoken = [d.alert, d.title, d.intro]
-          .concat((d.steps || []).map((s, i) => "Step " + (i + 1) + ". " + s))
+          .concat(
+            (d.steps || []).map(
+              (s, i) => copy().step + " " + (i + 1) + ". " + s,
+            ),
+          )
           .concat([d.warn])
           .filter(Boolean)
           .join(" ");
@@ -734,30 +1143,26 @@
 
         if (SELFHARM.test(low)) {
           addBot({
-            alert: "You are not alone.",
-            intro:
-              "I am sorry you are going through this. Please reach out right now: call 112 if you are in immediate danger, or call Tele-MANAS at 14416 (India) to talk to a trained counsellor. If you can, stay with someone you trust.",
+            alert: copy().selfHarmTitle,
+            intro: copy().selfHarm,
           });
           return;
         }
         if (intent === "greeting")
-          return addBot({
-            intro:
-              "Hello! Tell me what happened, for example “someone has a burn” or “nosebleed”.",
-          });
+          return addBot({ intro: copy().greeting });
         if (intent === "thanks")
-          return addBot({ intro: "You are welcome. Stay safe!" });
+          return addBot({ intro: copy().thanks });
         if (intent === "goodbye") {
           if (listening && rec) rec.stop();
-          return addBot({
-            intro: "Goodbye! Keep a first aid kit at home and learn CPR.",
-          });
+          return addBot({ intro: copy().goodbye });
         }
         if (intent === "help") {
           return addBot({
             intro:
-              "I can guide you on: " +
-              KB.map((k) => k.title.toLowerCase()).join(", ") +
+              copy().help +
+              KB.map((k) =>
+                (language === "hi" ? HI_KB[k.title] : k).title.toLowerCase(),
+              ).join(", ") +
               ".",
           });
         }
@@ -765,31 +1170,42 @@
         const r = findBest(text);
         const pct = Math.round(Math.min(r.score, 1) * 100);
         const trace =
-          "<b>Cleaned words:</b> " +
-          (r.tokens.length ? esc(r.tokens.join(", ")) : "none") +
-          "<br><b>Best match:</b> " +
-          (r.best >= 0 ? esc(KB[r.best].title) : "none") +
-          '<br><b>Similarity:</b><span class="bar"><i style="width:' +
+          "<b>" +
+          copy().cleanedWords +
+          "</b> " +
+          (r.tokens.length ? esc(r.tokens.join(", ")) : copy().fallback) +
+          "<br><b>" +
+          copy().bestMatch +
+          "</b> " +
+          (r.best >= 0
+            ? esc(
+                (language === "hi" ? HI_KB[KB[r.best].title] : KB[r.best])
+                  .title,
+              )
+            : copy().fallback) +
+          "<br><b>" +
+          copy().similarity +
+          '</b><span class="bar"><i style="width:' +
           pct +
           '%"></i></span>' +
           r.score.toFixed(2);
 
-        const alert = EMERGENCY.test(low) ? ALERT : null;
+        const alert = EMERGENCY.test(low) ? copy().emergency : null;
 
         if (r.score < THRESHOLD) {
           addBot({
             alert,
-            intro:
-              "Sorry, I do not have first aid steps for that. Try describing it differently, like “burn”, “cut”, “choking” or “fever”. If it is serious, call 112 now.",
+            intro: copy().noMatch,
             trace,
           });
         } else {
           const k = KB[r.best];
+          const answer = language === "hi" ? HI_KB[k.title] : k;
           addBot({
             alert,
-            title: k.title,
-            steps: k.steps,
-            warn: k.warn,
+            title: answer.title,
+            steps: answer.steps,
+            warn: answer.warn,
             trace,
           });
         }
@@ -808,17 +1224,43 @@
         input.value = "";
       });
 
-      [
-        "How to treat a burn?",
-        "Someone is choking",
-        "I have a nosebleed",
-        "My friend got a snake bite",
-      ].forEach((q) => {
-        const b = el("button", "", q);
-        b.type = "button";
-        b.onclick = () => handle(q);
-        document.getElementById("chips").appendChild(b);
-      });
+      function renderChips() {
+        const chips = document.getElementById("chips");
+        chips.replaceChildren();
+        copy().chips.forEach((q) => {
+          const b = el("button", "", q);
+          b.type = "button";
+          b.onclick = () => handle(q);
+          chips.appendChild(b);
+        });
+      }
+
+      function applyLanguage() {
+        const c = copy();
+        document.documentElement.lang = language;
+        document.title = c.title;
+        document.getElementById("sos").textContent = c.sos;
+        document.getElementById("languageLabel").textContent = c.language;
+        languageSelect.setAttribute("aria-label", c.language);
+        document.getElementById("heading").textContent = c.heading;
+        document.getElementById("subtitle").textContent = c.subtitle;
+        mic.setAttribute("aria-label", c.mic);
+        mic.title = c.micTitle;
+        input.placeholder = c.placeholder;
+        input.setAttribute("aria-label", c.describe);
+        document.getElementById("send").textContent = c.ask;
+        document.getElementById("speakLabel").textContent = c.speak;
+        document.getElementById("note").textContent = c.note;
+        if (rec) rec.lang = language === "hi" ? "hi-IN" : "en-IN";
+        statusEl.textContent = rec
+          ? listening
+            ? c.listening
+            : ""
+          : c.browserVoice;
+        const welcome = chat.querySelector(".welcome-msg p");
+        if (welcome) welcome.textContent = c.welcome;
+        renderChips();
+      }
 
       /* ============================================================
    7. SPEECH-TO-TEXT (Web Speech API: Chrome / Edge)
@@ -830,33 +1272,30 @@
 
       if (SR) {
         rec = new SR();
-        rec.lang = "en-IN";
+        rec.lang = language === "hi" ? "hi-IN" : "en-IN";
         rec.interimResults = true;
         rec.continuous = false;
 
         rec.onstart = () => {
           listening = true;
           mic.classList.add("on");
-          statusEl.textContent = "Listening...";
+          statusEl.textContent = copy().listening;
         };
         rec.onend = () => {
           listening = false;
           mic.classList.remove("on");
-          if (statusEl.textContent === "Listening...")
+          if (statusEl.textContent === copy().listening)
             statusEl.textContent = "";
         };
         rec.onerror = (e) => {
           statusEl.textContent =
             {
-              "not-allowed":
-                "Microphone blocked. Allow mic access in the browser address bar.",
-              "service-not-allowed":
-                "Microphone blocked. Allow mic access in the browser address bar.",
-              "no-speech":
-                "I did not hear anything. Click the mic and try again.",
-              "audio-capture": "No microphone found.",
-              network: "Speech recognition needs an internet connection.",
-            }[e.error] || "Mic error: " + e.error;
+              "not-allowed": copy().micBlocked,
+              "service-not-allowed": copy().micBlocked,
+              "no-speech": copy().noSpeech,
+              "audio-capture": copy().noMicrophone,
+              network: copy().speechNetwork,
+            }[e.error] || copy().micError + e.error;
         };
         rec.onresult = (e) => {
           let t = "";
@@ -870,9 +1309,13 @@
         };
       } else {
         mic.disabled = true;
-        statusEl.textContent =
-          "Voice input needs Chrome or Edge. You can still type.";
+        statusEl.textContent = copy().browserVoice;
       }
+
+      languageSelect.addEventListener("change", () => {
+        language = languageSelect.value;
+        applyLanguage();
+      });
 
       mic.addEventListener("click", () => {
         if (!rec) return;
@@ -880,14 +1323,12 @@
         try {
           listening ? rec.stop() : rec.start();
         } catch (err) {
-          statusEl.textContent = "Could not start the microphone.";
+          statusEl.textContent = copy().micStartError;
         }
       });
 
-      addBot({
-        intro:
-          "Hello, I am your first aid assistant. Press the mic or type what happened, for example “my friend has a burn on his hand”.",
-      });
+      applyLanguage();
+      addBot({ intro: copy().welcome, welcome: true });
     </script>
   </body>
 </html>
