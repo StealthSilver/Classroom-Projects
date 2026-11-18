@@ -6,7 +6,7 @@ Step 1: Make the knowledge base
 
 Theory: A chatbot can only answer what it has stored. This stored data is called the knowledge base.
 Do: Write a list of questions, each with an answer and some synonym words (tags).
-Example: "What is a stack?" → "A stack follows Last In First Out..."
+Each entry includes a question, answer, subject, and synonym tags. The tutor currently includes programming fundamentals, DSA, Java, Python, JavaScript, C/C++, web development, databases, computer science, mathematics, physics, biology, chemistry, and AI/data science.
 
 Step 2: Clean the text (preprocessing)
 
@@ -45,9 +45,9 @@ Do: Use the browser’s built-in speech recognition for the mic and speech synth
 
 What changes in each project
 AI Tutor First Aid Assistant School Helpdesk
-Step 1: Knowledge base DSA and Java questions First aid situations with steps Fees, timings, admission, holidays
+Step 1: Knowledge base Multiple subjects and programming languages First aid situations with steps Fees, timings, admission, holidays
 Step 5: Special case Greetings and fallback Emergency banner for words like “not breathing” Related question suggestions
 Output Short answer Numbered steps and a warning Bullet points and a note
 One-line summary for students
 
-Clean the text, convert it to numbers, find the closest stored question, and speak the answer.
+Choose a subject, clean the text, find the closest stored question, and read or hear the answer.

@@ -33,7 +33,7 @@
           sans-serif;
       }
       main {
-        max-width: 720px;
+        max-width: 820px;
         margin: 0 auto;
         min-height: 100%;
         display: flex;
@@ -107,6 +107,32 @@
         flex-wrap: wrap;
         gap: 8px;
         margin: 0 0 12px;
+      }
+      .browse {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin: 0 0 12px;
+        color: var(--dim);
+        font-size: 14px;
+      }
+      #subjectFilter {
+        max-width: 100%;
+        background: var(--board2);
+        color: var(--chalk);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 8px 10px;
+        font: inherit;
+      }
+      #surprise {
+        background: none;
+        color: var(--yellow);
+        border: 1px solid var(--yellow);
+        border-radius: 8px;
+        padding: 7px 10px;
+        cursor: pointer;
       }
       .chips button {
         background: none;
@@ -201,10 +227,20 @@
   <body>
     <main>
       <h1>AI Tutor</h1>
-      <p class="sub">Ask a DSA or Java question by voice or by typing.</p>
+      <p class="sub">
+        Explore school subjects, computer science, and programming languages.
+        Ask by voice or by typing.
+      </p>
 
       <div id="chat" aria-live="polite"></div>
 
+      <div class="browse">
+        <label for="subjectFilter">Browse a subject:</label>
+        <select id="subjectFilter" aria-label="Filter tutor topics by subject">
+          <option value="">All subjects</option>
+        </select>
+        <button type="button" id="surprise">Surprise me</button>
+      </div>
       <div class="chips" id="chips"></div>
 
       <form id="form" autocomplete="off">
@@ -245,87 +281,380 @@
         {
           q: "What is a stack?",
           a: "A stack is a linear data structure that follows Last In First Out. The last element added is the first one removed. Main operations are push, pop and peek.",
+          subject: "Data Structures & Algorithms",
           tags: "lifo push pop peek",
         },
         {
           q: "What is a queue?",
           a: "A queue is a linear data structure that follows First In First Out. Elements are added at the rear and removed from the front. Main operations are enqueue and dequeue.",
+          subject: "Data Structures & Algorithms",
           tags: "fifo enqueue dequeue front rear",
         },
         {
           q: "What is an array?",
           a: "An array stores elements of the same type in continuous memory. You can access any element by its index in constant time, but the size is fixed once created.",
+          subject: "Data Structures & Algorithms",
           tags: "index contiguous memory fixed size",
         },
         {
           q: "What is a linked list?",
           a: "A linked list is a chain of nodes. Each node holds data and a reference to the next node. It is easy to insert and delete, but you cannot jump directly to an index.",
+          subject: "Data Structures & Algorithms",
           tags: "node pointer next singly doubly",
         },
         {
           q: "What is the difference between ArrayList and LinkedList?",
           a: "ArrayList uses a dynamic array and gives fast random access. LinkedList uses nodes and gives fast insertion and deletion. Use ArrayList for reading, LinkedList for frequent inserts and deletes.",
+          subject: "Java",
           tags: "java collection compare vs",
         },
         {
           q: "What is binary search?",
           a: "Binary search finds an element in a sorted array by repeatedly halving the search range. Its time complexity is O of log n.",
+          subject: "Data Structures & Algorithms",
           tags: "sorted divide halve mid search find",
         },
         {
           q: "What is recursion?",
           a: "Recursion is when a function calls itself to solve a smaller version of the same problem. Every recursive function needs a base case to stop.",
+          subject: "Programming Fundamentals",
           tags: "function calls itself base case",
         },
         {
           q: "What is time complexity?",
           a: "Time complexity describes how the running time of an algorithm grows as the input size grows. We write it using Big O notation, like O of n or O of n squared.",
+          subject: "Data Structures & Algorithms",
           tags: "big o notation performance efficiency",
         },
         {
           q: "What is a HashMap?",
           a: "A HashMap stores key and value pairs. It uses a hash function to find the bucket for a key, so get and put are O of 1 on average.",
+          subject: "Java",
           tags: "hash key value map dictionary bucket java",
         },
         {
           q: "What are sorting algorithms?",
           a: "Sorting algorithms arrange data in order. Bubble sort and insertion sort are simple but slow, O of n squared. Merge sort and quick sort are faster, around O of n log n.",
+          subject: "Data Structures & Algorithms",
           tags: "sort sorting bubble merge quick insertion order arrange",
         },
         {
           q: "What is a binary tree?",
           a: "A binary tree is a hierarchical structure where each node has at most two children, called left and right. A binary search tree keeps smaller values on the left and bigger values on the right.",
+          subject: "Data Structures & Algorithms",
           tags: "node left right root leaf bst hierarchy",
         },
         {
           q: "What is a graph?",
           a: "A graph is a set of vertices connected by edges. It can model networks like roads or friendships. Common traversals are BFS, which uses a queue, and DFS, which uses a stack or recursion.",
+          subject: "Data Structures & Algorithms",
           tags: "vertex vertices edge bfs dfs traversal network",
         },
         {
           q: "What is dynamic programming?",
           a: "Dynamic programming solves a big problem by breaking it into overlapping smaller problems and storing their results, so each one is solved only once. Fibonacci with memoization is a classic example.",
+          subject: "Data Structures & Algorithms",
           tags: "dp memoization overlapping subproblem optimize",
         },
         {
           q: "What is object oriented programming?",
           a: "Object oriented programming organizes code into objects. Its four pillars are encapsulation, inheritance, polymorphism and abstraction.",
+          subject: "Programming Fundamentals",
           tags: "oop class object encapsulation inheritance polymorphism abstraction java",
         },
         {
           q: "What is inheritance in Java?",
           a: "Inheritance lets a child class reuse the fields and methods of a parent class using the extends keyword. It helps you avoid repeating code.",
+          subject: "Java",
           tags: "extends parent child subclass superclass oop java",
         },
         {
           q: "What is the difference between an interface and an abstract class?",
           a: "An interface defines a contract that classes implement, and a class can implement many interfaces. An abstract class can hold shared code and state, but a class can extend only one.",
+          subject: "Java",
           tags: "implements extends abstract java compare vs",
         },
         {
           q: "What is the difference between JDK, JRE and JVM?",
           a: "The JVM runs Java bytecode. The JRE is the JVM plus the standard libraries. The JDK is the JRE plus development tools like the compiler.",
+          subject: "Java",
           tags: "java virtual machine runtime environment development kit compiler bytecode compare vs",
+        },
+        {
+          q: "What is a variable?",
+          a: "A variable is a named place to store a value that a program can use. For example, age could store the number 15. Some languages require you to declare a variable's type.",
+          subject: "Programming Fundamentals",
+          tags: "data type name store value assignment",
+        },
+        {
+          q: "What is a loop?",
+          a: "A loop repeats a block of instructions. A for loop is useful when you know how many repetitions you need, while a while loop repeats as long as a condition stays true.",
+          subject: "Programming Fundamentals",
+          tags: "for while iteration repeat condition",
+        },
+        {
+          q: "What is a function?",
+          a: "A function is a reusable block of code that performs a task. It can accept inputs called parameters and return a result, which helps keep programs organized.",
+          subject: "Programming Fundamentals",
+          tags: "method parameter argument return reusable",
+        },
+        {
+          q: "What is a compiler?",
+          a: "A compiler translates source code into another form, often machine code or bytecode, before a program runs. It can report syntax and type errors during translation.",
+          subject: "Programming Fundamentals",
+          tags: "interpreter compile translate source code machine bytecode",
+        },
+        {
+          q: "What is an algorithm?",
+          a: "An algorithm is a finite set of clear steps for solving a problem. A good algorithm is correct and uses time and memory efficiently.",
+          subject: "Data Structures & Algorithms",
+          tags: "steps solve problem instructions efficiency",
+        },
+        {
+          q: "What is a Python list?",
+          a: "A Python list is an ordered, changeable collection. Create one with square brackets, such as numbers = [2, 4, 6], then access an item with its zero-based index.",
+          subject: "Python",
+          tags: "array collection append index mutable sequence",
+        },
+        {
+          q: "What is a Python dictionary?",
+          a: "A Python dictionary stores values under unique keys, for example {'name': 'Asha'}. Use a key to look up, add, or update its value.",
+          subject: "Python",
+          tags: "dict mapping key value lookup hash",
+        },
+        {
+          q: "What is a Python tuple?",
+          a: "A tuple is an ordered collection that cannot be changed after it is created. Tuples are written with parentheses, for example (3, 5), and can hold mixed types.",
+          subject: "Python",
+          tags: "immutable sequence parentheses collection",
+        },
+        {
+          q: "What is a Python list comprehension?",
+          a: "A list comprehension is a compact way to build a list from an iterable. For example, [n * n for n in numbers] creates a list of the squares of the numbers.",
+          subject: "Python",
+          tags: "comprehension iterable filter expression",
+        },
+        {
+          q: "What is the difference between a Python list and a tuple?",
+          a: "Both are ordered collections, but lists can be changed and use square brackets, while tuples are immutable and use parentheses. Choose a tuple for fixed data.",
+          subject: "Python",
+          tags: "compare mutable immutable brackets parentheses",
+        },
+        {
+          q: "What is exception handling in Python?",
+          a: "Exception handling lets a program respond to runtime errors. Use try for code that may fail, except to handle a specific error, and finally for cleanup that must run.",
+          subject: "Python",
+          tags: "try except finally error runtime raise",
+        },
+        {
+          q: "What is a JavaScript promise?",
+          a: "A Promise represents the eventual success or failure of an asynchronous operation. Handle its result with then and catch, or use await inside an async function.",
+          subject: "JavaScript",
+          tags: "async await then catch resolve reject",
+        },
+        {
+          q: "What is the DOM?",
+          a: "The Document Object Model is the browser's tree representation of an HTML page. JavaScript can use it to find elements, change content and respond to events.",
+          subject: "Web Development",
+          tags: "document object model browser html elements tree",
+        },
+        {
+          q: "What is the difference between let, const and var in JavaScript?",
+          a: "Use const for a binding you will not reassign and let when reassignment is needed. Both are block-scoped. var is function-scoped and is generally avoided in modern JavaScript.",
+          subject: "JavaScript",
+          tags: "variable declaration scope reassignment block",
+        },
+        {
+          q: "What is an arrow function in JavaScript?",
+          a: "An arrow function is a shorter way to write a function, such as const double = n => n * 2. It also uses the surrounding value of this instead of creating its own.",
+          subject: "JavaScript",
+          tags: "lambda function syntax this callback",
+        },
+        {
+          q: "What is JavaScript event bubbling?",
+          a: "Event bubbling is when an event starts on the target element and then travels up through its ancestors. It enables event delegation; stopPropagation can stop that travel.",
+          subject: "JavaScript",
+          tags: "event listener propagation click delegation target",
+        },
+        {
+          q: "What is HTML?",
+          a: "HTML, or HyperText Markup Language, structures content on a web page using elements such as headings, paragraphs, links and forms. CSS handles presentation and JavaScript adds behavior.",
+          subject: "Web Development",
+          tags: "markup tags webpage structure browser",
+        },
+        {
+          q: "What is CSS?",
+          a: "CSS, or Cascading Style Sheets, controls how web content looks and is laid out. Selectors target HTML elements, and properties set details such as color, spacing and font.",
+          subject: "Web Development",
+          tags: "style stylesheet selector layout responsive",
+        },
+        {
+          q: "What is an API?",
+          a: "An API is a defined way for software components to communicate. A web API commonly accepts an HTTP request and returns data, often in JSON format.",
+          subject: "Web Development",
+          tags: "application programming interface endpoint http json request response",
+        },
+        {
+          q: "What is responsive web design?",
+          a: "Responsive web design makes a page adapt to different screen sizes. Flexible layouts, relative units and CSS media queries help a site work on phones, tablets and desktops.",
+          subject: "Web Development",
+          tags: "mobile media query viewport flexible adaptive",
+        },
+        {
+          q: "What is SQL?",
+          a: "SQL, or Structured Query Language, is used to define, read and change data in relational databases. SELECT reads rows, while INSERT, UPDATE and DELETE modify data.",
+          subject: "Databases",
+          tags: "database query relational table select",
+        },
+        {
+          q: "What is a primary key?",
+          a: "A primary key is a column or set of columns that uniquely identifies each row in a database table. It must be unique and should not be null.",
+          subject: "Databases",
+          tags: "relational database unique row identifier",
+        },
+        {
+          q: "What is the difference between C and C++?",
+          a: "C is a procedural language focused on functions and direct system-level control. C++ supports procedural programming too, and adds features such as classes, templates and stronger abstractions.",
+          subject: "C and C++",
+          tags: "compare procedural object oriented classes templates",
+        },
+        {
+          q: "What is a pointer in C?",
+          a: "A pointer is a variable that stores the memory address of another value. In C, * accesses the value at an address and & obtains a variable's address.",
+          subject: "C and C++",
+          tags: "memory address dereference reference",
+        },
+        {
+          q: "What is a reference in C++?",
+          a: "A C++ reference is another name for an existing object. It must be initialized when declared and is commonly used to pass values to functions without copying them.",
+          subject: "C and C++",
+          tags: "alias parameter pass by reference object",
+        },
+        {
+          q: "What is a class in programming?",
+          a: "A class is a blueprint that groups data and the operations on that data. Objects are individual instances created from a class.",
+          subject: "Programming Fundamentals",
+          tags: "object instance fields methods blueprint",
+        },
+        {
+          q: "What is a prime number?",
+          a: "A prime number is a whole number greater than 1 with exactly two positive divisors: 1 and itself. For example, 2, 3 and 5 are prime; 1 is not.",
+          subject: "Mathematics",
+          tags: "factors divisibility composite integers",
+        },
+        {
+          q: "What is the Pythagorean theorem?",
+          a: "For a right triangle, the Pythagorean theorem says a squared plus b squared equals c squared, where a and b are the shorter sides and c is the hypotenuse.",
+          subject: "Mathematics",
+          tags: "triangle geometry hypotenuse right angle a2 b2 c2",
+        },
+        {
+          q: "How do you calculate the area of a circle?",
+          a: "The area of a circle is pi times the radius squared: A = pi r squared. The radius is the distance from the center to the edge.",
+          subject: "Mathematics",
+          tags: "geometry circumference radius formula",
+        },
+        {
+          q: "What is a fraction?",
+          a: "A fraction represents part of a whole. Its numerator is the number of parts you have, and its denominator is the number of equal parts in the whole.",
+          subject: "Mathematics",
+          tags: "numerator denominator ratio division",
+        },
+        {
+          q: "What is the mean median and mode?",
+          a: "The mean is the sum divided by the count. The median is the middle value after sorting. The mode is the value that occurs most often.",
+          subject: "Mathematics",
+          tags: "average statistics central tendency data",
+        },
+        {
+          q: "What is a variable in algebra?",
+          a: "An algebraic variable is a letter or symbol that stands for a number. In 2x + 3 = 11, x is the variable, and solving gives x = 4.",
+          subject: "Mathematics",
+          tags: "equation unknown solve expression",
+        },
+        {
+          q: "What is Newton's second law?",
+          a: "Newton's second law relates force, mass and acceleration: net force equals mass times acceleration, or F = ma. For a fixed mass, greater net force causes greater acceleration.",
+          subject: "Physics",
+          tags: "motion force mass acceleration mechanics",
+        },
+        {
+          q: "What is the difference between speed and velocity?",
+          a: "Speed is how fast an object moves. Velocity is speed in a specified direction, so velocity includes both magnitude and direction.",
+          subject: "Physics",
+          tags: "distance displacement direction scalar vector",
+        },
+        {
+          q: "What is photosynthesis?",
+          a: "Photosynthesis is how plants use light energy, water and carbon dioxide to make glucose and release oxygen. It mainly takes place in chloroplasts.",
+          subject: "Biology",
+          tags: "plant sunlight chlorophyll glucose carbon dioxide",
+        },
+        {
+          q: "What is an atom?",
+          a: "An atom is the smallest unit of an element that retains that element's chemical properties. It has a nucleus containing protons and neutrons, with electrons around it.",
+          subject: "Chemistry",
+          tags: "matter proton neutron electron nucleus element",
+        },
+        {
+          q: "What is the periodic table?",
+          a: "The periodic table organizes chemical elements by increasing atomic number. Elements in the same column often have similar chemical properties.",
+          subject: "Chemistry",
+          tags: "elements atomic number groups periods",
+        },
+        {
+          q: "What is the difference between an acid and a base?",
+          a: "In the Brønsted–Lowry model, an acid donates protons and a base accepts protons. In water, acids have pH below 7 and bases usually have pH above 7.",
+          subject: "Chemistry",
+          tags: "ph proton donate accept alkaline",
+        },
+        {
+          q: "What is a cell in biology?",
+          a: "A cell is the basic structural and functional unit of living things. Cells are surrounded by a membrane and contain structures that carry out life processes.",
+          subject: "Biology",
+          tags: "organism membrane organelle living",
+        },
+        {
+          q: "What is DNA?",
+          a: "DNA is a molecule that stores genetic instructions. Its sequence of chemical bases carries information used by cells to build and regulate organisms.",
+          subject: "Biology",
+          tags: "gene genetics heredity chromosome nucleotide",
+        },
+        {
+          q: "What is an ecosystem?",
+          a: "An ecosystem includes living organisms and the nonliving parts of their environment, interacting in an area. Energy flows through food webs while matter is recycled.",
+          subject: "Biology",
+          tags: "habitat organism environment food chain ecology",
+        },
+        {
+          q: "What is machine learning?",
+          a: "Machine learning is a branch of artificial intelligence in which a model learns patterns from data to make predictions or decisions, rather than following only hand-written rules.",
+          subject: "AI & Data Science",
+          tags: "artificial intelligence model training prediction data",
+        },
+        {
+          q: "What is supervised learning?",
+          a: "Supervised learning trains a model using examples that include the correct answers, called labels. It is commonly used for classification and numeric prediction.",
+          subject: "AI & Data Science",
+          tags: "labeled data classification regression training",
+        },
+        {
+          q: "What is a neural network?",
+          a: "A neural network is a machine-learning model made of connected layers of simple computations. During training, it adjusts weights to learn patterns from examples.",
+          subject: "AI & Data Science",
+          tags: "deep learning neurons layers weights model",
+        },
+        {
+          q: "What is data visualization?",
+          a: "Data visualization presents information with visual forms such as charts and maps. A suitable visualization can reveal comparisons, trends and unusual values.",
+          subject: "AI & Data Science",
+          tags: "graphs charts dashboard communicate insight",
+        },
+        {
+          q: "What is a computer network?",
+          a: "A computer network is a group of connected devices that exchange data. Networks use agreed protocols, such as TCP/IP, to address devices and deliver information.",
+          subject: "Computer Science",
+          tags: "internet protocol devices communication tcp ip",
         },
       ];
 
@@ -365,7 +694,9 @@
       /* ============================================================
    3. TF-IDF + COSINE SIMILARITY
    ============================================================ */
-      const docs = KB.map((k) => preprocess(k.q + " " + k.tags));
+      const docs = KB.map((k) =>
+        preprocess(k.q + " " + k.tags + " " + k.subject),
+      );
       const N = docs.length;
       const df = new Map();
       docs.forEach((d) =>
@@ -405,6 +736,8 @@
         let best = -1,
           bestScore = 0;
         docVecs.forEach((dv, i) => {
+          if (subjectFilter.value && KB[i].subject !== subjectFilter.value)
+            return;
           const s = cosine(qv, dv);
           if (s > bestScore) {
             bestScore = s;
@@ -477,11 +810,34 @@
           (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c],
         );
 
+      const subjectFilter = document.getElementById("subjectFilter");
+      const subjects = [...new Set(KB.map((item) => item.subject))].sort();
+      subjects.forEach((subject) => {
+        const option = document.createElement("option");
+        option.value = subject;
+        option.textContent = subject;
+        subjectFilter.appendChild(option);
+      });
+
       function randomQuestions(n) {
-        return [...KB]
+        const available = KB.filter(
+          (item) => !subjectFilter.value || item.subject === subjectFilter.value,
+        );
+        return [...available]
           .sort(() => Math.random() - 0.5)
-          .slice(0, n)
+          .slice(0, Math.min(n, available.length))
           .map((k) => k.q);
+      }
+
+      function showQuestionChips() {
+        chips.replaceChildren();
+        randomQuestions(4).forEach((q) => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.textContent = q;
+          button.onclick = () => handle(q);
+          chips.appendChild(button);
+        });
       }
 
       function reply(userText) {
@@ -498,7 +854,7 @@
           answer = "You are welcome! Ask me anything else.";
         } else if (intent === "help") {
           answer =
-            "I can answer DSA and Java questions. Try: " +
+            "I can help with programming, DSA, Java, Python, JavaScript, C/C++, web development, databases, math, physics, biology, chemistry, AI and computer science. Try: " +
             randomQuestions(3).join("  |  ");
         } else {
           const r = findBest(userText);
@@ -507,14 +863,16 @@
             "<b>Cleaned words:</b> " +
             (r.tokens.length ? esc(r.tokens.join(", ")) : "none") +
             "<br><b>Best match:</b> " +
-            (r.best >= 0 ? esc(KB[r.best].q) : "none") +
+            (            r.best >= 0
+              ? esc(KB[r.best].q) + " (" + esc(KB[r.best].subject) + ")"
+              : "none") +
             '<br><b>Similarity:</b><span class="bar"><i style="width:' +
             pct +
             '%"></i></span>' +
             r.score.toFixed(2);
           if (r.score < THRESHOLD) {
             answer =
-              "Sorry, I do not know that yet. Try asking about stacks, queues, sorting, recursion or Java basics.";
+              "Sorry, I do not know that yet. Choose a subject above to browse sample questions, or ask about programming, math, science, databases, or AI.";
           } else {
             answer = KB[r.best].a;
           }
@@ -536,15 +894,15 @@
         input.value = "";
       });
 
-      /* example question chips */
       const chips = document.getElementById("chips");
-      randomQuestions(4).forEach((q) => {
-        const b = document.createElement("button");
-        b.type = "button";
-        b.textContent = q;
-        b.onclick = () => handle(q);
-        chips.appendChild(b);
+      subjectFilter.addEventListener("change", () => {
+        showQuestionChips();
       });
+      document.getElementById("surprise").addEventListener("click", () => {
+        const questions = randomQuestions(1);
+        if (questions.length) handle(questions[0]);
+      });
+      showQuestionChips();
 
       /* ============================================================
    7. SPEECH-TO-TEXT (Web Speech API: Chrome / Edge)
@@ -614,7 +972,7 @@
       /* first message (browsers only allow speech after a click, so this one is text only) */
       addMessage(
         "bot",
-        "Hello, I am your AI tutor. Press the mic and ask a DSA or Java question, or type it below.",
+        "Hello, I am your AI tutor. Choose a subject to browse, try a sample question, or ask about programming, math, science and more.",
       );
     </script>
   </body>
